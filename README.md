@@ -6,6 +6,7 @@ schneidereits 1637673@ed.ac.uk
 
 - [etiquette](/etiquette) this folder cointains the extended guidlines and code of conduct for this repo
 - [other](/other) this folder cointains various miscilanous information and resources accumilated during the duration of the course 
+- [figures](/figures) folder containing figures
 
 ### feedback
 Feel free to give feedback by creating pull requests, commenting in the feedback issue, or sending an email to 1637673@ed.ac.uk.
