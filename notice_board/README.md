@@ -10,7 +10,7 @@ The place to keep track whats what, where we've been, and whats coming next
   4) Creat list of reqired datasets: IN PROGRESS
   5) Help Gergana clean up and merge datasets of spectral images & plots
   6) Work on GIS skills in R. 
-  7) 
+  7) [Pre-register](https://cos.io/our-products/osf/) paper when ready 
   
   
   
