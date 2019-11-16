@@ -20,6 +20,7 @@ The place to keep track whats what, where we've been, and whats coming next
 | ----------------------- |:---------------------------:| -----------------------:|
 |      Arctic DEM         |          Interwebs          |       Need to find      |
 |      Veg Types          |       Sam's disseration     |       Need to find      |
-|      Pin drop data      |         Isla/Gergana        |         can wait        |
+|      Pointframing       |         Isla/Gergana        |         can wait        |
+|larger-scale Pointframing (drone)   |         Isla/Gergana        |         can wait        |
 |    Bare ground cover    |     Drone spectral data?    |         can wait        |
 |    Plane hyperspectral  |            NASA?            |      can/have to wait   |
