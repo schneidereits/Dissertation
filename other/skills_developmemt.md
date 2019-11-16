@@ -2,7 +2,7 @@
 
 ## Performing GIS analysis in R
 - [Textbook](https://bookdown.org/robinlovelace/geocompr/intro.html)
-### Helpfull packages
+###### Helpfull packages
 
 - the packages **Rcpp** and **reticulate** enable access to C++ and Python code, for example. This means R can be used as a      ‘bridge’ to a wide range of geospatial programs (see Section 1.3).
 
