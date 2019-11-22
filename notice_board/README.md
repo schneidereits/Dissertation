@@ -24,3 +24,4 @@ The place to keep track whats what, where we've been, and whats coming next
 |larger-scale Pointframing (drone)   |         Isla/Gergana        |         can wait        |
 |    Bare ground cover    |     Drone spectral data?    |         can wait        |
 |    Plane hyperspectral  |            NASA?            |      can/have to wait   |
+|    actic species spectral data  |            interwebs            |      need to find   |
