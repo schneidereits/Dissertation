@@ -17,3 +17,5 @@
 
 - [Tutorial](https://www.datacamp.com/community/tutorials/pca-analysis-r)
 - 
+
+### [SNAP tutorials](http://step.esa.int/main/doc/tutorials/snap-tutorials/) if needed
