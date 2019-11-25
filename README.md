@@ -4,7 +4,11 @@ schneidereits 1637673@ed.ac.uk
 
 ## Table of contents
 
+- [data](/data) all the data and spreadsheets used in analysis
+- [documents](/documents) relavent documents on matters related to the dissertation 
 - [etiquette](/etiquette) this folder cointains the extended guidlines and code of conduct for this repo
+- [figures](/figures) Figures and vizualizations created during data analysis
+- [notice_board](/notice_board) The place to keep track whats what, where we've been, and whats coming next
 - [other](/other) this folder cointains various miscilanous information and resources accumilated during the duration of the course 
 - [figures](/figures) folder containing figures
 
