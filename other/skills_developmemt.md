@@ -11,7 +11,7 @@
 - point pattern analysis, including splancs (Rowlingson and Diggle 2017) and spatstat (Baddeley, Rubak, and Turner 2015).
   
 - [Nick Eubank tutorial](http://www.nickeubank.com/gis-in-r/)
-- 
+- [Spatial Data Science with R](https://rspatial.org/index.html) - used by maud in her R GIS tutorial
 
 ## Principle Component Analysis 
 
