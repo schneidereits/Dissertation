@@ -18,7 +18,7 @@ The place to keep track whats what, where we've been, and whats coming next
 
 |          Dataset        |          Location           |         Status          |
 | ----------------------- |:---------------------------:| -----------------------:|
-|      Arctic DEM         |          Interwebs          |       Need to find      |
+|      Arctic DEM         |          Interwebs          |       aquired? need to inspect      |
 |      Veg Types          |       Sam's disseration     |       Need to find      |
 |      Pointframing       |         Isla/Gergana        |         can wait        |
 |larger-scale Pointframing (drone)   |         Isla/Gergana        |         can wait        |
