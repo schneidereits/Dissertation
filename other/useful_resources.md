@@ -22,4 +22,7 @@ https://rpubs.com/DaveRosenman/ifelsealternative
 https://rawgit.com/valentinitnelav/plotbiomes/master/html/Whittaker_biomes_examples.html
 
 ### Etienne Laliberté code for SpecDiv to Biodiv
+
+contains example of PCA
+
 https://github.com/elaliberte/specdiv
