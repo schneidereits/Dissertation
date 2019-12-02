@@ -18,6 +18,8 @@ https://rpubs.com/DaveRosenman/ifelsealternative
 
 [presentation dropbox](https://www.dropbox.com/sh/mp8mdmvayne6wjv/AABiRQkVeR8lGeSRBt0cp7NZa?dl=0)
 
-### [Whittaker biomes package](https://rawgit.com/valentinitnelav/plotbiomes/master/html/Whittaker_biomes_examples.html)
+### Whittaker biomes package
+https://rawgit.com/valentinitnelav/plotbiomes/master/html/Whittaker_biomes_examples.html
 
-### 
+### Etienne Laliberté code for SpecDiv to Biodiv
+https://github.com/elaliberte/specdiv
