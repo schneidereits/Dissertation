@@ -5,7 +5,7 @@ The place to keep track whats what, where we've been, and whats coming next
 ## To-do 
   
   1) ~~Create this Repo~~
-  2) Read literature and come up with some justified directional hypothisis: taken note of will amend
+  2) ~~Read literature and come up with some justified directional hypothisis
   3) Hone dissertation pitch and distribute: IN PROGRESS
   4) Creat list of reqired datasets: IN PROGRESS
   5) Help Gergana clean up and merge datasets of spectral images & plots
