@@ -26,3 +26,7 @@ https://rawgit.com/valentinitnelav/plotbiomes/master/html/Whittaker_biomes_examp
 contains example of PCA
 
 https://github.com/elaliberte/specdiv
+
+### biodivMapR:  An r package for α‐ and β‐diversity mapping using remotely sensed images
+
+[biodivMapR](https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.13310)
