@@ -21,6 +21,13 @@ https://rpubs.com/DaveRosenman/ifelsealternative
 ### Whittaker biomes package
 https://rawgit.com/valentinitnelav/plotbiomes/master/html/Whittaker_biomes_examples.html
 
+### PCA for spectral data
+
+https://learnche.org/pid/latent-variable-modelling/principal-component-analysis/pca-example-analysis-of-spectral-data
+
+***PCA chapter***
+https://learnche.org/pid/latent-variable-modelling/principal-component-analysis/index
+
 ### Etienne Laliberté code for SpecDiv to Biodiv
 
 contains example of PCA
