@@ -2,6 +2,8 @@
 # shawn schneidereit edit
 # 5.3.2020
 
+library(tidyverse)
+
 # time sorting ----
 list_of_files <- list.files(path = "~/Documents/university work/Dissertation/local/QHI_fieldspec/sort/exctracted_Fieldspec/", recursive = TRUE,
                             pattern = "\\.asc$", 
@@ -12,24 +14,26 @@ QHI <- list_of_files %>%
   mutate(FileName = str_remove_all(FileName, "/Users/shawn/Documents/university work/Dissertation/local/QHI_fieldspec/sort/exctracted_Fieldspec"),
          V3 = str_remove_all(V3, ",16.02.2018"),
          V3 = str_remove_all(V3, ",28.08.2016"),
-         V3 = str_remove_all(V3, ",27.08.2016")) %>%
+         V3 = str_remove_all(V3, ",27.08.2016"),
+         time = V4,
+         time = as.factor(time)) %>%
   # filter only measurment times 
            filter( V1 == "time=") #%>%  V4 = as.factor(V4))
 
 unique(QHI$V4)
 
-QHI <- QHI %>% mutate( V4 = case_when(V4 == "00:01:38")~ "24:01:38")
+QHI <- QHI %>% mutate(time = case_when(time == "00:01:38") ~  (time=="24:01:38"))
 
 #QHI <- QHI %>% mutate( V4 = case_when(grepl("00:0", V4))   ~ 
 #                                              mutate(V4 = V4 + 24))
 
 #QHI <- QHI %>% mutate( V4 = V4[365:366] + 24)
 
-ggplot(QHI, aes(x=V4, fill=V4)) +
+ggplot(QHI, aes(x=time, fill=V4)) +
   geom_bar(position = "dodge") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-ggplot(QHI, aes(x=V4, y=V3, color=V4)) +
+ggplot(QHI, aes(x=time, y=V3, color=V4)) +
   geom_point(position = "dodge") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
@@ -46,7 +50,7 @@ ggplot(sp163, aes(x = wavelength, y = reflectence)) +
 
 library(tidyverse)
 
-# theme for graphs
+# functions ----
 theme_spectra <- function(){
   theme_bw() +
     theme(axis.text = element_text(size = 14), 
@@ -236,6 +240,7 @@ test <- list_of_files %>%
   
   spec_plot(test_2)
   spec_fct_plot(test_2)
+  ref_fct_plot(test_2)
   
   #ggsave(p_test_2, path = "figures", filename = "QHI_142-175.png", height = 8, width = 10)
   
