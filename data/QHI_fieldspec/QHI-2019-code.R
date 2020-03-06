@@ -2,7 +2,40 @@
 # shawn schneidereit edit
 # 5.3.2020
 
-# Isla's code for one file
+# time sorting ----
+list_of_files <- list.files(path = "~/Documents/university work/Dissertation/local/QHI_fieldspec/sort/exctracted_Fieldspec/", recursive = TRUE,
+                            pattern = "\\.asc$", 
+                            full.names = TRUE)
+QHI <- list_of_files %>%
+  set_names(.) %>%
+  map_df(read.csv2, header = FALSE, sep = "", .id = "FileName") %>%
+  mutate(FileName = str_remove_all(FileName, "/Users/shawn/Documents/university work/Dissertation/local/QHI_fieldspec/sort/exctracted_Fieldspec"),
+         V3 = str_remove_all(V3, ",16.02.2018"),
+         V3 = str_remove_all(V3, ",28.08.2016"),
+         V3 = str_remove_all(V3, ",27.08.2016")) %>%
+  # filter only measurment times 
+           filter( V1 == "time=") #%>%  V4 = as.factor(V4))
+
+unique(QHI$V4)
+
+QHI <- QHI %>% mutate( V4 = case_when(V4 == "00:01:38")~ "24:01:38")
+
+#QHI <- QHI %>% mutate( V4 = case_when(grepl("00:0", V4))   ~ 
+#                                              mutate(V4 = V4 + 24))
+
+#QHI <- QHI %>% mutate( V4 = V4[365:366] + 24)
+
+ggplot(QHI, aes(x=V4, fill=V4)) +
+  geom_bar(position = "dodge") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplot(QHI, aes(x=V4, y=V3, color=V4)) +
+  geom_point(position = "dodge") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+# Isla's code for one file ----
 sp300 <- read.csv2("/Users/shawn/Documents/university work/Dissertation/local/QHI_fieldspec/sort/exctracted_Fieldspec/gr080119_300.asc", header=FALSE, sep="")
 
 names(sp163) <- c("wavelength", "reference", "target", "reflectence")
@@ -179,37 +212,16 @@ test <- list_of_files %>%
 #ggsave(p_test,path = "figures", filename = "QHI_384-360.png", height = 6, width = 8)
 
 (p_test <- spec_fct_plot(test))
-#ggsave(p_test, path = "figures", filename = "QHI_fct384-360.png", height = 6, width = 8)
+#ggsave(p_test, path = "figures", filename = "QHI_fct384-360.png", height = 8, width = 10)
 
 (p_test <- ref_fct_plot(test))
-#ggsave(p_test, path = "figures", filename = "QHI_ref384-360.png", height = 6, width = 8)
+#ggsave(p_test, path = "figures", filename = "QHI_ref384-360.png", height = 8, width = 10)
 
 (p_test <- target_fct_plot(test))
-# ggsave(p_test, path = "figures", filename = "QHI_target384-360.png", height = 6, width = 8)
+#ggsave(p_test, path = "figures", filename = "QHI_target384-360.png", height = 8, width = 10)
 
 
-
-# 
-  # her_df_clean <- her_df[grep("[[:digit:]]", HE_LTP_6_df$wavelenght), ]
-names(test) <- c("id", "wavelength", "reference", "target", "reflectance")
-  test$wavelength2 <- parse_number(as.character(test$wavelength))/100
-  test$reflectance2 <- parse_number(as.character(test$reflectance))/100
-  
-  test_clean <- test %>% drop_na(reflectance2) %>% 
-    drop_na(wavelength2)
-  
-  (p_test <- ggplot(test_clean, aes(x = wavelength2, y = reflectance2, group = id)) + 
-      geom_line(alpha = 0.2, colour = "#ffa544") + 
-      theme_spectra() +
-      labs(x = "\nWavelength (mm)", y = "Reflectance\n")) +
-    facet_wrap(.~id)
-  
- 
-  
-  
-  
-
-  ########### test 2 142-175
+########### test 2 142-175 ------
   
   # Gergana's code for multiple files
   list_of_files <- list.files(path = "~/Documents/university work/Dissertation/local/QHI_fieldspec/sort/test_2/", recursive = TRUE,
@@ -223,27 +235,12 @@ names(test) <- c("id", "wavelength", "reference", "target", "reflectance")
     mutate(FileName = str_remove_all(FileName, "/Users/shawn/Documents/university work/Dissertation/local/QHI_fieldspec/sort"))
   
   spec_plot(test_2)
+  spec_fct_plot(test_2)
   
-  # her_df_clean <- her_df[grep("[[:digit:]]", HE_LTP_6_df$wavelenght), ]
-  names(test_2) <- c("id", "wavelength", "reference", "target", "reflectance")
-  test_2$wavelength2 <- parse_number(as.character(test_2$wavelength))/100
-  test_2$reflectance2 <- parse_number(as.character(test_2$reflectance))/100
+  #ggsave(p_test_2, path = "figures", filename = "QHI_142-175.png", height = 8, width = 10)
   
-  test_2_clean <- test_2 %>% drop_na(reflectance2) %>% 
-    drop_na(wavelength2)
+########## test 3 246-275 ----
   
-  (p_test_2 <- ggplot(test_2_clean, aes(x = wavelength2, y = reflectance2, group = id)) + 
-      geom_line(alpha = 0.2, colour = "#ffa544") + 
-      theme_spectra() +
-      labs(x = "\nWavelength (mm)", y = "Reflectance\n")) +
-    facet_wrap(.~id)
-  
-  #ggsave(p_test_2, path = "figures", filename = "QHI_142-175.png", 
-         height = 6, width = 8)
-  
- ############### # test3 246-275
-  
-  # Gergana's code for multiple files
   list_of_files <- list.files(path = "~/Documents/university work/Dissertation/local/QHI_fieldspec/sort/test_3/", recursive = TRUE,
                               pattern = "\\.asc$", 
                               full.names = TRUE)
@@ -253,30 +250,18 @@ names(test) <- c("id", "wavelength", "reference", "target", "reflectance")
     set_names(.) %>%
     map_df(read.csv2, header = FALSE, sep = "", .id = "FileName") %>%
     mutate(FileName = str_remove_all(FileName, "/Users/shawn/Documents/university work/Dissertation/local/QHI_fieldspec/sort"))
-  
-  
-  # her_df_clean <- her_df[grep("[[:digit:]]", HE_LTP_6_df$wavelenght), ]
-  names(test_3) <- c("id", "wavelength", "reference", "target", "reflectance")
-  test_3$wavelength2 <- parse_number(as.character(test_3$wavelength))/100
-  test_3$reflectance2 <- parse_number(as.character(test_3$reflectance))/100
-  
-  
-  test_3_clean <- test_3 %>% drop_na(reflectance2) %>% 
-    drop_na(wavelength2)
-  
-  (ggplot(test_3_clean, aes(x = wavelength2, y = reflectance2, group = id)) + 
-      geom_line(alpha = 0.2, colour = "#ffa544") + 
-      theme_spectra() +
-      labs(x = "\nWavelength (mm)", y = "Reflectance\n")) +
-    facet_wrap(.~id)
-  
-  (p_test_3 <- spec_plot(test_3))
 
-  ggsave(p_test_3, path = "figures", filename = "QHI_246-275.png", 
-  height = 6, width = 8)
+(p_test_3 <- spec_plot(test_3))
+#ggsave(p_test_3, path = "figures", filename = "QHI_246-275.png", height = 8, width = 10)
   
+(p_test_3 <- spec_fct_plot(test_3))
+#ggsave(p_test_3, path = "figures", filename = "QHI_fct246-275.png", height = 8, width = 10)
   
+(p_test_3 <- ref_fct_plot(test_3))
+#ggsave(p_test_3, path = "figures", filename = "QHI_ref246-275.png", height = 8, width = 10)
   
+(p_test_3 <- target_fct_plot(test_3))
+#ggsave(p_test_3, path = "figures", filename = "QHI_target246-275.png", height = 8, width = 10)
   
   
   
