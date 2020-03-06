@@ -40,4 +40,5 @@ rsconnect/
 
 # exclude powerpoint 
 
-
+# DS_Store files
+.DS_Store
