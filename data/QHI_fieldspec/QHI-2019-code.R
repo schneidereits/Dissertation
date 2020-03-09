@@ -147,13 +147,32 @@ target_fct_plot <- function(x){
     facet_wrap(.~id)
 }
 
-## all HE_LPT ----
 
-# Gergana's code for multiple files
-list_of_files <- list.files(path = "~/Documents/university work/Dissertation/local/QHI_fieldspec/sort/HE_LTP/", recursive = TRUE,
+## full QHI fieldspec ----
+
+list_of_files <- list.files(path = "~/Documents/university work/Dissertation/local/QHI_fieldspec/sort/exctracted_Fieldspec/", recursive = TRUE,
                             pattern = "\\.asc$", 
                             full.names = TRUE)
 
+# Read all the files and create a FileName column to store filenames
+full_QHI <- list_of_files %>%
+  set_names(.) %>%
+  map_df(read.csv2, header = FALSE, sep = "", .id = "FileName") %>%
+  mutate(FileName = str_remove_all(FileName, "/Users/shawn/Documents/university work/Dissertation/local/QHI_fieldspec/sort/exctracted_Fieldspec/"))
+
+names(full_QHI) <- c("id", "wavelength", "reference", "target", "reflectance")
+
+# her_df_clean <- her_df[grep("[[:digit:]]", HE_LTP_6_df$wavelenght), ]
+
+full_QHI$wavelength2 <- parse_number(as.character(full_QHI$wavelength))/100
+full_QHI$reflectance2 <- parse_number(as.character(full_QHI$reflectance))/100
+
+full_QHI <- full_QHI %>% drop_na(reflectance2) %>% 
+  drop_na(wavelength2) # %>% filter(reflectance2 %in% (0:100))
+
+spec_plot(full_QHI)
+
+## all HE_LPT ----
 # Read all the files and create a FileName column to store filenames
 HE_LTP_df <- list_of_files %>%
   set_names(.) %>%
