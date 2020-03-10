@@ -1,23 +1,57 @@
-# Isla's code for one file
-gr080119new_384 <- read.csv2("~/Desktop/Fieldspec/gr080119new_384.asc", header=FALSE, sep="")
+# QHI 2019 field spec 
+# shawn schneidereit edit
+# 5.3.2020
 
-View(gr080119new_384)
+library(tidyverse)
 
-names(gr080119new_384) <- c("wavelength", "reference", "target", "reflectence")
+# time sorting ----
+list_of_files <- list.files(path = "~/Documents/university work/Dissertation/local/QHI_fieldspec/sort/exctracted_Fieldspec/", recursive = TRUE,
+                            pattern = "\\.asc$", 
+                            full.names = TRUE)
+QHI_time <- list_of_files %>%
+  set_names(.) %>%
+  map_df(read.csv2, header = FALSE, sep = "", .id = "FileName") %>%
+  mutate(FileName = str_remove_all(FileName, "/Users/shawn/Documents/university work/Dissertation/local/QHI_fieldspec/sort/exctracted_Fieldspec"),
+         V3 = str_remove_all(V3, ",16.02.2018"),
+         V3 = str_remove_all(V3, ",28.08.2016"),
+         V3 = str_remove_all(V3, ",27.08.2016"),
+         V3 = str_remove_all(V3, ",25.04.2017"),
+         time = V4,
+         time = as.factor(time)) %>%
+  # filter only measurment times 
+           filter( V1 == "time=")  #%>%  V4 = as.factor(V4))
 
-ggplot(gr080119new_384, aes(x = wavelength, y = reflectence)) + 
+unique(QHI_time$V4)
+
+#QHI_time <- QHI_time %>% mutate(time = case_when(time == "00:01:38") ~  (time=="24:01:38"))
+
+#QHI <- QHI %>% mutate( V4 = case_when(grepl("00:0", V4))   ~ 
+#                                              mutate(V4 = V4 + 24))
+
+#QHI <- QHI %>% mutate( V4 = V4[365:366] + 24)
+
+ggplot(QHI_time, aes(x=time, fill=V4)) +
+  geom_bar(position = "dodge") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplot(QHI_time, aes(x=time, y=V3, color=V4)) +
+  geom_point(position = "dodge") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+# Isla's code for one file ----
+sp300 <- read.csv2("/Users/shawn/Documents/university work/Dissertation/local/QHI_fieldspec/sort/exctracted_Fieldspec/gr080119_300.asc", header=FALSE, sep="")
+
+names(sp163) <- c("wavelength", "reference", "target", "reflectence")
+
+ggplot(sp163, aes(x = wavelength, y = reflectence)) + 
   geom_point() + 
   theme_bw()
 
 
-# Gergana's code for multiple files
-list_of_files <- list.files(path = "data/2019/her", recursive = TRUE,
-                            pattern = "\\.asc$", 
-                            full.names = TRUE)
 
-library(tidyverse)
-
-# theme for graphs
+# functions ----
 theme_spectra <- function(){
   theme_bw() +
     theme(axis.text = element_text(size = 14), 
@@ -41,85 +75,255 @@ theme_spectra <- function(){
                                            size = 2, linetype = "blank"))
 }
 
+# ploting spectral signatures 
+
+spec_plot <- function(x){
+  names(x) <- c("id", "wavelength", "reference", "target", "reflectance")
+  
+  # her_df_clean <- her_df[grep("[[:digit:]]", HE_LTP_6_df$wavelenght), ]
+  
+  x$wavelength2 <- parse_number(as.character(x$wavelength))/100
+  x$reflectance2 <- parse_number(as.character(x$reflectance))/100
+  
+  x_clean <- x %>% drop_na(reflectance2) %>% 
+    drop_na(wavelength2)
+  
+  (test_graph <- ggplot(x_clean, aes(x = wavelength2, y = reflectance2, group = id)) + 
+      geom_line(alpha = 0.2, colour = "#ffa544") + 
+      theme_spectra() +
+      labs(x = "\nWavelength (mm)", y = "Reflectance\n"))
+}
+
+spec_fct_plot <- function(x){
+  names(x) <- c("id", "wavelength", "reference", "target", "reflectance")
+  
+  # her_df_clean <- her_df[grep("[[:digit:]]", HE_LTP_6_df$wavelenght), ]
+  
+  x$wavelength2 <- parse_number(as.character(x$wavelength))/100
+  x$reflectance2 <- parse_number(as.character(x$reflectance))/100
+  
+  x_clean <- x %>% drop_na(reflectance2) %>% 
+    drop_na(wavelength2)
+  
+  (test_graph <- ggplot(x_clean, aes(x = wavelength2, y = reflectance2, group = id)) + 
+      geom_line(alpha = 0.2, colour = "#ffa544") + 
+      theme_spectra() +
+      labs(x = "\nWavelength (mm)", y = "Reflectance\n")) +
+    facet_wrap(.~id)
+}
+
+ref_fct_plot <- function(x){
+  names(x) <- c("id", "wavelength", "reference", "target", "reflectance")
+  
+  # her_df_clean <- her_df[grep("[[:digit:]]", HE_LTP_6_df$wavelenght), ]
+  
+  x$wavelength2 <- parse_number(as.character(x$wavelength))/100
+  x$reference2 <- parse_number(as.character(x$reference))/100
+  
+  x_clean <- x %>% drop_na(reference2) %>% 
+    drop_na(wavelength2)
+  
+  (test_graph <- ggplot(x_clean, aes(x = wavelength2, y = reference2, group = id)) + 
+      geom_line(alpha = 0.2, colour = "#ffa544") + 
+      theme_spectra() +
+      labs(x = "\nWavelength (mm)", y = "Reference\n")) +
+    facet_wrap(.~id)
+}
+
+target_fct_plot <- function(x){
+  names(x) <- c("id", "wavelength", "reference", "target", "reflectance")
+  
+  # her_df_clean <- her_df[grep("[[:digit:]]", HE_LTP_6_df$wavelenght), ]
+  
+  x$wavelength2 <- parse_number(as.character(x$wavelength))/100
+  x$target2 <- parse_number(as.character(x$target))/100
+  
+  x_clean <- x %>% drop_na(target2) %>% 
+    drop_na(wavelength2)
+  
+  (test_graph <- ggplot(x_clean, aes(x = wavelength2, y = target2, group = id)) + 
+      geom_line(alpha = 0.2, colour = "#ffa544") + 
+      theme_spectra() +
+      labs(x = "\nWavelength (mm)", y = "target\n")) +
+    facet_wrap(.~id)
+}
+
+
+## full QHI fieldspec ----
+
+list_of_files <- list.files(path = "~/Documents/university work/Dissertation/local/QHI_fieldspec/sort/exctracted_Fieldspec/", recursive = TRUE,
+                            pattern = "\\.asc$", 
+                            full.names = TRUE)
 
 # Read all the files and create a FileName column to store filenames
-her_df <- list_of_files %>%
+full_QHI <- list_of_files %>%
   set_names(.) %>%
-  map_df(read.csv2, header = FALSE, sep = "", .id = "FileName")
+  map_df(read.csv2, header = FALSE, sep = "", .id = "FileName") %>%
+  mutate(FileName = str_remove_all(FileName, "/Users/shawn/Documents/university work/Dissertation/local/QHI_fieldspec/sort/exctracted_Fieldspec/"),
+         # to extract id from file name
+         id = stringr::str_extract(FileName, "_\\d*"),
+         id = str_remove_all(id, "_"),
+         id = gsub("(?<![0-9])0+", "", id, perl = TRUE))
 
-names(her_df) <- c("id", "wavelength", "reference", "target", "reflectance")
+# added id column
+names(full_QHI) <- c("name", "wavelength", "reference", "target", "reflectance", "id")
 
-# her_df_clean <- her_df[grep("[[:digit:]]", her_df$wavelenght), ]
+# her_df_clean <- her_df[grep("[[:digit:]]", HE_LTP_6_df$wavelenght), ]
 
-her_df$wavelength2 <- parse_number(as.character(her_df$wavelength))/100
-her_df$reflectance2 <- parse_number(as.character(her_df$reflectance))/100
+full_QHI$wavelength2 <- parse_number(as.character(full_QHI$wavelength))/100
+full_QHI$reflectance2 <- parse_number(as.character(full_QHI$reflectance))/100
 
-her_df_clean <- her_df %>% drop_na(reflectance2) %>% 
-  drop_na(wavelength2)
+full_QHI <- full_QHI %>% drop_na(reflectance2) %>% 
+  drop_na(wavelength2) # %>% filter(reflectance2 %in% (0:100))
 
-(her_all_graph <- ggplot(her_df_clean, aes(x = wavelength2, y = reflectance2, group = id)) + 
-  geom_line(alpha = 0.2, colour = "#ffa544") + 
-  theme_spectra() +
-    labs(x = "\nWavelength (mm)", y = "Reflectance\n"))
+# for subset of data
+(ggplot(subset(full_QHI ,id %in% c(355:368))) +
+    aes(x = wavelength2, y = reflectance2, group = id)) + 
+    geom_line(alpha = 0.2, colour = "#ffa544") + 
+    theme_spectra() +
+    labs(x = "\nWavelength (mm)", y = "Reflectance\n") +
+  facet_wrap(.~id)
 
-ggsave(her_all_graph, filename = "figures/her_2019clean.png", 
-       height = 6, width = 6)
+spec_plot(full_QHI)
 
-list_of_files <- list.files(path = "data/2019/kom", recursive = TRUE,
+## all HE_LPT ----
+# Read all the files and create a FileName column to store filenames
+HE_LTP_df <- list_of_files %>%
+  set_names(.) %>%
+  map_df(read.csv2, header = FALSE, sep = "", .id = "FileName") %>%
+  mutate(FileName = str_remove_all(FileName, "/Users/shawn/Documents/university work/Dissertation/local/QHI_fieldspec/sort"))
+
+
+spec_plot(HE_LTP_df)
+spec_fct_plot(HE_LTP_df)
+
+
+## baby KO+HE ----
+# Gergana's code for multiple files
+list_of_files <- list.files(path = "~/Documents/university work/Dissertation/local/QHI_fieldspec/sort/baby/", recursive = TRUE,
                             pattern = "\\.asc$", 
                             full.names = TRUE)
 
-kom_df <- list_of_files %>%
+# Read all the files and create a FileName column to store filenames
+baby_df <- list_of_files %>%
   set_names(.) %>%
-  map_df(read.csv2, header = FALSE, sep = "", .id = "FileName")
-
-names(kom_df) <- c("id", "wavelength", "reference", "target", "reflectance")
-
-kom_df$wavelength2 <- parse_number(as.character(kom_df$wavelength))/100
-kom_df$reflectance2 <- parse_number(as.character(kom_df$reflectance))/1000
-
-kom_df_clean <- kom_df %>% drop_na(reflectance2) %>% drop_na(wavelength2)
-
-kom_test <- kom_df_clean %>% filter(reflectance2 < 100 & reflectance2 > 0)
-
-(kom_all_graph <- ggplot(kom_test, aes(x = wavelength2, y = reflectance2, group = id)) + 
-    geom_line(alpha = 0.2) + 
-    theme_bw())
-
-ggsave(kom_all_graph, filename = "figures/kom_2019clean.png", 
-       height = 8, width = 8)
+  map_df(read.csv2, header = FALSE, sep = "", .id = "FileName")%>%
+  mutate(FileName = str_remove_all(FileName, "/Users/shawn/Documents/university work/Dissertation/local/QHI_fieldspec/sort"))
 
 
-list_of_files <- list.files(path = "data/2019/ko1", recursive = TRUE,
+spec_plot(baby_df)
+spec_fct_plot(baby_df)
+
+# KO_LTP_4 ----
+
+list_of_files <- list.files(path = "~/Documents/university work/Dissertation/local/QHI_fieldspec/sort/KO_LTP/", recursive = TRUE,
+                           pattern = "\\.asc$", 
+                           full.names = TRUE)
+
+# Read all the files and create a FileName column to store filenames
+KO_LTP_df <- list_of_files %>%
+  set_names(.) %>%
+  map_df(read.csv2, header = FALSE, sep = "", .id = "FileName") %>%
+  mutate(FileName = str_remove_all(FileName, "/Users/shawn/Documents/university work/Dissertation/local/QHI_fieldspec/sort"))
+
+
+spec_plot(KO_LTP_df)
+spec_fct_plot(KO_LTP_df)
+
+## test ----
+
+############ test 1 349-384 
+
+# Gergana's code for multiple files
+list_of_files <- list.files(path = "~/Documents/university work/Dissertation/local/QHI_fieldspec/sort/test/", recursive = TRUE,
                             pattern = "\\.asc$", 
                             full.names = TRUE)
 
-kom1_df <- list_of_files %>%
+# Read all the files and create a FileName column to store filenames
+test <- list_of_files %>%
   set_names(.) %>%
-  map_df(read.csv2, header = FALSE, sep = "", .id = "FileName")
+  map_df(read.csv2, header = FALSE, sep = "", .id = "FileName") %>%
+    mutate(FileName = str_remove_all(FileName, "/Users/shawn/Documents/university work/Dissertation/local/QHI_fieldspec/sort"))
 
-names(kom1_df) <- c("id", "wavelength", "reference", "target", "reflectence")
+(p_test <- spec_plot(test))
+#ggsave(p_test,path = "figures", filename = "QHI_384-360.png", height = 6, width = 8)
 
-(kom1_all_graph <- ggplot(kom1_df, aes(x = wavelength, y = reflectence, group = id)) + 
+(p_test <- spec_fct_plot(test))
+#ggsave(p_test, path = "figures", filename = "QHI_fct384-360.png", height = 8, width = 10)
+
+(p_test <- ref_fct_plot(test))
+#ggsave(p_test, path = "figures", filename = "QHI_ref384-360.png", height = 8, width = 10)
+
+(p_test <- target_fct_plot(test))
+#ggsave(p_test, path = "figures", filename = "QHI_target384-360.png", height = 8, width = 10)
+
+
+########### test 2 142-175 ------
+  
+  # Gergana's code for multiple files
+  list_of_files <- list.files(path = "~/Documents/university work/Dissertation/local/QHI_fieldspec/sort/test_2/", recursive = TRUE,
+                              pattern = "\\.asc$", 
+                              full.names = TRUE)
+  
+  # Read all the files and create a FileName column to store filenames
+  test_2 <- list_of_files %>%
+    set_names(.) %>%
+    map_df(read.csv2, header = FALSE, sep = "", .id = "FileName") %>%
+    mutate(FileName = str_remove_all(FileName, "/Users/shawn/Documents/university work/Dissertation/local/QHI_fieldspec/sort"))
+  
+  spec_plot(test_2)
+  spec_fct_plot(test_2)
+  ref_fct_plot(test_2)
+  
+  #ggsave(p_test_2, path = "figures", filename = "QHI_142-175.png", height = 8, width = 10)
+  
+########## test 3  ----
+  
+list_of_files <- list.files(path = "~/Documents/university work/Dissertation/local/QHI_fieldspec/sort/test_3/", recursive = TRUE,
+                              pattern = "\\.asc$", 
+                              full.names = TRUE)
+  
+  # Read all the files and create a FileName column to store filenames
+  test_3 <- list_of_files %>%
+    set_names(.) %>%
+    map_df(read.csv2, header = FALSE, sep = "", .id = "FileName") %>%
+    mutate(FileName = str_remove_all(FileName, "/Users/shawn/Documents/university work/Dissertation/local/QHI_fieldspec/sort/test_3/"),
+           id = stringr::str_extract(FileName, "_\\d*"),
+           id = str_remove_all(id, "_"),
+           id = gsub("(?<![0-9])0+", "", id, perl = TRUE),
+           plot = case_when(grepl("HE|KO", FileName)   ~ 
+                                   stringr::str_extract(FileName, "HE\\d*|KO\\d*"),
+           plot = as.factor(plot)),
+           group_by(id, plot))
+str(test_3)
+
+  
+  names(test_3) <- c("name", "wavelength", "reference", "target", "reflectance", "id", "plot")
+  
+  # her_df_clean <- her_df[grep("[[:digit:]]", HE_LTP_6_df$wavelenght), ]
+  
+  test_3$wavelength2 <- parse_number(as.character(test_3$wavelength))/100
+  test_3$reflectance2 <- parse_number(as.character(test_3$reflectance))/100
+  
+  test_3 <- test_3 %>% drop_na(reflectance2) %>% 
+    drop_na(wavelength2) # %>% filter(reflectance2 %in% (0:100))
+  
+ggplot(test_3, aes(x = wavelength2, y = reflectance2, group = id, color = plot)) + 
     geom_line(alpha = 0.2) + 
-    theme_bw())
+    theme_spectra() +
+    labs(x = "\nWavelength (mm)", y = "Reference\n")
 
-ggsave(kom1_all_graph, filename = "figures/kom1_2019.png", 
-       height = 8, width = 8)
-
-list_of_files <- list.files(path = "data/2019/he1", recursive = TRUE,
-                            pattern = "\\.asc$", 
-                            full.names = TRUE)
-
-her1_df <- list_of_files %>%
-  set_names(.) %>%
-  map_df(read.csv2, header = FALSE, sep = "", .id = "FileName")
-
-names(her1_df) <- c("id", "wavelength", "reference", "target", "reflectence")
-
-(her1_all_graph <- ggplot(her1_df, aes(x = wavelength, y = reflectence, group = id)) + 
-    geom_line(alpha = 0.2) + 
-    theme_bw())
-
-ggsave(her1_all_graph, filename = "figures/her1_2019.png", 
-       height = 8, width = 8)
+(p_test_3 <- spec_plot(test_3))
+#ggsave(p_test_3, path = "figures", filename = "QHI_246-275.png", height = 8, width = 10)
+  
+(p_test_3 <- spec_fct_plot(test_3))
+#ggsave(p_test_3, path = "figures", filename = "QHI_fct246-275.png", height = 8, width = 10)
+  
+(p_test_3 <- ref_fct_plot(test_3))
+#ggsave(p_test_3, path = "figures", filename = "QHI_ref246-275.png", height = 8, width = 10)
+  
+(p_test_3 <- target_fct_plot(test_3))
+#ggsave(p_test_3, path = "figures", filename = "QHI_target246-275.png", height = 8, width = 10)
+  
+  
+  

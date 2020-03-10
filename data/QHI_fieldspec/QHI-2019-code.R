@@ -8,32 +8,33 @@ library(tidyverse)
 list_of_files <- list.files(path = "~/Documents/university work/Dissertation/local/QHI_fieldspec/sort/exctracted_Fieldspec/", recursive = TRUE,
                             pattern = "\\.asc$", 
                             full.names = TRUE)
-QHI <- list_of_files %>%
+QHI_time <- list_of_files %>%
   set_names(.) %>%
   map_df(read.csv2, header = FALSE, sep = "", .id = "FileName") %>%
   mutate(FileName = str_remove_all(FileName, "/Users/shawn/Documents/university work/Dissertation/local/QHI_fieldspec/sort/exctracted_Fieldspec"),
          V3 = str_remove_all(V3, ",16.02.2018"),
          V3 = str_remove_all(V3, ",28.08.2016"),
          V3 = str_remove_all(V3, ",27.08.2016"),
+         V3 = str_remove_all(V3, ",25.04.2017"),
          time = V4,
          time = as.factor(time)) %>%
   # filter only measurment times 
-           filter( V1 == "time=") #%>%  V4 = as.factor(V4))
+           filter( V1 == "time=")  #%>%  V4 = as.factor(V4))
 
-unique(QHI$V4)
+unique(QHI_time$V4)
 
-QHI <- QHI %>% mutate(time = case_when(time == "00:01:38") ~  (time=="24:01:38"))
+#QHI_time <- QHI_time %>% mutate(time = case_when(time == "00:01:38") ~  (time=="24:01:38"))
 
 #QHI <- QHI %>% mutate( V4 = case_when(grepl("00:0", V4))   ~ 
 #                                              mutate(V4 = V4 + 24))
 
 #QHI <- QHI %>% mutate( V4 = V4[365:366] + 24)
 
-ggplot(QHI, aes(x=time, fill=V4)) +
+ggplot(QHI_time, aes(x=time, fill=V4)) +
   geom_bar(position = "dodge") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-ggplot(QHI, aes(x=time, y=V3, color=V4)) +
+ggplot(QHI_time, aes(x=time, y=V3, color=V4)) +
   geom_point(position = "dodge") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
@@ -158,9 +159,14 @@ list_of_files <- list.files(path = "~/Documents/university work/Dissertation/loc
 full_QHI <- list_of_files %>%
   set_names(.) %>%
   map_df(read.csv2, header = FALSE, sep = "", .id = "FileName") %>%
-  mutate(FileName = str_remove_all(FileName, "/Users/shawn/Documents/university work/Dissertation/local/QHI_fieldspec/sort/exctracted_Fieldspec/"))
+  mutate(FileName = str_remove_all(FileName, "/Users/shawn/Documents/university work/Dissertation/local/QHI_fieldspec/sort/exctracted_Fieldspec/"),
+         # to extract id from file name
+         id = stringr::str_extract(FileName, "_\\d*"),
+         id = str_remove_all(id, "_"),
+         id = gsub("(?<![0-9])0+", "", id, perl = TRUE))
 
-names(full_QHI) <- c("id", "wavelength", "reference", "target", "reflectance")
+# added id column
+names(full_QHI) <- c("name", "wavelength", "reference", "target", "reflectance", "id")
 
 # her_df_clean <- her_df[grep("[[:digit:]]", HE_LTP_6_df$wavelenght), ]
 
@@ -169,6 +175,14 @@ full_QHI$reflectance2 <- parse_number(as.character(full_QHI$reflectance))/100
 
 full_QHI <- full_QHI %>% drop_na(reflectance2) %>% 
   drop_na(wavelength2) # %>% filter(reflectance2 %in% (0:100))
+
+# for subset of data
+(ggplot(subset(full_QHI ,id %in% c(87:24))) +
+    aes(x = wavelength2, y = reflectance2, group = id)) + 
+    geom_line(alpha = 0.2, colour = "#ffa544") + 
+    theme_spectra() +
+    labs(x = "\nWavelength (mm)", y = "Reflectance\n") +
+  facet_wrap(.~id)
 
 spec_plot(full_QHI)
 
@@ -218,7 +232,7 @@ spec_fct_plot(KO_LTP_df)
 
 ## test ----
 
-############ 349-384 
+############ test 1 349-384 
 
 # Gergana's code for multiple files
 list_of_files <- list.files(path = "~/Documents/university work/Dissertation/local/QHI_fieldspec/sort/test/", recursive = TRUE,
@@ -263,7 +277,7 @@ test <- list_of_files %>%
   
   #ggsave(p_test_2, path = "figures", filename = "QHI_142-175.png", height = 8, width = 10)
   
-########## test 3 246-275 ----
+########## test 3  ----
   
   list_of_files <- list.files(path = "~/Documents/university work/Dissertation/local/QHI_fieldspec/sort/test_3/", recursive = TRUE,
                               pattern = "\\.asc$", 
@@ -273,7 +287,28 @@ test <- list_of_files %>%
   test_3 <- list_of_files %>%
     set_names(.) %>%
     map_df(read.csv2, header = FALSE, sep = "", .id = "FileName") %>%
-    mutate(FileName = str_remove_all(FileName, "/Users/shawn/Documents/university work/Dissertation/local/QHI_fieldspec/sort"))
+    mutate(FileName = str_remove_all(FileName, "/Users/shawn/Documents/university work/Dissertation/local/QHI_fieldspec/sort/test_3/"),
+           id = stringr::str_extract(FileName, "_\\d*"),
+           id = str_remove_all(id, "_"),
+           id = gsub("(?<![0-9])0+", "", id, perl = TRUE),
+           plot = case_when(grepl("HE|KO", FileName)   ~ 
+                                   stringr::str_extract(FileName, "HE\\d*|KO\\d*")))
+           
+  
+  names(test_3) <- c("name", "wavelength", "reference", "target", "reflectance", "id", "plot")
+  
+  # her_df_clean <- her_df[grep("[[:digit:]]", HE_LTP_6_df$wavelenght), ]
+  
+  test_3$wavelength2 <- parse_number(as.character(test_3$wavelength))/100
+  test_3$reflectance2 <- parse_number(as.character(test_3$reflectance))/100
+  
+  test_3 <- test_3 %>% drop_na(reflectance2) %>% 
+    drop_na(wavelength2) # %>% filter(reflectance2 %in% (0:100))
+  
+ggplot(test_3, aes(x = wavelength2, y = reflectance, group = id)) + 
+    geom_line(alpha = 0.2, colour = "#ffa544") + 
+    theme_spectra() +
+    labs(x = "\nWavelength (mm)", y = "Reference\n")
 
 (p_test_3 <- spec_plot(test_3))
 #ggsave(p_test_3, path = "figures", filename = "QHI_246-275.png", height = 8, width = 10)
