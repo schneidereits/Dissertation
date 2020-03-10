@@ -1,6 +1,9 @@
 ### data vizualization 
 https://www.data-to-viz.com
 
+## raincloud plots
+https://wellcomeopenresearch.org/articles/4-63
+
 ### cheat sheets
 https://www.rstudio.com/resources/cheatsheets/
 
