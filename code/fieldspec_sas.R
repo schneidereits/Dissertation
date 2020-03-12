@@ -208,7 +208,7 @@ full_QHI <- full_QHI %>% drop_na(reflectance2) %>%
   filter(between(wavelength2, 400, 985))
 
 # for subset of data
-(ggplot(subset(full_QHI ,id %in% c(144:115))) +
+(ggplot(subset(full_QHI ,id %in% c(384:320))) +
     aes(x = wavelength2, y = reflectance2, group = id, color = id)) + 
   geom_line(alpha = 0.9) + 
   scale_color_viridis_d(option = "D") +
@@ -326,7 +326,7 @@ test_3 <- list_of_files %>%
          id = str_remove_all(id, "_"),
          id = gsub("(?<![0-9])0+", "", id, perl = TRUE),
          veg_type = case_when(grepl("HE|KO", FileName)   ~ 
-                                stringr::str_extract(FileName, "HE|KO*")),
+                                stringr::str_extract(FileName, "HE|KO")),
          # might need to split to just number...
          plot = case_when(grepl("HE|KO", FileName)   ~ 
                             stringr::str_extract(FileName, "HE\\d*|KO\\d*")))
@@ -464,6 +464,184 @@ pca <- prcomp(pca, scale = TRUE)
 
 (p_pca <-autoplot(pca, loadings = TRUE, loadings.label = TRUE,
                   data = test_3, colour = 'veg_type', alpha = 0.5))
+
+(p_pca <- autoplot(pam(pca), frame = TRUE, frame.type = 'norm'))
+
+
+########## QHI spec  ----
+
+list_of_files <- list.files(path = "~/Documents/university work/Dissertation/local/QHI_fieldspec/fieldspec_sorted_sas/", recursive = TRUE,
+                            pattern = "\\.asc$", 
+                            full.names = TRUE)
+
+# Read all the files and create a FileName column to store filenames
+QHI <- list_of_files %>%
+  set_names(.) %>%
+  map_df(read.csv2, header = FALSE, sep = "", .id = "FileName") %>%
+  mutate(FileName = str_remove_all(FileName, "/Users/shawn/Documents/university work/Dissertation/local/QHI_fieldspec/fieldspec_sorted_sas"),
+         id = stringr::str_extract(FileName, "_\\d*"),
+         id = str_remove_all(id, "_"),
+         id = gsub("(?<![0-9])0+", "", id, perl = TRUE),
+         veg_type = case_when(grepl("HE|KO", FileName)   ~ 
+                                stringr::str_extract(FileName, "HE|KO")),
+         # might need to split to just number...
+         plot = case_when(grepl("HE|KO", FileName)   ~ 
+                            stringr::str_extract(FileName, "HE\\d*|KO\\d*")))
+
+str(QHI)
+names(QHI) <- c("name", "wavelength", "reference", "target", "reflectance", "id", "veg_type", "plot")
+
+QHI <- QHI %>%
+  mutate(wavelength = parse_number(as.character(wavelength))/100,
+         reflectance = parse_number(as.character(reflectance))/100,
+         reference = parse_number(as.character(reference))/100,
+         target = parse_number(as.character(target))/100,
+         veg_type = as.factor(veg_type)) %>%
+  drop_na(reflectance) %>% 
+  drop_na(wavelength) %>%
+  drop_na(reference) %>%
+  drop_na(target)  %>%
+  filter(between(wavelength, 400, 985),
+         !id %in% c(148:171, 196, 210:211, 250:259))
+
+#### QHI vis -------
+
+
+# single wavelengths VT
+(p_QHI <-  ggplot(QHI, aes(x = wavelength, y = reflectance, group = id, color = veg_type)) + 
+   geom_line(alpha = 0.3) + 
+   theme_spectra() +
+   labs(x = "\nWavelength (mm)", y = "Reflectance\n")+ 
+   theme(legend.position = "right") +
+   # scale_color_viridis_d(option = "C") +
+   guides(colour = guide_legend(override.aes = list(size=5))))
+#ggsave(p_test_3, path = "figures", filename = "spec_sig.png", height = 8, width = 10)
+
+# single wavelengths plot
+(p_QHI <-  ggplot(QHI, aes(x = wavelength, y = reflectance, group = id, color = plot)) + 
+    geom_line(alpha = 0.2) + 
+    theme_spectra() +
+    labs(x = "\nWavelength (mm)", y = "reflectance\n")+ 
+    theme(legend.position = "right") +
+    # scale_color_viridis_d(option = "C") +
+    guides(colour = guide_legend(override.aes = list(size=5))))
+#ggsave(p_test_3, path = "figures", filename = "spec_sig.png", height = 8, width = 10)
+
+
+QHI_small <- QHI %>%
+  group_by(veg_type, plot, id) %>%
+  summarise(spec_mean = mean(reflectance),
+            CV = mean(sd(reflectance)/mean(reflectance)))
+
+# for vis inspecting 
+#QHI_small <- QHI %>%
+  group_by(veg_type, plot, id) %>%
+  summarise(spec_mean = mean(reflectance),
+            CV = mean(sd(reflectance)/mean(reflectance)))%>%
+  filter(between(spec_mean, 25, 35) )
+
+# violin of mean by vegetation type
+ggplot(QHI_small, aes(x=veg_type, y=spec_mean, fill=veg_type)) + 
+  geom_violin(trim=FALSE, alpha = .5) +
+  geom_point(position = position_jitter(0.05)) +
+  geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
+  theme_cowplot()
+
+# cloud of mean by vegetation type
+(p_QHI <- ggplot(QHI_small, aes(x=veg_type, y=spec_mean, fill=veg_type)) +
+    geom_flat_violin(position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
+    geom_point(position = position_jitter(width = .05), size = .8) +
+    geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
+    theme_cowplot())
+
+(p_QHI <- ggplot() +
+    geom_flat_violin(data = QHI_small, aes(x=veg_type, y=spec_mean, fill=veg_type),
+                     position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
+    geom_point(data = QHI_small, aes(x=veg_type, y=spec_mean, colour=plot),
+               position = position_jitter(width = .05), size = 3) +
+    geom_boxplot(data = QHI_small, aes(x=veg_type, y=spec_mean, colour= veg_type),
+                  width=0.2, fill="white", alpha = 0.3) +
+    scale_color_brewer(palette = "Paired") +
+    theme_cowplot())
+
+#ggsave(p_test_3, path = "figures", filename = "cloud_specmean.png", height = 8, width = 10)
+
+
+
+# violin of cv by vegtation type
+ggplot(QHI_small, aes(x=veg_type, y=CV, fill=veg_type)) + 
+  geom_violin(trim=FALSE, alpha = .5) +
+  geom_point(position = position_jitter(0.05)) +
+  geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
+  theme_cowplot()
+
+# cloud of spec mean by VT
+(p_QHI <- ggplot() +
+    geom_flat_violin(data = QHI_small, aes(x=veg_type, y=CV, fill=veg_type),
+                     position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
+    geom_point(data = QHI_small, aes(x=veg_type, y=CV, colour=plot),
+               position = position_jitter(width = .05), size = 3) +
+    geom_boxplot(data = QHI_small, aes(x=veg_type, y=CV, colour= veg_type),
+                 width=0.2, fill="white", alpha = 0.3) +
+    scale_color_brewer(palette = "Paired") +
+    theme_cowplot())
+
+# ggsave(p_test_3, path = "figures", filename = "cloud_CV.png", height = 8, width = 10)
+
+# group by wavelength 
+
+QHI_small_wvlgth <- QHI %>%
+  group_by(veg_type, plot, wavelength) %>%
+  summarise(spec_mean = mean(reflectance),
+            CV = mean(sd(reflectance)/mean(reflectance)))
+
+QHI_check <- QHI %>%
+  group_by(veg_type, plot) %>%
+  summarise(spec_mean = mean(reflectance),
+            CV = mean(sd(reflectance)/mean(reflectance)))
+
+# GD advice: split full spec into regions (via background colors) and make seperate raincloud plot at each spec_region. (for full snazzyness add color of spec_region to backround)
+#plot spectral mean
+ggplot(QHI_small_wvlgth, aes(x = wavelength, y = spec_mean, group = plot, color = plot)) + 
+  geom_line(alpha = 0.7, size=1.) + 
+  theme_spectra() +
+  theme(legend.position = "right") +
+ 
+  labs(x = "\nWavelength (mm)", y = "mean reflectance\n")
+
+
+## SMOOTHING NOT CORRECT
+ggplot(QHI_small_wvlgth, aes(x = wavelength, y = spec_mean, group=veg_type, color = veg_type)) + 
+  geom_smooth(alpha = 0.2, se=TRUE) + 
+  theme_spectra() +
+  labs(x = "\nWavelength (mm)", y = "mean reflectance\n")
+
+# plot CV
+
+ggplot(QHI_small_wvlgth, aes(x = wavelength, y = CV, group = plot, color = plot)) + 
+  geom_line(alpha = 0.2) + 
+  theme_spectra() +
+  labs(x = "\nWavelength (mm)", y = "CV\n")
+
+# SMOOTHING NOT CORRECT
+ggplot(QHI_small_wvlgth, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
+  geom_smooth(alpha = 0.2, se=TRUE) + 
+  theme_spectra() +
+  labs(x = "\nWavelength (mm)", y = "CV\n")
+
+
+# test_3 PCA ----
+
+pca <- QHI %>%
+  select(reflectance, wavelength)
+pca <- prcomp(pca, scale = TRUE)
+
+(p_pca <-autoplot(pca, loadings = TRUE, loadings.label = TRUE,
+                  data = QHI, colour = 'veg_type', alpha = 0.5))
+#ggsave(p_pca, path = "figures", filename = "pca_attempt.png", height = 8, width = 10)
+
+(p_pca <-autoplot(pca, loadings = TRUE, loadings.label = TRUE,
+                  data = QHI, colour = 'plot', alpha = 0.5))
 
 (p_pca <- autoplot(pam(pca), frame = TRUE, frame.type = 'norm'))
 
