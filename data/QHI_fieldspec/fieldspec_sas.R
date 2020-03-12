@@ -305,8 +305,8 @@ test <- list_of_files %>%
   test_3 <- test_3 %>% drop_na(reflectance2) %>% 
     drop_na(wavelength2) # %>% filter(reflectance2 %in% (0:100))
   
-ggplot(test_3, aes(x = wavelength2, y = reflectance2, group = id, color = plot)) + 
-    geom_line(alpha = 0.2) + 
+ggplot(test_3, aes(x = wavelength2, y = reflectance, group = id)) + 
+    geom_line(alpha = 0.2, colour = "#ffa544") + 
     theme_spectra() +
     labs(x = "\nWavelength (mm)", y = "Reference\n")
 
