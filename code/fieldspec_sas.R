@@ -13,6 +13,7 @@ library(ggfortify)
 library(cluster)
 library(viridis)
 library(ggpubr)
+library(grid)
 
 source("https://gist.githubusercontent.com/benmarwick/2a1bb0133ff568cbe28d/raw/fb53bd97121f7f9ce947837ef1a4c65a73bffb3f/geom_flat_violin.R")
 
@@ -345,6 +346,8 @@ ggplot(QHI_small, aes(x=veg_type, y=CV, fill=veg_type)) +
     theme_cowplot())
 # ggsave(p_QHI, path = "figures", filename = "cloud_CV.png", height = 8, width = 10)
 
+
+
 # group by wavelength 
 
 QHI_small_wvlgth <- QHI %>%
@@ -500,11 +503,11 @@ collison_small_wvlgth <- collison %>%
 #plot spectral mean
 (p_col_mean <- ggplot(collison_small_wvlgth, aes(x = wavelength, y = spec_mean, group = plot, color = plot)) + 
     geom_line(alpha = 0.7, size=1.) + 
-    theme(legend.position = "right") +
     guides(colour = guide_legend(override.aes = list(size=5))) +
     scale_color_brewer(palette = "Paired") +
-    labs(x = "\nWavelength (mm)", y = "Reflectance\n") +
+    labs(x = "Wavelength (mm)", y = "Reflectance") +
     theme_spectra() +
+    theme(legend.position = "bottom") +
     annotate("rect", xmin = 400, xmax = 500, ymin = 0.5, ymax = 100, 
              alpha = .05, fill = "blue") +
     annotate("rect", xmin = 500, xmax = 600, ymin = 0.5, ymax = 100, 
@@ -512,162 +515,288 @@ collison_small_wvlgth <- collison %>%
     annotate("rect", xmin = 600, xmax = 680, ymin = 0.5, ymax = 100, 
              alpha = .05, fill = "red") +
     annotate("rect", xmin = 680, xmax = 800, ymin = 0.5, ymax = 100, 
-             alpha = .05, fill = "tomato"))
+             alpha = .05, fill = "tomato") +
+  annotate("rect", xmin = 800, xmax = 985, ymin = 0.5, ymax = 100, 
+           alpha = .05, fill = "orange"))
 #ggsave(p_collison, path = "figures", filename = "spec_sig_plot_collison.png", height = 8, width = 10)
+
+(p_col_CV <- ggplot(collison_small_wvlgth, aes(x = wavelength, y = CV, group = plot, color = plot)) + 
+    geom_line(alpha = 0.7, size=1.) + 
+    guides(colour = guide_legend(override.aes = list(size=5))) +
+    scale_color_brewer(palette = "Paired") +
+    labs(x = "Wavelength (mm)", y = "Reflectance") +
+    theme_spectra() +
+    theme(legend.position = "bottom") +
+    annotate("rect", xmin = 400, xmax = 500, ymin = 0, ymax = 0.5, 
+             alpha = .05, fill = "blue") +
+    annotate("rect", xmin = 500, xmax = 600, ymin = 0, ymax = 0.5, 
+             alpha = .05, fill = "green") +
+    annotate("rect", xmin = 600, xmax = 680, ymin = 0, ymax = 0.5, 
+             alpha = .05, fill = "red") +
+    annotate("rect", xmin = 680, xmax = 800, ymin = 0, ymax = 0.5, 
+             alpha = .05, fill = "tomato") +
+    annotate("rect", xmin = 800, xmax = 985, ymin = 0, ymax = 0.5, 
+             alpha = .05, fill = "orange"))
 
 # spectral mean and CV violin plots by region ----
 
 # blue mean
-(p_blue_mean <- ggplot(subset(collison_small_wvlgth, region %in% c("blue"))) +
-                             aes(x=veg_type, y=spec_mean, fill=veg_type)) +
-    geom_flat_violin(position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
+(p_blue_mean <- ggplot() +
+    geom_flat_violin(data = subset(collison_small_wvlgth, region %in% c("blue")), 
+                     aes(x=veg_type, y=spec_mean, fill=veg_type),
+                     position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
+    
     geom_point(data = subset(collison_small_wvlgth, region %in% c("blue")),
-                             aes(x=veg_type, y=spec_mean, colour=plot),
-             position = position_jitter(width = .05), size = 2) +
-    geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
+               aes(x=veg_type, y=spec_mean, colour=plot),
+               position = position_jitter(width = .05), size = 2) +
+    
+    geom_boxplot(data = subset(collison_small_wvlgth, region %in% c("blue")),
+                 aes(x=veg_type, y=spec_mean),
+                 width=0.2, fill="white", alpha = 0.3) +
     scale_color_brewer(palette = "Paired") +
+    
     theme_cowplot() +
     theme(panel.background =  element_rect(fill = "white"),
-          plot.background = element_rect(fill = "#cfe2fd"))
+          plot.background = element_rect(color = "#cfe2fd")))
+
+print(p_blue_mean)
+
 
 # blue CV
-(p_blue_cv <- ggplot(subset(collison_small_wvlgth, region %in% c("blue"))) +
-    aes(x=veg_type, y=CV, fill=veg_type)) +
-  geom_flat_violin(position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-  geom_point(data = subset(collison_small_wvlgth, region %in% c("blue")),
-             aes(x=veg_type, y=CV, colour=plot),
-             position = position_jitter(width = .05), size = 2) +
-  geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
-  scale_color_brewer(palette = "Paired") +
-  theme_cowplot() +
-  theme(panel.background =  element_rect(fill = "white"),
-        plot.background = element_rect(fill = "#cfe2fd"))
+(p_blue_CV <- ggplot() +
+    geom_flat_violin(data = subset(collison_small_wvlgth, region %in% c("blue")), 
+                     aes(x=veg_type, y=CV, fill=veg_type),
+                     position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
+    
+    geom_point(data = subset(collison_small_wvlgth, region %in% c("blue")),
+               aes(x=veg_type, y=CV, colour=plot),
+               position = position_jitter(width = .05), size = 2) +
+    
+    geom_boxplot(data = subset(collison_small_wvlgth, region %in% c("blue")),
+                 aes(x=veg_type, y=CV),
+                 width=0.2, fill="white", alpha = 0.3) +
+    scale_color_brewer(palette = "Paired") +
+    
+    theme_cowplot() +
+    ylim(0.1, 0.4) +
+    theme(panel.background =  element_rect(fill = "white"),
+          plot.background = element_rect(color = "#cfe2fd")))
 
 # green mean
-(p_green_mean <- ggplot(subset(collison_small_wvlgth, region %in% c("green"))) +
-    aes(x=veg_type, y=spec_mean, fill=veg_type)) +
-  geom_flat_violin(position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-  geom_point(data = subset(collison_small_wvlgth, region %in% c("green")),
-             aes(x=veg_type, y=spec_mean, colour=plot),
-             position = position_jitter(width = .05), size = 2) +
-  geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
-  scale_color_brewer(palette = "Paired") +
-  theme_cowplot() +
-  theme(panel.background =  element_rect(fill = "white"),
-        plot.background = element_rect(fill = "palegreen"))
+(p_green_mean <- ggplot() +
+    geom_flat_violin(data = subset(collison_small_wvlgth, region %in% c("green")), 
+                     aes(x=veg_type, y=spec_mean, fill=veg_type),
+                     position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
+    
+    geom_point(data = subset(collison_small_wvlgth, region %in% c("green")),
+               aes(x=veg_type, y=spec_mean, colour=plot),
+               position = position_jitter(width = .05), size = 2) +
+    
+    geom_boxplot(data = subset(collison_small_wvlgth, region %in% c("green")),
+                 aes(x=veg_type, y=spec_mean),
+                 width=0.2, fill="white", alpha = 0.3) +
+    scale_color_brewer(palette = "Paired") +
+    
+    theme_cowplot() +
+    theme(panel.background =  element_rect(fill = "white"),
+          plot.background = element_rect(color = "lightgreen")))
+
 
 # green CV
-(p_green_cv <- ggplot(subset(collison_small_wvlgth, region %in% c("green"))) +
-    aes(x=veg_type, y=CV, fill=veg_type)) +
-  geom_flat_violin(position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-  geom_point(data = subset(collison_small_wvlgth, region %in% c("green")),
-             aes(x=veg_type, y=CV, colour=plot),
-             position = position_jitter(width = .05), size = 2) +
-  geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
-  scale_color_brewer(palette = "Paired") +
-  theme_cowplot() +
-  theme(panel.background =  element_rect(fill = "white"),
-        plot.background = element_rect(fill = "palegreen"))
+(p_green_CV <- ggplot() +
+    geom_flat_violin(data = subset(collison_small_wvlgth, region %in% c("green")), 
+                     aes(x=veg_type, y=CV, fill=veg_type),
+                     position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
+    
+    geom_point(data = subset(collison_small_wvlgth, region %in% c("green")),
+               aes(x=veg_type, y=CV, colour=plot),
+               position = position_jitter(width = .05), size = 2) +
+    
+    geom_boxplot(data = subset(collison_small_wvlgth, region %in% c("green")),
+                 aes(x=veg_type, y=CV),
+                 width=0.2, fill="white", alpha = 0.3) +
+    scale_color_brewer(palette = "Paired") +
+    
+    theme_cowplot() +
+    ylim(0.1, 0.4) +
+    theme(panel.background =  element_rect(fill = "white"),
+          plot.background = element_rect(color = "lightgreen")))
 
 # red mean
-(p_red_mean <- ggplot(subset(collison_small_wvlgth, region %in% c("red"))) +
-    aes(x=veg_type, y=spec_mean, fill=veg_type)) +
-  geom_flat_violin(position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-  geom_point(data = subset(collison_small_wvlgth, region %in% c("red")),
-             aes(x=veg_type, y=spec_mean, colour=plot),
-             position = position_jitter(width = .05), size = 2) +
-  geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
-  scale_color_brewer(palette = "Paired") +
-  theme_cowplot() +
-  theme(panel.background =  element_rect(fill = "white"),
-        plot.background = element_rect(fill = "red"))
+(p_red_mean <- ggplot() +
+    geom_flat_violin(data = subset(collison_small_wvlgth, region %in% c("red")), 
+                     aes(x=veg_type, y=spec_mean, fill=veg_type),
+                     position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
+    
+    geom_point(data = subset(collison_small_wvlgth, region %in% c("red")),
+               aes(x=veg_type, y=spec_mean, colour=plot),
+               position = position_jitter(width = .05), size = 2) +
+    
+    geom_boxplot(data = subset(collison_small_wvlgth, region %in% c("red")),
+                 aes(x=veg_type, y=spec_mean),
+                 width=0.2, fill="white", alpha = 0.3) +
+    scale_color_brewer(palette = "Paired") +
+    
+    theme_cowplot() +
+    theme(panel.background =  element_rect(fill = "white"),
+          plot.background = element_rect(color = "red")))
+
 
 # red CV
-(p_red_cv <- ggplot(subset(collison_small_wvlgth, region %in% c("red"))) +
-    aes(x=veg_type, y=CV, fill=veg_type)) +
-  geom_flat_violin(position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-  geom_point(data = subset(collison_small_wvlgth, region %in% c("red")),
-             aes(x=veg_type, y=CV, colour=plot),
-             position = position_jitter(width = .05), size = 2) +
-  geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
-  scale_color_brewer(palette = "Paired") +
-  theme_cowplot() +
-  theme(panel.background =  element_rect(fill = "white"),
-        plot.background = element_rect(fill = "red"))
+(p_red_CV <- ggplot() +
+    geom_flat_violin(data = subset(collison_small_wvlgth, region %in% c("red")), 
+                     aes(x=veg_type, y=CV, fill=veg_type),
+                     position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
+    
+    geom_point(data = subset(collison_small_wvlgth, region %in% c("red")),
+               aes(x=veg_type, y=CV, colour=plot),
+               position = position_jitter(width = .05), size = 2) +
+    
+    geom_boxplot(data = subset(collison_small_wvlgth, region %in% c("red")),
+                 aes(x=veg_type, y=CV),
+                 width=0.2, fill="white", alpha = 0.3) +
+    scale_color_brewer(palette = "Paired") +
+    
+    theme_cowplot() +
+    ylim(0.1, 0.4) +
+    theme(panel.background =  element_rect(fill = "white"),
+          plot.background = element_rect(color = "red")))
 
 # NIR mean
-(p_NIR_mean <- ggplot(subset(collison_small_wvlgth, region %in% c("NIR"))) +
-    aes(x=veg_type, y=spec_mean, fill=veg_type)) +
-  geom_flat_violin(position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-  geom_point(data = subset(collison_small_wvlgth, region %in% c("NIR")),
-             aes(x=veg_type, y=spec_mean, colour=plot),
-             position = position_jitter(width = .05), size = 2) +
-  geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
-  scale_color_brewer(palette = "Paired") +
-  theme_cowplot() +
-  theme(panel.background =  element_rect(fill = "white"),
-        plot.background = element_rect(fill = "tomato"))
+(p_NIR_mean <- ggplot() +
+    geom_flat_violin(data = subset(collison_small_wvlgth, region %in% c("NIR")), 
+                     aes(x=veg_type, y=spec_mean, fill=veg_type),
+                     position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
+    
+    geom_point(data = subset(collison_small_wvlgth, region %in% c("NIR")),
+               aes(x=veg_type, y=spec_mean, colour=plot),
+               position = position_jitter(width = .05), size = 2) +
+    
+    geom_boxplot(data = subset(collison_small_wvlgth, region %in% c("NIR")),
+                 aes(x=veg_type, y=spec_mean),
+                 width=0.2, fill="white", alpha = 0.3) +
+    scale_color_brewer(palette = "Paired") +
+    
+    theme_cowplot() +
+    theme(panel.background =  element_rect(fill = "white"),
+          plot.background = element_rect(color = "tomato")))
+
 
 # NIR CV
-(p_NIR_cv <- ggplot(subset(collison_small_wvlgth, region %in% c("NIR"))) +
-    aes(x=veg_type, y=CV, fill=veg_type)) +
-  geom_flat_violin(position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-  geom_point(data = subset(collison_small_wvlgth, region %in% c("NIR")),
-             aes(x=veg_type, y=CV, colour=plot),
-             position = position_jitter(width = .05), size = 2) +
-  geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
-  scale_color_brewer(palette = "Paired") +
-  theme_cowplot() +
-  theme(panel.background =  element_rect(fill = "white"),
-        plot.background = element_rect(fill = "tomato"))
+(p_NIR_CV <- ggplot() +
+    geom_flat_violin(data = subset(collison_small_wvlgth, region %in% c("NIR")), 
+                     aes(x=veg_type, y=CV, fill=veg_type),
+                     position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
+    
+    geom_point(data = subset(collison_small_wvlgth, region %in% c("NIR")),
+               aes(x=veg_type, y=CV, colour=plot),
+               position = position_jitter(width = .05), size = 2) +
+    
+    geom_boxplot(data = subset(collison_small_wvlgth, region %in% c("NIR")),
+                 aes(x=veg_type, y=CV),
+                 width=0.2, fill="white", alpha = 0.3) +
+    scale_color_brewer(palette = "Paired") +
+    
+    theme_cowplot() +
+    ylim(0.1, 0.4) +
+    theme(panel.background =  element_rect(fill = "white"),
+          plot.background = element_rect(color = "tomato")))
 
 # IR mean
-(p_IR_mean <- ggplot(subset(collison_small_wvlgth, region %in% c("IR"))) +
-    aes(x=veg_type, y=spec_mean, fill=veg_type)) +
-  geom_flat_violin(position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-  geom_point(data = subset(collison_small_wvlgth, region %in% c("IR")),
-             aes(x=veg_type, y=spec_mean, colour=plot),
-             position = position_jitter(width = .05), size = 2) +
-  geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
-  scale_color_brewer(palette = "Paired") +
-  theme_cowplot() +
-  theme(panel.background =  element_rect(fill = "white"),
-        plot.background = element_rect(fill = "tomato"))
+(p_IR_mean <- ggplot() +
+    geom_flat_violin(data = subset(collison_small_wvlgth, region %in% c("IR")), 
+                     aes(x=veg_type, y=spec_mean, fill=veg_type),
+                     position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
+    
+    geom_point(data = subset(collison_small_wvlgth, region %in% c("IR")),
+               aes(x=veg_type, y=spec_mean, colour=plot),
+               position = position_jitter(width = .05), size = 2) +
+    
+    geom_boxplot(data = subset(collison_small_wvlgth, region %in% c("IR")),
+                 aes(x=veg_type, y=spec_mean),
+                 width=0.2, fill="white", alpha = 0.3) +
+    scale_color_brewer(palette = "Paired") +
+    
+    theme_cowplot() +
+    theme(panel.background =  element_rect(fill = "white"),
+          plot.background = element_rect(color = "orange")))
+
 
 # IR CV
-(p_IR_cv <- ggplot(subset(collison_small_wvlgth, region %in% c("IR"))) +
-    aes(x=veg_type, y=CV, fill=veg_type)) +
-  geom_flat_violin(position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-  geom_point(data = subset(collison_small_wvlgth, region %in% c("IR")),
-             aes(x=veg_type, y=CV, colour=plot),
-             position = position_jitter(width = .05), size = 2) +
-  geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
-  scale_color_brewer(palette = "Paired") +
-  theme_cowplot() +
-  theme(panel.background =  element_rect(fill = "white"),
-        plot.background = element_rect(fill = "tomato"))
+(p_IR_CV <- ggplot() +
+    geom_flat_violin(data = subset(collison_small_wvlgth, region %in% c("IR")), 
+                     aes(x=veg_type, y=CV, fill=veg_type),
+                     position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
+    
+    geom_point(data = subset(collison_small_wvlgth, region %in% c("IR")),
+               aes(x=veg_type, y=CV, colour=plot),
+               position = position_jitter(width = .05), size = 2) +
+    
+    geom_boxplot(data = subset(collison_small_wvlgth, region %in% c("IR")),
+                 aes(x=veg_type, y=CV),
+                 width=0.2, fill="white", alpha = 0.3) +
+    scale_color_brewer(palette = "Paired") +
+    
+    theme_cowplot() +
+    ylim(0.1, 0.4) +
+    theme(panel.background =  element_rect(fill = "white"),
+          plot.background = element_rect(color = "orange")))
 
 
-library(grid)
+
+# facet plot for spectral mean and cv ----
+
+# STILL NEED TO ADD AVERAGE OF ENTIRE VEGETATION TYPE 
+
 # Move to a new page
 grid.newpage()
+
 # Create layout : nrow = 3, ncol = 2
-pushViewport(viewport(layout = grid.layout(nrow = 3, ncol = 2)))
+pushViewport(viewport(layout = grid.layout(nrow = 3, ncol = 5)))
+
 # A helper function to define a region on the layout
 define_region <- function(row, col){
   viewport(layout.pos.row = row, layout.pos.col = col)
+  
 } 
+
 # Arrange the plots
-print(p_col_mean, vp = define_region(row = 1, col = 1:2))   # Span over two columns
-print(p_blue_mean, vp = define_region(row = 2, col = 1))
-print(p_green_mean, vp = define_region(row = 2, col = 2))
-print(p_red_cv + rremove("x.text"), vp = define_region(row = 3, col = 1:2))
+print(p_col_mean, vp = define_region(row = 1:2, col = 1:5))   # Span over two columns
+print(p_blue_mean + rremove("legend") + rremove("xlab"), vp = define_region(row = 3, col = 1))
+print(p_green_mean + rremove("legend") + rremove("xylab"), vp = define_region(row = 3, col = 2))
+print(p_red_mean + rremove("legend") +  rremove("xylab"), vp = define_region(row = 3, col = 3))
+print(p_NIR_mean + rremove("legend") + rremove("xylab"), vp = define_region(row = 3, col = 4))
+print(p_IR_mean + rremove("legend")  + rremove("xylab"), vp = define_region(row = 3, col = 5))
+
+
+# facet plot for spectral CV
+
+# Move to a new page
+grid.newpage()
+
+# Create layout : nrow = 3, ncol = 2
+pushViewport(viewport(layout = grid.layout(nrow = 3, ncol = 5)))
+
+# arranging plots
+print(p_col_CV, vp = define_region(row = 1:2, col = 1:5))
+print(p_blue_CV + rremove("legend") + rremove("xlab"), vp = define_region(row = 3, col = 1))
+print(p_green_CV + rremove("legend") + rremove("xylab"), vp = define_region(row = 3, col = 2))
+print(p_red_CV + rremove("legend") +  rremove("xylab"), vp = define_region(row = 3, col = 3))
+print(p_NIR_CV + rremove("legend") + rremove("xylab"), vp = define_region(row = 3, col = 4))
+print(p_IR_CV + rremove("legend")  + rremove("xylab"), vp = define_region(row = 3, col = 5))
 
 ggarrange(p_col_mean,                                                 
           ggarrange(p_blue_mean, p_green_mean, ncol = 2, labels = c("B", "C")), nrow = 2, labels = "A",
           ggarrange(p_blue_mean, p_green_mean, ncol = 2, labels = c("D", "E")))
           
 
+
+ggplot(collison_small_wvlgth, aes(x = wavelength, y = spec_mean, group = plot, color = plot)) + 
+  geom_line(alpha = 0.9) + 
+  theme_spectra() +
+  theme(legend.position = "right") +
+  guides(colour = guide_legend(override.aes = list(size=5))) +
+  labs(x = "\nWavelength (mm)", y = "CV\n")
 
 ## SMOOTHING NOT CORRECT
 ggplot(collison_small_wvlgth, aes(x = wavelength, y = spec_mean, group=veg_type, color = veg_type)) + 
@@ -691,7 +820,7 @@ ggplot(collison_small_wvlgth, aes(x = wavelength, y = CV, group=veg_type, color 
   labs(x = "\nWavelength (mm)", y = "CV\n")
 
 
-# QHI PCA ----
+# collison PCA ----
 
 pca <- collison %>%
   select(reflectance, wavelength)
@@ -711,7 +840,33 @@ ggbiplot(pca, ellipse=TRUE,  labels=rownames(QHI), groups=QHI)
 (p_pca <- autoplot(pam(pca), frame = TRUE, frame.type = 'norm'))
 
 
-# 
+# H1 model----
+
+# spectral mean
+
+collison_small_plot <- collison %>%
+  group_by(veg_type, plot, id) %>%
+  summarise(spec_mean = mean(reflectance),
+            CV = mean(sd(reflectance)/mean(reflectance)))
+
+ggplot(collison_small_plot, aes(x = wavelength, y = plot, group = plot, color = plot)) + 
+  geom_line(alpha = 0.9) + 
+  theme_spectra() +
+  theme(legend.position = "right") +
+  guides(colour = guide_legend(override.aes = list(size=5))) +
+  labs(x = "\nWavelength (mm)", y = "CV\n")
+
+
+m_H1 <- glm(data = collison_small_plot, spec_mean ~ veg_type + plot, family = gaussian)  
+
+summary(m_H1)
+
+ggplot(collison_small_wvlgth, aes(x = wavelength, y = spec_mean, group=veg_type, color = veg_type)) + 
+  geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
+  geom_point(aes(color = veg_type)) +
+  theme_spectra() +
+  labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n")
+
 
 
 
