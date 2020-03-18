@@ -12,11 +12,9 @@ library(ape)
 library(ggfortify)
 library(cluster)
 library(viridis)
-library(ggpubr)
 library(grid)
 
 source("https://gist.githubusercontent.com/benmarwick/2a1bb0133ff568cbe28d/raw/fb53bd97121f7f9ce947837ef1a4c65a73bffb3f/geom_flat_violin.R")
-
 
 
 # Isla's code for one file ----
@@ -54,6 +52,29 @@ theme_spectra <- function(){
                                            fill = "transparent", 
                                            size = 3, linetype = "blank"))
 }
+
+theme_rgb_mean <- list( annotate("rect", xmin = 400, xmax = 500, ymin = 0.5,
+                                 ymax = 100, alpha = .05, fill = "blue"),
+                        annotate("rect", xmin = 500, xmax = 600, ymin = 0.5, 
+                                 ymax = 100, alpha = .05, fill = "green"), 
+                        annotate("rect", xmin = 600, xmax = 680, ymin = 0.5, 
+                                 ymax = 100, alpha = .05, fill = "red"), 
+                        annotate("rect", xmin = 680, xmax = 800, ymin = 0.5, 
+                                 ymax = 100, alpha = .05, fill = "tomato"),
+                        annotate("rect", xmin = 800, xmax = 985, ymin = 0.5, 
+                                 ymax = 100, alpha = .05, fill = "orange"))
+
+theme_rgb_CV <- list(annotate("rect", xmin = 400, xmax = 500, ymin = 0, ymax = 0.5, 
+                          alpha = .05, fill = "blue"),
+                     annotate("rect", xmin = 500, xmax = 600, ymin = 0, ymax = 0.5, 
+                          alpha = .05, fill = "green"),
+                     annotate("rect", xmin = 600, xmax = 680, ymin = 0, ymax = 0.5, 
+                          alpha = .05, fill = "red"),
+                     annotate("rect", xmin = 680, xmax = 800, ymin = 0, ymax = 0.5, 
+                          alpha = .05, fill = "tomato"),
+                     annotate("rect", xmin = 800, xmax = 985, ymin = 0, ymax = 0.5, 
+                         alpha = .05, fill = "orange"))
+  
 
 
 # ploting spectral signatures 
@@ -150,6 +171,8 @@ raincloud_theme <- theme(
 list_of_files <- list.files(path = "~/Documents/university work/Dissertation/local/QHI_fieldspec/sort/exctracted_Fieldspec/", recursive = TRUE,
                             pattern = "\\.asc$", 
                             full.names = TRUE)
+
+
 QHI_time <- list_of_files %>%
   set_names(.) %>%
   map_df(read.csv2, header = FALSE, sep = "", .id = "FileName") %>%
@@ -179,9 +202,9 @@ ggplot(QHI_time, aes(x=time, fill=V4)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
-## full QHI fieldspec ----
+# full QHI fieldspec ----
 
-### QHI data  ----
+# QHI data  ----
 
 list_of_files <- list.files(path = "~/Documents/university work/Dissertation/local/QHI_fieldspec/fieldspec_sorted_sas/", recursive = TRUE,
                             pattern = "\\.asc$", 
@@ -269,7 +292,7 @@ ggplot(SZU, aes(x=n, y=D_ISIi)) +
  
          
 
-#### QHI vis -------
+# * QHI vis -------
 
 # single wavelengths VT
 (p_QHI <-  ggplot(QHI, aes(x = wavelength, y = reflectance, group = id, color = veg_type)) + 
@@ -303,6 +326,7 @@ facet_wrap(.~id)
 
 
 QHI_small <- QHI %>%
+  mutate(veg_type =  fct_explicit_na(veg_type, na_level = "to_impute"))
   group_by(veg_type, plot, id) %>%
   summarise(spec_mean = mean(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance)))
@@ -347,7 +371,6 @@ ggplot(QHI_small, aes(x=veg_type, y=CV, fill=veg_type)) +
 # ggsave(p_QHI, path = "figures", filename = "cloud_CV.png", height = 8, width = 10)
 
 
-
 # group by wavelength 
 
 QHI_small_wvlgth <- QHI %>%
@@ -355,44 +378,26 @@ QHI_small_wvlgth <- QHI %>%
   summarise(spec_mean = mean(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance)))
 
-QHI_blue <- QHI_small_wvlgth %>%
-  filter(between(wavelength, 400, 500))
-
 
 # GD advice: split full spec into regions (via background colors) and make seperate raincloud plot at each spec_region. (for full snazzyness add color of spec_region to backround)
 #plot spectral mean
 (p_QHI <- ggplot(QHI_small_wvlgth, aes(x = wavelength, y = spec_mean, group = plot, color = plot)) + 
     geom_line(alpha = 0.7, size=1.) + 
-    theme(legend.position = "right") +
     guides(colour = guide_legend(override.aes = list(size=5))) +
     scale_color_brewer(palette = "Paired") +
     labs(x = "\nWavelength (mm)", y = "Reflectance\n") +
-    theme_spectra() +
-    annotate("rect", xmin = 400, xmax = 500, ymin = 0.5, ymax = 100, 
-             alpha = .05, fill = "blue") +
-    annotate("rect", xmin = 500, xmax = 600, ymin = 0.5, ymax = 100, 
-             alpha = .05, fill = "green") +
-    annotate("rect", xmin = 600, xmax = 680, ymin = 0.5, ymax = 100, 
-             alpha = .05, fill = "red") +
-    annotate("rect", xmin = 680, xmax = 800, ymin = 0.5, ymax = 100, 
-             alpha = .05, fill = "tomato"))
+    theme_spectra()+
+    theme(legend.position = "right") +
+    theme_rgb_mean)
+
 #ggsave(p_QHI, path = "figures", filename = "spec_sig_plot.png", height = 8, width = 10)
-
-(p_QHI <- ggplot(QHI_blue, aes(x=veg_type, y=spec_mean, fill=veg_type)) +
-    geom_flat_violin(position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(position = position_jitter(width = .05), size = 2) +
-    geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
-    scale_color_brewer(palette = "Paired") +
-    theme_cowplot() +
-   theme(panel.background =  element_rect(fill = "white"),
-     plot.background = element_rect(fill = "#cfe2fd")))
-
 
 ## SMOOTHING NOT CORRECT
 ggplot(QHI_small_wvlgth, aes(x = wavelength, y = spec_mean, group=veg_type, color = veg_type)) + 
   geom_smooth(alpha = 0.2, se=TRUE) + 
   theme_spectra() +
-  labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n")
+  labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n") +
+  theme_rgb_mean
 
 # plot CV
 
@@ -401,15 +406,17 @@ ggplot(QHI_small_wvlgth, aes(x = wavelength, y = CV, group = plot, color = plot)
   theme_spectra() +
   theme(legend.position = "right") +
   guides(colour = guide_legend(override.aes = list(size=5))) +
-  labs(x = "\nWavelength (mm)", y = "CV\n")
+  labs(x = "\nWavelength (mm)", y = "CV\n") +
+  theme_rgb_CV
 
 # SMOOTHING NOT CORRECT
 ggplot(QHI_small_wvlgth, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
   geom_smooth(alpha = 0.2, se=TRUE) + 
   theme_spectra() +
-  labs(x = "\nWavelength (mm)", y = "CV\n")
+  labs(x = "\nWavelength (mm)", y = "CV\n") +
+  theme_rgb_CV
 
-#### collison vis -------
+#  collison vis -------
 
 # single wavelengths VT
 (p_collison <-  ggplot(collison, aes(x = wavelength, y = reflectance, group = id, color = veg_type)) + 
@@ -431,22 +438,10 @@ ggplot(QHI_small_wvlgth, aes(x = wavelength, y = CV, group=veg_type, color = veg
     guides(colour = guide_legend(override.aes = list(size=5))))
 #ggsave(p_test_3, path = "figures", filename = "spec_sig_collison.png", height = 8, width = 10)
 
-# for subsets of measurements 
-(ggplot(subset(collison ,id %in% c(180:190))) +
-    aes(x = wavelength, y = reflectance, group = id, color = id)) + 
-  geom_line(alpha = 0.9) + 
-  scale_color_viridis_d(option = "D") +
-  theme_spectra() +
-  labs(x = "\nWavelength (mm)", y = "Reflectance\n") +
-  geom_hline( yintercept= c(50,70), color = "red") #+
-facet_wrap(.~id) 
-
-
 collison_small <- collison %>%
   group_by(veg_type, plot, id) %>%
   summarise(spec_mean = mean(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance)))
-
 
 # violin of mean by vegetation type
 ggplot(collison_small, aes(x=veg_type, y=spec_mean, fill=veg_type)) + 
@@ -486,7 +481,42 @@ ggplot(collison_small, aes(x=veg_type, y=CV, fill=veg_type)) +
     theme_cowplot())
 # ggsave(p_collison, path = "figures", filename = "cloud_CV_collison.png", height = 8, width = 10)
 
-# group by wavelength 
+# plots mean reflectance 
+(p_col_mean <- ggplot(collison_small_wvlgth, aes(x = wavelength, y = spec_mean, group = plot, color = plot)) + 
+    geom_line(alpha = 0.7, size=1.) + 
+    guides(colour = guide_legend(override.aes = list(size=5))) +
+    scale_color_brewer(palette = "Paired") +
+    labs(x = "Wavelength (mm)", y = "Reflectance") +
+    theme_spectra() +
+    theme(legend.position = "bottom") +
+    theme_rgb_mean)
+#ggsave(p_collison, path = "figures", filename = "spec_sig_plot_collison.png", height = 8, width = 10)
+
+##  smoothed plots mean reflectance SMOOTHING NOT CORRECT
+ggplot(collison_small_wvlgth, aes(x = wavelength, y = spec_mean, group=veg_type, color = veg_type)) + 
+  geom_smooth(alpha = 0.2, se=TRUE) + 
+  theme_spectra() +
+  labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n")
+
+# plot CV
+
+(p_col_CV <- ggplot(collison_small_wvlgth, aes(x = wavelength, y = CV, group = plot, color = plot)) + 
+    geom_line(alpha = 0.7, size=1.) + 
+    guides(colour = guide_legend(override.aes = list(size=5))) +
+    scale_color_brewer(palette = "Paired") +
+    labs(x = "Wavelength (mm)", y = "Reflectance") +
+    theme_spectra() +
+    theme(legend.position = "bottom") +
+    theme_rgb_CV)
+
+# SMOOTHING NOT CORRECT
+ggplot(collison_small_wvlgth, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
+  geom_smooth(alpha = 0.2, se=TRUE) + 
+  theme_spectra() +
+  labs(x = "\nWavelength (mm)", y = "CV\n")
+
+#  collison facet plot ----
+#  spectral mean and CV violin plots by region ----
 
 collison_small_wvlgth <- collison %>%
   group_by(veg_type, plot, wavelength) %>%
@@ -497,48 +527,6 @@ collison_small_wvlgth <- collison %>%
                             between(wavelength, 600, 680) ~ "red",
                             between(wavelength, 680, 800) ~ "NIR",
                             between(wavelength, 800, 1000) ~ "IR"))
-
-
-# GD advice: split full spec into regions (via background colors) and make seperate raincloud plot at each spec_region. (for full snazzyness add color of spec_region to backround)
-#plot spectral mean
-(p_col_mean <- ggplot(collison_small_wvlgth, aes(x = wavelength, y = spec_mean, group = plot, color = plot)) + 
-    geom_line(alpha = 0.7, size=1.) + 
-    guides(colour = guide_legend(override.aes = list(size=5))) +
-    scale_color_brewer(palette = "Paired") +
-    labs(x = "Wavelength (mm)", y = "Reflectance") +
-    theme_spectra() +
-    theme(legend.position = "bottom") +
-    annotate("rect", xmin = 400, xmax = 500, ymin = 0.5, ymax = 100, 
-             alpha = .05, fill = "blue") +
-    annotate("rect", xmin = 500, xmax = 600, ymin = 0.5, ymax = 100, 
-             alpha = .05, fill = "green") +
-    annotate("rect", xmin = 600, xmax = 680, ymin = 0.5, ymax = 100, 
-             alpha = .05, fill = "red") +
-    annotate("rect", xmin = 680, xmax = 800, ymin = 0.5, ymax = 100, 
-             alpha = .05, fill = "tomato") +
-  annotate("rect", xmin = 800, xmax = 985, ymin = 0.5, ymax = 100, 
-           alpha = .05, fill = "orange"))
-#ggsave(p_collison, path = "figures", filename = "spec_sig_plot_collison.png", height = 8, width = 10)
-
-(p_col_CV <- ggplot(collison_small_wvlgth, aes(x = wavelength, y = CV, group = plot, color = plot)) + 
-    geom_line(alpha = 0.7, size=1.) + 
-    guides(colour = guide_legend(override.aes = list(size=5))) +
-    scale_color_brewer(palette = "Paired") +
-    labs(x = "Wavelength (mm)", y = "Reflectance") +
-    theme_spectra() +
-    theme(legend.position = "bottom") +
-    annotate("rect", xmin = 400, xmax = 500, ymin = 0, ymax = 0.5, 
-             alpha = .05, fill = "blue") +
-    annotate("rect", xmin = 500, xmax = 600, ymin = 0, ymax = 0.5, 
-             alpha = .05, fill = "green") +
-    annotate("rect", xmin = 600, xmax = 680, ymin = 0, ymax = 0.5, 
-             alpha = .05, fill = "red") +
-    annotate("rect", xmin = 680, xmax = 800, ymin = 0, ymax = 0.5, 
-             alpha = .05, fill = "tomato") +
-    annotate("rect", xmin = 800, xmax = 985, ymin = 0, ymax = 0.5, 
-             alpha = .05, fill = "orange"))
-
-# spectral mean and CV violin plots by region ----
 
 # blue mean
 (p_blue_mean <- ggplot() +
@@ -743,8 +731,7 @@ print(p_blue_mean)
           plot.background = element_rect(color = "orange")))
 
 
-
-# facet plot for spectral mean and cv ----
+#  facet plot for spectral mean and cv ----
 
 # STILL NEED TO ADD AVERAGE OF ENTIRE VEGETATION TYPE 
 
@@ -785,51 +772,89 @@ print(p_red_CV + rremove("legend") +  rremove("xylab"), vp = define_region(row =
 print(p_NIR_CV + rremove("legend") + rremove("xylab"), vp = define_region(row = 3, col = 4))
 print(p_IR_CV + rremove("legend")  + rremove("xylab"), vp = define_region(row = 3, col = 5))
 
-ggarrange(p_col_mean,                                                 
-          ggarrange(p_blue_mean, p_green_mean, ncol = 2, labels = c("B", "C")), nrow = 2, labels = "A",
-          ggarrange(p_blue_mean, p_green_mean, ncol = 2, labels = c("D", "E")))
-          
+
+#  H1 model----
+
+# spectral mean
+ 
+# histogram 
+
+library(lme4)
+library(sjPlot)  # to visualise model outputs
+library(ggeffects)  # to visualise model predictions
+library(glmmTMB) # to vusualise model predictions
 
 
-ggplot(collison_small_wvlgth, aes(x = wavelength, y = spec_mean, group = plot, color = plot)) + 
-  geom_line(alpha = 0.9) + 
-  theme_spectra() +
-  theme(legend.position = "right") +
-  guides(colour = guide_legend(override.aes = list(size=5))) +
-  labs(x = "\nWavelength (mm)", y = "CV\n")
 
-## SMOOTHING NOT CORRECT
+(hist <- ggplot(collison_small, aes(x = spec_mean)) +
+   geom_histogram() +
+   theme_classic())
+
+m_H1a <- lmer(data = collison_small, spec_mean ~ veg_type + (1|plot))
+
+summary(m_H1a)
+
+plot(m_H1a)
+
+# Visualises random effects 
+(re.effects <- plot_model(m_H1a, type = "re", show.values = TRUE))
+(fe.effects <- plot_model(m_H1a, show.values = TRUE))
+
 ggplot(collison_small_wvlgth, aes(x = wavelength, y = spec_mean, group=veg_type, color = veg_type)) + 
-  geom_smooth(alpha = 0.2, se=TRUE) + 
+  geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
+  stat_smooth(method = "lm", aes(fill = veg_type, color = veg_type), se=TRUE )+
   theme_spectra() +
   labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n")
 
-# plot CV
 
-ggplot(collison_small_wvlgth, aes(x = wavelength, y = CV, group = plot, color = plot)) + 
-  geom_line(alpha = 0.9) + 
-  theme_spectra() +
-  theme(legend.position = "right") +
-  guides(colour = guide_legend(override.aes = list(size=5))) +
-  labs(x = "\nWavelength (mm)", y = "CV\n")
+# CV
 
-# SMOOTHING NOT CORRECT
+(hist <- ggplot(collison_small, aes(x = CV)) +
+    geom_histogram() +
+    theme_classic())
+
+m_H1b <- lm(data = collison_small, CV ~ veg_type + plot)  
+
+summary(m_H1b)
+
+plot(m_H1b)
+
 ggplot(collison_small_wvlgth, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
-  geom_smooth(alpha = 0.2, se=TRUE) + 
+  geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
+  stat_smooth(method = "lm", aes(fill = veg_type, color = veg_type), se=TRUE )+
   theme_spectra() +
-  labs(x = "\nWavelength (mm)", y = "CV\n")
+  labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n")
 
 
-# collison PCA ----
 
-pca <- collison %>%
-  select(reflectance, wavelength)
-pca <- prcomp(pca, scale = TRUE, center = TRUE) # for adding number of ranks (rank. = 4)
+
+collison_small_VT <- collison %>%
+  group_by(veg_type,wavelength) %>%
+  summarise(spec_mean = mean(reflectance),
+            CV = mean(sd(reflectance)/mean(reflectance)))
+
+(p_col_CV <- ggplot(collison, aes(x = wavelength, y = reflectance, group = veg_type, color = veg_type)) + 
+    stat_smooth(method = "lm", aes(fill = veg_type, color = veg_type), se=TRUE ) +
+    guides(colour = guide_legend(override.aes = list(size=5))) +
+    labs(x = "Wavelength (mm)", y = "Reflectance") +
+    theme_spectra() +
+    theme(legend.position = "bottom"))
+
+#  collison PCA ----
+
+pca <- QHI_small %>%
+   mutate(veg_type =  fct_explicit_na(veg_type, na_level = "to_impute"))
+
+mutate(loc_len = fct_explicit_na(loc_len, na_level = "to_impute"))
+ 
+
+
+pca <- prcomp(pca[,3:4], scale = TRUE, center = TRUE) # for adding number of ranks (rank. = 4)
 
 summary(pca)
 
 (p_pca <-autoplot(pca, loadings = TRUE, loadings.label = TRUE,
-                  data = collison, colour = 'veg_type', alpha = 0.5))
+                  data = collison_small, colour = 'veg_type', alpha = 0.5))
 #ggsave(p_pca, path = "figures", filename = "pca_attempt.png", height = 8, width = 10)
 
 (p_pca <-autoplot(pca, loadings = TRUE, loadings.label = TRUE,
@@ -840,39 +865,68 @@ ggbiplot(pca, ellipse=TRUE,  labels=rownames(QHI), groups=QHI)
 (p_pca <- autoplot(pam(pca), frame = TRUE, frame.type = 'norm'))
 
 
-# H1 model----
+library("FactoMineR")
+library("factoextra")
 
-# spectral mean
+# pca
+res.pca <- PCA(pca[,4:5], scale.unit = TRUE, ncp = 5, graph = TRUE)
 
-collison_small_plot <- collison %>%
-  group_by(veg_type, plot, id) %>%
-  summarise(spec_mean = mean(reflectance),
-            CV = mean(sd(reflectance)/mean(reflectance)))
+# pca results
+print(res.pca)
 
-ggplot(collison_small_plot, aes(x = wavelength, y = plot, group = plot, color = plot)) + 
-  geom_line(alpha = 0.9) + 
-  theme_spectra() +
-  theme(legend.position = "right") +
-  guides(colour = guide_legend(override.aes = list(size=5))) +
-  labs(x = "\nWavelength (mm)", y = "CV\n")
+# eigen values
+
+eig.val <- get_eigenvalue(res.pca)
+eig.val
+
+# pca barplot
+fviz_eig(res.pca, addlabels = TRUE, ylim = c(0, 50))
+
+# saving results
+var <- get_pca_var(res.pca)
+var
+
+# Coordinates
+head(var$coord)
+# Cos2: quality on the factore map
+head(var$cos2)
+# Contributions to the principal components
+head(var$contrib)
+
+# plotting variables
+fviz_pca_var(res.pca, col.var = "black")
+
+# to visulize correlation on of varibals in each dimention
+library("corrplot")
+corrplot(var$cos2, is.corr=FALSE)
+
+# Total cos2 of variables on Dim.1 and Dim.2
+fviz_cos2(res.pca, choice = "var", axes = 1:2)
+
+# Color by cos2 values: quality on the factor map
+fviz_pca_var(res.pca, col.var = "cos2",
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), 
+             repel = TRUE)
+
+# contributions of variables 
+corrplot(var$contrib, is.corr=FALSE)    
+
+fviz_pca_var(res.pca, col.var = "contrib",
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"))
+
+# grouped by elipsise
+fviz_pca_ind(res.pca,
+             geom.ind = "point", # show points only (nbut not "text")
+             col.ind = QHI_small$veg_type, # color by groups
+             palette = c("#00AFBB", "#E7B800", "#EE5C42"),
+             addEllipses = TRUE, # Concentration ellipses
+             # ellipse.type = "confidence",
+             legend.title = "Groups")
 
 
-m_H1 <- glm(data = collison_small_plot, spec_mean ~ veg_type + plot, family = gaussian)  
+# PS2 ----
 
-summary(m_H1)
-
-ggplot(collison_small_wvlgth, aes(x = wavelength, y = spec_mean, group=veg_type, color = veg_type)) + 
-  geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
-  geom_point(aes(color = veg_type)) +
-  theme_spectra() +
-  labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n")
-
-
-
-
-## PS2 ----
-
-########### PS2 24-144 (PS2) ------
+# PS2 24-144 (PS2) ------
 
 
 list_of_files <- list.files(path = "~/Documents/university work/Dissertation/local/QHI_fieldspec/sort/PS2", recursive = TRUE,
@@ -909,7 +963,7 @@ PS2 <- PS2 %>%
   filter(between(wavelength, 400, 985),
          !id %in% c(148:171, 196, 210:211, 250:259))
 
-#### PS2 vis -------
+# * PS2 vis -------
 
 
 # single wavelengths VT
@@ -1014,7 +1068,7 @@ ggplot(PS2_small_wvlgth, aes(x = wavelength, y = CV, group=veg_type, color = veg
   labs(x = "\nWavelength (mm)", y = "CV\n")
 
 
-# PS2 PCA ----
+# * PS2 PCA ----
 
 pca <- PS2 %>%
   select(reflectance, wavelength)
