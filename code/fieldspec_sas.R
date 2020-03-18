@@ -3,16 +3,18 @@
 # 5.3.2020
 
 library(tidyverse)
-library(cowplot)
-library(lavaan)
+library(cowplot) # probaly can remove?
+library(lavaan) 
 library(smooth)
 library(Hmisc)
-library(vegan)
-library(ape)
-library(ggfortify)
-library(cluster)
-library(viridis)
-library(grid)
+library(vegan) # pca (maybe remove)
+library(ape) # pca (maybe remove)
+library(ggfortify) # pca (maybe remove)
+library(cluster) # pca (maybe remove)
+library(viridis) # color pallet
+library(grid) # for pannel plot
+library(FactoMineR) # for pca
+library(factoextra) # for pca visulizaiton
 
 source("https://gist.githubusercontent.com/benmarwick/2a1bb0133ff568cbe28d/raw/fb53bd97121f7f9ce947837ef1a4c65a73bffb3f/geom_flat_violin.R")
 
@@ -248,11 +250,19 @@ QHI %>% filter(reflectance>100) %>%
 QHI <- QHI %>%
   filter(!id %in% c(100, 104, 106, 147, 172, 207, 208))
 
+QHI_small <- QHI %>%
+  mutate(veg_type =  fct_explicit_na(veg_type, na_level = "mixed")) %>%
+  group_by(veg_type, plot, id) %>%
+  summarise(spec_mean = mean(reflectance),
+            CV = mean(sd(reflectance)/mean(reflectance)))
+
 collison <- QHI %>%
   filter(!is.na(veg_type))
 
 PS2 <- QHI %>%
   filter(is.na(veg_type))
+
+
 
 
 ##### correction factros for 250-259 reflectance. but to small. need > 3. also dont know how to apply to refletance 
@@ -300,9 +310,12 @@ ggplot(SZU, aes(x=n, y=D_ISIi)) +
    theme_spectra() +
    labs(x = "\nWavelength (mm)", y = "Reflectance\n")+ 
    theme(legend.position = "right") +
+   scale_color_manual(values = c("#ffa544", "#2b299b", "gray65")) +
    # scale_color_viridis_d(option = "C") +
    guides(colour = guide_legend(override.aes = list(size=5))))
 #ggsave(p_QHI, path = "figures", filename = "spec_sig.png", height = 10, width = 12)
+
+
 
 # single wavelengths plot
 (p_QHI <-  ggplot(QHI, aes(x = wavelength, y = reflectance, group = id, color = plot)) + 
@@ -323,13 +336,6 @@ ggplot(SZU, aes(x=n, y=D_ISIi)) +
   labs(x = "\nWavelength (mm)", y = "Reflectance\n") +
   geom_hline( yintercept= c(50,70), color = "red") #+
 facet_wrap(.~id) 
-
-
-QHI_small <- QHI %>%
-  mutate(veg_type =  fct_explicit_na(veg_type, na_level = "to_impute"))
-  group_by(veg_type, plot, id) %>%
-  summarise(spec_mean = mean(reflectance),
-            CV = mean(sd(reflectance)/mean(reflectance)))
 
 
 # violin of mean by vegetation type
@@ -842,14 +848,10 @@ collison_small_VT <- collison %>%
 
 #  collison PCA ----
 
-pca <- QHI_small %>%
-   mutate(veg_type =  fct_explicit_na(veg_type, na_level = "to_impute"))
-
-mutate(loc_len = fct_explicit_na(loc_len, na_level = "to_impute"))
- 
+pca <- QHI_small 
 
 
-pca <- prcomp(pca[,3:4], scale = TRUE, center = TRUE) # for adding number of ranks (rank. = 4)
+pca <- prcomp(pca[,4:5], scale = TRUE, center = TRUE) # for adding number of ranks (rank. = 4)
 
 summary(pca)
 
@@ -864,9 +866,6 @@ ggbiplot(pca, ellipse=TRUE,  labels=rownames(QHI), groups=QHI)
 
 (p_pca <- autoplot(pam(pca), frame = TRUE, frame.type = 'norm'))
 
-
-library("FactoMineR")
-library("factoextra")
 
 # pca
 res.pca <- PCA(pca[,4:5], scale.unit = TRUE, ncp = 5, graph = TRUE)
@@ -918,11 +917,11 @@ fviz_pca_var(res.pca, col.var = "contrib",
 fviz_pca_ind(res.pca,
              geom.ind = "point", # show points only (nbut not "text")
              col.ind = QHI_small$veg_type, # color by groups
-             palette = c("#00AFBB", "#E7B800", "#EE5C42"),
+            
+             palette = c("#ffa544", "#2b299b", "gray65"),
              addEllipses = TRUE, # Concentration ellipses
              # ellipse.type = "confidence",
              legend.title = "Groups")
-
 
 # PS2 ----
 
@@ -1085,4 +1084,112 @@ pca <- prcomp(pca, scale = TRUE)
 (p_pca <- autoplot(pam(pca), frame = TRUE, frame.type = 'norm'))
 
 
+
+
+# PCA check if sorted PS2 HE and KO plot discriminate ----
+
+list_of_files <- list.files(path = "~/Documents/university work/Dissertation/local/QHI_fieldspec/fieldspec_sorted_sas_12.4.2020/", recursive = TRUE,
+                            pattern = "\\.asc$", 
+                            full.names = TRUE)
+
+# Read all the files and create a FileName column to store filenames
+QHI_PS2plot <- list_of_files %>%
+  set_names(.) %>%
+  map_df(read.csv2, header = FALSE, sep = "", .id = "FileName") %>%
+  mutate(FileName = str_remove_all(FileName, "/Users/shawn/Documents/university work/Dissertation/local/QHI_fieldspec/fieldspec_sorted_sas_12.4.2020//gr080119"),
+         id = stringr::str_extract(FileName, "_\\d*"),
+         id = str_remove_all(id, "_"),
+         id = gsub("(?<![0-9])0+", "", id, perl = TRUE),
+         veg_type = case_when(grepl("HE|KO", FileName)   ~ 
+                                stringr::str_extract(FileName, "HE|KO")),
+         # might need to split to just number...
+         plot = case_when(grepl("HE|KO|PS2", FileName)   ~ 
+                            stringr::str_extract(FileName, "HE\\d*|KO\\d*|PS2")))
+
+names(QHI_PS2plot) <- c("name", "wavelength", "reference", "target", "reflectance", "id", "veg_type", "plot")
+
+QHI_PS2plot <- QHI_PS2plot %>%
+  mutate(wavelength = parse_number(as.character(wavelength))/100,
+         reflectance = parse_number(as.character(reflectance))/100,
+         reference = parse_number(as.character(reference))/100,
+         target = parse_number(as.character(target))/100,
+         veg_type = as.factor(veg_type)) %>%
+  drop_na(reflectance) %>% 
+  drop_na(wavelength) %>%
+  drop_na(reference) %>%
+  drop_na(target)  %>%
+  filter(between(wavelength, 400, 985),
+         # 100, 147 have reflectances >100
+         !id %in% c(148:171, 196, 210:211, 250:259))
+
+# which id hace reflectance>100
+QHI_PS2plot %>% filter(reflectance>100) %>%
+  count(id)
+
+QHI_PS2plot_small <- QHI_PS2plot %>%
+  mutate(veg_type =  fct_explicit_na(veg_type, na_level = "NA")) %>%
+  group_by(veg_type, plot, id) %>%
+  summarise(spec_mean = mean(reflectance),
+            CV = mean(sd(reflectance)/mean(reflectance)))
+
+
+# pca
+res.pca_QHI_PS2 <- PCA(QHI_PS2plot_small[,4:5], scale.unit = TRUE, ncp = 5, graph = TRUE)
+
+# pca results
+print(res.pca_QHI_PS2)
+
+# eigen values
+
+eig.val <- get_eigenvalue(res.pca_QHI_PS2)
+eig.val
+
+# pca barplot
+fviz_eig(res.pca_QHI_PS2, addlabels = TRUE, ylim = c(0, 50))
+
+# saving results
+var <- get_pca_var(res.pca_QHI_PS2)
+var
+
+# Coordinates
+head(var$coord)
+# Cos2: quality on the factore map
+head(var$cos2)
+# Contributions to the principal components
+head(var$contrib)
+
+# plotting variables
+fviz_pca_var(res.pca_QHI_PS2, col.var = "black")
+
+# to visulize correlation on of varibals in each dimention
+library("corrplot")
+corrplot(var$cos2, is.corr=FALSE)
+
+# Total cos2 of variables on Dim.1 and Dim.2
+fviz_cos2(res.pca_QHI_PS2, choice = "var", axes = 1:2)
+
+# Color by cos2 values: quality on the factor map
+fviz_pca_var(res.pca_QHI_PS2, col.var = "cos2",
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), 
+             repel = TRUE)
+
+# contributions of variables 
+corrplot(var$contrib, is.corr=FALSE)    
+
+fviz_pca_var(res.pca_QHI_PS2, col.var = "contrib",
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"))
+
+# grouped by elipsise
+fviz_pca_ind(res.pca_QHI_PS2,
+             geom.ind = "point", # show points only (nbut not "text")
+             col.ind = QHI_PS2plot_small$plot, # color by groups
+             
+            
+             addEllipses = TRUE, # Concentration ellipses
+             # ellipse.type = "confidence",
+             legend.title = "Groups")
+
+
+scale_color_manual(values = c("#ffa544", "#2b299b", "gray65", "black"), name = "", 
+                   labels = c("Her.", "Kom.", "Her./Kom."))
 
