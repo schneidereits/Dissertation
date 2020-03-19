@@ -206,7 +206,7 @@ ggplot(QHI_time, aes(x=time, fill=V4)) +
 
 # full QHI fieldspec ----
 
-# QHI data  ----
+# data manipulation  ----
 
 list_of_files <- list.files(path = "~/Documents/university work/Dissertation/local/QHI_fieldspec/fieldspec_sorted_sas/", recursive = TRUE,
                             pattern = "\\.asc$", 
@@ -274,7 +274,7 @@ filter(id %in% c("249", "250")) %>%
          correction_factor = (reference[id == "250"] / reference[id == "249"]),
          reflectance = reflectance/correction_factor)
 
-# ISI band selection ----
+#  ISI band selection ----
 
 SZU <- collison %>%
   filter(veg_type %in% c("KO" , "HE")) %>%
@@ -282,7 +282,8 @@ SZU <- collison %>%
   summarise(ISI = (1.96*(mean(reflectance[veg_type=="HE"]) + mean(reflectance[veg_type=="KO"])))/
                         abs(sd(reflectance[veg_type=="HE"] - sd(reflectance[veg_type=="KO"])))) %>%
   arrange(ISI) %>%
-  mutate(n = row_number(),
+  mutate(ISI = as.numeric(ISI),
+    n = row_number(),
     d_ISI = (lead(ISI)/ISI - 1) *100,
          # 0.015 is the trade-off value (q)
          d_qi = (0.015- d_ISI),
@@ -294,15 +295,37 @@ head(SZU, n=5)
 
 ggplot(SZU, aes(x=wavelength, y=ISI)) +
   geom_line() +
-  theme_cowplot()
+  theme_cowplot() +
+  stat_valleys(colour = "blue")
 
 ggplot(SZU, aes(x=n, y=D_ISIi)) +
   geom_line() +
   theme_cowplot()
- 
-         
 
-# * QHI vis -------
+install.packages("ggmisc")
+
+vec_ISI <- pull(SZU, ISI)
+
+which.peaks <- function(x,partial=TRUE,decreasing=FALSE){
+  if (decreasing){
+    if (partial){
+      which(diff(c(TRUE,diff(x)<=0,FALSE))>0)
+    }else {
+      which(diff(diff(x)<=0)>0)
+    }    
+  }else {
+    if (partial){
+      which(diff(c(TRUE,diff(x)>=0,FALSE))<0)
+    }else {
+      which(diff(diff(x)>=0)<0)
+    }
+    
+  }
+}
+ 
+which.peaks(vec_ISI)
+
+#  QHI vis -------
 
 # single wavelengths VT
 (p_QHI <-  ggplot(QHI, aes(x = wavelength, y = reflectance, group = id, color = veg_type)) + 
@@ -552,7 +575,7 @@ collison_small_wvlgth <- collison %>%
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
       geom_point(data = subset(collison_small_wvlgth, region %in% c("blue")),
                aes(x=veg_type, y=spec_mean, colour=plot),
-               position = position_jitter(width = .05), size = 1) +
+               position = position_jitter(width = .05), size = .5) +
      geom_boxplot(data = subset(collison_small_wvlgth, region %in% c("blue")),
                  aes(x=veg_type, y=spec_mean),
                  width=0.2, fill="white", alpha = 0.3) +
@@ -562,7 +585,6 @@ collison_small_wvlgth <- collison %>%
     theme(panel.background =  element_rect(fill = "white"),
           plot.background = element_rect(color = "#cfe2fd")))
 
-print(p_blue_mean)
 
 
 # blue CV
@@ -572,7 +594,7 @@ print(p_blue_mean)
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = subset(collison_small_wvlgth, region %in% c("blue")),
                aes(x=veg_type, y=CV, colour=plot),
-               position = position_jitter(width = .05), size = 1) +
+               position = position_jitter(width = .05), size = .5) +
     geom_boxplot(data = subset(collison_small_wvlgth, region %in% c("blue")),
                  aes(x=veg_type, y=CV),
                  width=0.2, fill="white", alpha = 0.3) +
@@ -590,7 +612,7 @@ print(p_blue_mean)
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = subset(collison_small_wvlgth, region %in% c("green")),
                aes(x=veg_type, y=spec_mean, colour=plot),
-               position = position_jitter(width = .05), size = 1) +
+               position = position_jitter(width = .05), size = .5) +
     geom_boxplot(data = subset(collison_small_wvlgth, region %in% c("green")),
                  aes(x=veg_type, y=spec_mean),
                  width=0.2, fill="white", alpha = 0.3) +
@@ -608,7 +630,7 @@ print(p_blue_mean)
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = subset(collison_small_wvlgth, region %in% c("green")),
                aes(x=veg_type, y=CV, colour=plot),
-               position = position_jitter(width = .05), size = 1) +
+               position = position_jitter(width = .05), size = .5) +
     geom_boxplot(data = subset(collison_small_wvlgth, region %in% c("green")),
                  aes(x=veg_type, y=CV),
                  width=0.2, fill="white", alpha = 0.3) +
@@ -626,7 +648,7 @@ print(p_blue_mean)
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = subset(collison_small_wvlgth, region %in% c("red")),
                aes(x=veg_type, y=spec_mean, colour=plot),
-               position = position_jitter(width = .05), size = 1) +
+               position = position_jitter(width = .05), size = .5) +
     geom_boxplot(data = subset(collison_small_wvlgth, region %in% c("red")),
                  aes(x=veg_type, y=spec_mean),
                  width=0.2, fill="white", alpha = 0.3) +
@@ -644,7 +666,7 @@ print(p_blue_mean)
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = subset(collison_small_wvlgth, region %in% c("red")),
                aes(x=veg_type, y=CV, colour=plot),
-               position = position_jitter(width = .05), size = 1) +
+               position = position_jitter(width = .05), size = .5) +
     geom_boxplot(data = subset(collison_small_wvlgth, region %in% c("red")),
                  aes(x=veg_type, y=CV),
                  width=0.2, fill="white", alpha = 0.3) +
@@ -782,13 +804,30 @@ library(sjPlot)  # to visualise model outputs
 library(ggeffects)  # to visualise model predictions
 library(glmmTMB) # to vusualise model predictions
 
+collison_small <- collison %>%
+  group_by(veg_type, plot, id) %>%
+  summarise(spec_mean = mean(reflectance),
+            CV = mean(sd(reflectance)/mean(reflectance)))
 
+ISI_selection <- collison %>%
+  filter(wavelength %in% c("568.34" )) %>% # should be "565.10" but doesnt filter???
+  group_by(veg_type, plot, id) %>%
+  summarise(spec_mean = mean(reflectance),
+            CV = mean(sd(reflectance)/mean(reflectance)))
 
+  
 (hist <- ggplot(collison_small, aes(x = spec_mean)) +
    geom_histogram() +
    theme_classic())
 
 m_H1a <- lmer(data = collison_small, spec_mean ~ veg_type + (1|plot))
+
+m_H1a <- lmer(data = ISI_selection, spec_mean ~ veg_type + (1|plot))
+
+m_H1a <- glm(data = ISI_selection, spec_mean ~ veg_type + plot)
+m_H1a <- glm(data = collison_small, spec_mean ~ veg_type + plot)
+
+summary(m_H1a)
 
 summary(m_H1a)
 
@@ -915,11 +954,15 @@ fviz_pca_var(res.pca, col.var = "contrib",
 fviz_pca_ind(res.pca,
              geom.ind = "point", # show points only (nbut not "text")
              col.ind = QHI_small$veg_type, # color by groups
-            
              palette = c("#ffa544", "#2b299b", "gray65"),
              addEllipses = TRUE, # Concentration ellipses
              # ellipse.type = "confidence",
-             legend.title = "Groups")
+             ellipse.level = 0.95, # confidence level specification
+             mean.point = TRUE, # braycenter mean point
+             legend.title = "Groups",
+             axes.linetype = "dashed",
+             xlab = "PC1", ylab = "PC2", 
+             ggtheme = theme_spectra())
 
 # PS2 ----
 
@@ -932,7 +975,7 @@ list_of_files <- list.files(path = "~/Documents/university work/Dissertation/loc
 
 # Read all the files and create a FileName column to store filenames
 PS2 <- list_of_files %>%
-  set_names(.) %>%
+  purrr::set_names(.) %>%
   map_df(read.csv2, header = FALSE, sep = "", .id = "FileName") %>%
   mutate(FileName = str_remove_all(FileName, "/Users/shawn/Documents/university work/Dissertation/local/QHI_fieldspec/sort/PS2"),
          id = stringr::str_extract(FileName, "_\\d*"),
@@ -943,6 +986,7 @@ PS2 <- list_of_files %>%
          # might need to split to just number...
          plot = case_when(grepl("HE|KO", FileName)   ~ 
                             stringr::str_extract(FileName, "HE\\d*|KO\\d*")))
+
 
 names(PS2) <- c("name", "wavelength", "reference", "target", "reflectance", "id", "veg_type", "plot")
 
@@ -960,7 +1004,7 @@ PS2 <- PS2 %>%
   filter(between(wavelength, 400, 985),
          !id %in% c(148:171, 196, 210:211, 250:259))
 
-# * PS2 vis -------
+# PS2 vis -------
 
 
 # single wavelengths VT
@@ -969,19 +1013,9 @@ PS2 <- PS2 %>%
    theme_spectra() +
    labs(x = "\nWavelength (mm)", y = "Reflectance\n")+ 
    theme(legend.position = "right") +
-   # scale_color_viridis_d(option = "C") +
+   scale_color_manual(values = c("#ffa544", "#2b299b")) +
    guides(colour = guide_legend(override.aes = list(size=5))))
 #ggsave(p_QHI, path = "figures", filename = "spec_sig.png", height = 10, width = 12)
-
-# single wavelengths plot
-(p_PS2 <-  ggplot(PS2, aes(x = wavelength, y = reflectance, group = id, color = plot)) + 
-    geom_line(alpha = 0.2) + 
-    theme_spectra() +
-    labs(x = "\nWavelength (mm)", y = "reflectance\n")+ 
-    theme(legend.position = "right") +
-    # scale_color_viridis_d(option = "C") +
-    guides(colour = guide_legend(override.aes = list(size=5))))
-#ggsave(p_test_3, path = "figures", filename = "spec_sig.png", height = 8, width = 10)
 
 
 PS2_small <- PS2 %>%
@@ -989,17 +1023,12 @@ PS2_small <- PS2 %>%
   summarise(spec_mean = mean(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance)))
 
-# for vis inspecting 
-#QHI_small <- QHI %>%
-group_by(veg_type, plot, id) %>%
-  summarise(spec_mean = mean(reflectance),
-            CV = mean(sd(reflectance)/mean(reflectance)))%>%
-  filter(between(spec_mean, 25, 35) )
 
 # violin of mean by vegetation type
 ggplot(PS2_small, aes(x=veg_type, y=spec_mean, fill=veg_type)) + 
   geom_violin(trim=FALSE, alpha = .5) +
   geom_point(position = position_jitter(0.05)) +
+  scale_fill_manual(values = c("#ffa544", "#2b299b")) +
   geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
   theme_cowplot()
 
@@ -1008,6 +1037,7 @@ ggplot(PS2_small, aes(x=veg_type, y=spec_mean, fill=veg_type)) +
     geom_flat_violin(position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(position = position_jitter(width = .05), size = .8) +
     geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
+    scale_fill_manual(values = c("#ffa544", "#2b299b")) +
     theme_cowplot())
 
 # violin of cv by vegtation type
@@ -1015,12 +1045,14 @@ ggplot(PS2_small, aes(x=veg_type, y=CV, fill=veg_type)) +
   geom_violin(trim=FALSE, alpha = .5) +
   geom_point(position = position_jitter(0.05)) +
   geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
+  scale_fill_manual(values = c("#ffa544", "#2b299b")) +
   theme_cowplot()
 
 ggplot(PS2_small, aes(x=veg_type, y=CV, fill=veg_type)) +
   geom_flat_violin(position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
   geom_point(position = position_jitter(width = .05), size = .8) +
   geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
+  scale_fill_manual(values = c("#ffa544", "#2b299b")) +
   theme_cowplot()
 
 # ggsave(p_QHI, path = "figures", filename = "cloud_CV.png", height = 8, width = 10)
@@ -1039,6 +1071,7 @@ PS2_small_wvlgth <- PS2 %>%
     theme_spectra() +
     theme(legend.position = "right") +
     guides(colour = guide_legend(override.aes = list(size=5))) +
+    scale_color_manual(values = c("#ffa544", "#2b299b")) +
     labs(x = "\nWavelength (mm)", y = "CV\n"))
 #ggsave(p_QHI, path = "figures", filename = "spec_sig_plot.png", height = 8, width = 10)
 
@@ -1047,6 +1080,7 @@ PS2_small_wvlgth <- PS2 %>%
 ggplot(PS2_small_wvlgth, aes(x = wavelength, y = spec_mean, group=veg_type, color = veg_type)) + 
   geom_smooth(alpha = 0.2, se=TRUE) + 
   theme_spectra() +
+  scale_color_manual(values = c("#ffa544", "#2b299b")) +
   labs(x = "\nWavelength (mm)", y = "mean reflectance\n")
 
 # plot CV
@@ -1055,6 +1089,7 @@ ggplot(PS2_small_wvlgth, aes(x = wavelength, y = CV, group = plot, color = plot)
   geom_line(alpha = 0.9) + 
   theme_spectra() +
   theme(legend.position = "right") +
+  scale_color_manual(values = c("#ffa544", "#2b299b")) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
   labs(x = "\nWavelength (mm)", y = "CV\n")
 
@@ -1062,24 +1097,15 @@ ggplot(PS2_small_wvlgth, aes(x = wavelength, y = CV, group = plot, color = plot)
 ggplot(PS2_small_wvlgth, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
   geom_smooth(alpha = 0.2, se=TRUE) + 
   theme_spectra() +
+  scale_color_manual(values = c("#ffa544", "#2b299b")) +
   labs(x = "\nWavelength (mm)", y = "CV\n")
 
 
-# * PS2 PCA ----
+# PS2 PCA ----
 
-pca <- PS2 %>%
-  select(reflectance, wavelength)
+pca <- PS2
+
 pca <- prcomp(pca, scale = TRUE)
-
-(p_pca <-autoplot(pca, loadings = TRUE, loadings.label = TRUE,
-                  data = PS2, colour = 'veg_type', alpha = 0.5))
-#ggsave(p_pca, path = "figures", filename = "pca_attempt.png", height = 8, width = 10)
-
-# attempt to group 
-(p_pca <-autoplot(pca, loadings = TRUE, loadings.label = TRUE,
-                  data = QHI, colour = 'plot', alpha = 0.5))
-
-(p_pca <- autoplot(pam(pca), frame = TRUE, frame.type = 'norm'))
 
 
 
@@ -1131,22 +1157,23 @@ QHI_PS2plot_small <- QHI_PS2plot %>%
             CV = mean(sd(reflectance)/mean(reflectance)))
 
 
-# pca
-res.pca_QHI_PS2 <- PCA(QHI_PS2plot_small[,4:5], scale.unit = TRUE, ncp = 5, graph = TRUE)
+# PS2 pca
+
+res.pca_PS2 <- PCA(PS2_small[,4:5], scale.unit = TRUE, ncp = 5, graph = TRUE)
 
 # pca results
-print(res.pca_QHI_PS2)
+print(res.pca_PS2)
 
 # eigen values
 
-eig.val <- get_eigenvalue(res.pca_QHI_PS2)
+eig.val <- get_eigenvalue(res.pca_PS2)
 eig.val
 
 # pca barplot
-fviz_eig(res.pca_QHI_PS2, addlabels = TRUE, ylim = c(0, 50))
+fviz_eig(res.pca_PS2, addlabels = TRUE, ylim = c(0, 50))
 
 # saving results
-var <- get_pca_var(res.pca_QHI_PS2)
+var <- get_pca_var(res.pca_PS2)
 var
 
 # Coordinates
@@ -1157,17 +1184,17 @@ head(var$cos2)
 head(var$contrib)
 
 # plotting variables
-fviz_pca_var(res.pca_QHI_PS2, col.var = "black")
+fviz_pca_var(res.pca_PS2, col.var = "black")
 
 # to visulize correlation on of varibals in each dimention
 library("corrplot")
 corrplot(var$cos2, is.corr=FALSE)
 
 # Total cos2 of variables on Dim.1 and Dim.2
-fviz_cos2(res.pca_QHI_PS2, choice = "var", axes = 1:2)
+fviz_cos2(res.pca_PS2, choice = "var", axes = 1:2)
 
 # Color by cos2 values: quality on the factor map
-fviz_pca_var(res.pca_QHI_PS2, col.var = "cos2",
+fviz_pca_var(res.pca_PS2, col.var = "cos2",
              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), 
              repel = TRUE)
 
@@ -1178,16 +1205,12 @@ fviz_pca_var(res.pca_QHI_PS2, col.var = "contrib",
              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"))
 
 # grouped by elipsise
-fviz_pca_ind(res.pca_QHI_PS2,
-             geom.ind = "point", # show points only (nbut not "text")
-             col.ind = QHI_PS2plot_small$plot, # color by groups
+(p_pca_PS2 <- fviz_pca_ind(res.pca_PS2,
+             geom.ind = c("point"), # show points only (nbut not "text")
+             col.ind = PS2_small$veg_type, # color by groups
+             palette = c("#ffa544", "#2b299b"),
              
-            
              addEllipses = TRUE, # Concentration ellipses
              # ellipse.type = "confidence",
-             legend.title = "Groups")
-
-
-scale_color_manual(values = c("#ffa544", "#2b299b", "gray65", "black"), name = "", 
-                   labels = c("Her.", "Kom.", "Her./Kom."))
+             legend.title = "Groups"))
 
