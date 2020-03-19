@@ -64,7 +64,9 @@ theme_rgb_mean <- list( annotate("rect", xmin = 400, xmax = 500, ymin = 0.5,
                         annotate("rect", xmin = 680, xmax = 800, ymin = 0.5, 
                                  ymax = 100, alpha = .05, fill = "tomato"),
                         annotate("rect", xmin = 800, xmax = 985, ymin = 0.5, 
-                                 ymax = 100, alpha = .05, fill = "orange"))
+                                 ymax = 100, alpha = .05, fill = "orange"),
+                        scale_y_continuous(expand = expand_scale(mult = c(0, .1))),
+                        scale_x_continuous(expand = expand_scale(mult = c(0, .1))))
 
 theme_rgb_CV <- list(annotate("rect", xmin = 400, xmax = 500, ymin = 0, ymax = 0.5, 
                           alpha = .05, fill = "blue"),
@@ -290,19 +292,19 @@ filter(id %in% c("249", "250")) %>%
 
 #  ISI band selection ----
 
-ISI <- collison %>%
+collison_ISI <- collison %>%
   filter(veg_type %in% c("KO" , "HE")) %>%
   group_by(wavelength) %>%
   summarise(ISI = (1.96*(mean(reflectance[veg_type=="HE"]) + mean(reflectance[veg_type=="KO"])))/
                         abs(sd(reflectance[veg_type=="HE"] - sd(reflectance[veg_type=="KO"])))) 
 
-
-band_selection <- ISI %>%
+band_selection <- collison_ISI %>%
     mutate(n = row_number()) %>%
      # filter wavelengths that are local ISI minima
-    filter(n %in% find_peaks(-SZU$ISI))
+    filter(n %in% find_peaks(-collison_ISI$ISI))
  
-SZU <- ISI %>%
+
+SZU <- collison_ISI %>%
   arrange(ISI) %>%
   mutate(ISI = as.numeric(ISI),
     n = row_number(),
@@ -320,19 +322,28 @@ library(ggpmisc)
 
 
 # need to spruce up https://www.rdocumentation.org/packages/ggpmisc/versions/0.3.3/topics/stat_peaks
+# plot of ISI by wavelength and local minima
 ggplot(ISI, aes(x=wavelength, y=ISI)) +
   geom_line() +
   theme_cowplot() +
-  stat_valleys(colour = "blue", span = 3)
-
-
+  stat_valleys(colour = "red", span = 3) +
+  scale_y_continuous(expand = expand_scale(mult = c(0, .1))) +
+  scale_x_continuous(expand = expand_scale(mult = c(0, .1))) +
+  annotate("rect", xmin = 400, xmax = 500, ymin = 16,
+           ymax = 23, alpha = .05, fill = "blue") + 
+  annotate("rect", xmin = 500, xmax = 600, ymin = 16, 
+         ymax = 23, alpha = .05, fill = "green") +
+  annotate("rect", xmin = 600, xmax = 680, ymin = 16, 
+         ymax = 23, alpha = .05, fill = "red") + 
+  annotate("rect", xmin = 680, xmax = 800, ymin = 16, 
+         ymax = 23, alpha = .05, fill = "tomato") +
+  annotate("rect", xmin = 800, xmax = 985, ymin = 16, 
+         ymax = 23, alpha = .05, fill = "orange")
+  
+# plot of trends in accumulated D_ISIi values
 ggplot(SZU, aes(x=n, y=D_ISIi)) +
   geom_line() +
   theme_cowplot() 
-
-
-# negative to find minima
-find_peaks(-SZU$ISI)
 
 #  QHI vis -------
 
@@ -818,25 +829,14 @@ collison_small <- collison %>%
   summarise(spec_mean = mean(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance)))
 
-ISI_selection <- collison %>%
-  filter(wavelength %in% c("568.34" )) %>% # should be "565.10" but doesnt filter???
-  group_by(veg_type, plot, id) %>%
-  summarise(spec_mean = mean(reflectance),
-            CV = mean(sd(reflectance)/mean(reflectance)))
-
-  
 (hist <- ggplot(collison_small, aes(x = spec_mean)) +
    geom_histogram() +
    theme_classic())
 
+# linear model for H1
 m_H1a <- lmer(data = collison_small, spec_mean ~ veg_type + (1|plot))
 
-m_H1a <- lmer(data = ISI_selection, spec_mean ~ veg_type + (1|plot))
-
-m_H1a <- glm(data = ISI_selection, spec_mean ~ veg_type + plot)
 m_H1a <- glm(data = collison_small, spec_mean ~ veg_type + plot)
-
-summary(m_H1a)
 
 summary(m_H1a)
 
@@ -885,12 +885,79 @@ collison_small_VT <- collison %>%
   summarise(spec_mean = mean(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance)))
 
-(p_col_CV <- ggplot(collison, aes(x = wavelength, y = reflectance, group = veg_type, color = veg_type)) + 
+ggplot(collison, aes(x = wavelength, y = reflectance, group = veg_type, color = veg_type)) + 
     stat_smooth(method = "lm", aes(fill = veg_type, color = veg_type), se=TRUE ) +
+    geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
     guides(colour = guide_legend(override.aes = list(size=5))) +
     labs(x = "Wavelength (mm)", y = "Reflectance") +
     theme_spectra() +
-    theme(legend.position = "bottom"))
+    theme(legend.position = "bottom")
+
+# model H3 (band selection) ----
+
+# spectral mean
+
+# reduced dimentionality; product of ISI band selection
+lowD <- collison %>%
+  filter(wavelength %in% band_selection$wavelength) %>%
+  group_by(veg_type, plot, id) %>%
+  summarise(spec_mean = mean(reflectance),
+            CV = mean(sd(reflectance)/mean(reflectance)))
+
+(hist <- ggplot(lowD, aes(x = spec_mean)) +
+    geom_histogram() +
+    theme_classic())
+
+# linear model with band selection
+
+m_H3a <- glm(data = lowD, spec_mean ~ veg_type + plot)
+
+m_H3a <- lmer(data = lowD, spec_mean ~ veg_type + (1|plot))
+
+summary(m_H3a)
+
+plot(m_H3a)
+
+
+# Visualises random effects 
+(re.effects <- plot_model(m_H3a, type = "re", show.values = TRUE))
+# visulise fixed effect
+(fe.effects <- plot_model(m_H3a, show.values = TRUE))
+
+ggplot(collison_small_wvlgth, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
+  geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
+  stat_smooth(method = "lm", aes(fill = veg_type, color = veg_type), se=TRUE )+
+  theme_spectra() +
+  labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n")
+
+# CV
+
+(hist <- ggplot(lowD, aes(x = CV)) +
+    geom_histogram() +
+    theme_classic())
+
+# linear model with band selection
+
+m_H3b <- glm(data = lowD, CV ~ veg_type + plot)
+
+m_H3b <- lmer(data = lowD, CV ~ veg_type + (1|plot))
+
+summary(m_H3b)
+
+plot(m_H3b)
+
+
+# Visualises random effects 
+(re.effects <- plot_model(m_H3b, type = "re", show.values = TRUE))
+# visulise fixed effect
+(fe.effects <- plot_model(m_H3b, show.values = TRUE))
+
+ggplot(collison_small_wvlgth, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
+  geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
+  stat_smooth(method = "lm", aes(fill = veg_type, color = veg_type), se=TRUE )+
+  theme_spectra() +
+  labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n")
+
 
 #  collison PCA ----
 
