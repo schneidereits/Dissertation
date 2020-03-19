@@ -168,6 +168,20 @@ raincloud_theme <- theme(
   axis.line.x = element_line(colour = "black", size = 0.5, linetype = "solid"),
   axis.line.y = element_line(colour = "black", size = 0.5, linetype = "solid"))
 
+# finding extrema; source: https://github.com/stas-g/findPeaks
+find_peaks <- function (x, m = 3){
+  shape <- diff(sign(diff(x, na.pad = FALSE)))
+  pks <- sapply(which(shape < 0), FUN = function(i){
+    z <- i - m + 1
+    z <- ifelse(z > 0, z, 1)
+    w <- i + m + 1
+    w <- ifelse(w < length(x), w, length(x))
+    if(all(x[c(z : i, (i + 2) : w)] <= x[i + 1])) return(i + 1) else return(numeric(0))
+  })
+  pks <- unlist(pks)
+  pks
+}
+
 
 # time sorting ----
 list_of_files <- list.files(path = "~/Documents/university work/Dissertation/local/QHI_fieldspec/sort/exctracted_Fieldspec/", recursive = TRUE,
@@ -276,11 +290,19 @@ filter(id %in% c("249", "250")) %>%
 
 #  ISI band selection ----
 
-SZU <- collison %>%
+ISI <- collison %>%
   filter(veg_type %in% c("KO" , "HE")) %>%
   group_by(wavelength) %>%
   summarise(ISI = (1.96*(mean(reflectance[veg_type=="HE"]) + mean(reflectance[veg_type=="KO"])))/
-                        abs(sd(reflectance[veg_type=="HE"] - sd(reflectance[veg_type=="KO"])))) %>%
+                        abs(sd(reflectance[veg_type=="HE"] - sd(reflectance[veg_type=="KO"])))) 
+
+
+band_selection <- ISI %>%
+    mutate(n = row_number()) %>%
+     # filter wavelengths that are local ISI minima
+    filter(n %in% find_peaks(-SZU$ISI))
+ 
+SZU <- ISI %>%
   arrange(ISI) %>%
   mutate(ISI = as.numeric(ISI),
     n = row_number(),
@@ -293,37 +315,24 @@ SZU <- collison %>%
 # the selcted wavelengths according to SZU
 head(SZU, n=5)
 
-ggplot(SZU, aes(x=wavelength, y=ISI)) +
+
+library(ggpmisc)
+
+
+# need to spruce up https://www.rdocumentation.org/packages/ggpmisc/versions/0.3.3/topics/stat_peaks
+ggplot(ISI, aes(x=wavelength, y=ISI)) +
   geom_line() +
   theme_cowplot() +
-  stat_valleys(colour = "blue")
+  stat_valleys(colour = "blue", span = 3)
+
 
 ggplot(SZU, aes(x=n, y=D_ISIi)) +
   geom_line() +
-  theme_cowplot()
+  theme_cowplot() 
 
-install.packages("ggmisc")
 
-vec_ISI <- pull(SZU, ISI)
-
-which.peaks <- function(x,partial=TRUE,decreasing=FALSE){
-  if (decreasing){
-    if (partial){
-      which(diff(c(TRUE,diff(x)<=0,FALSE))>0)
-    }else {
-      which(diff(diff(x)<=0)>0)
-    }    
-  }else {
-    if (partial){
-      which(diff(c(TRUE,diff(x)>=0,FALSE))<0)
-    }else {
-      which(diff(diff(x)>=0)<0)
-    }
-    
-  }
-}
- 
-which.peaks(vec_ISI)
+# negative to find minima
+find_peaks(-SZU$ISI)
 
 #  QHI vis -------
 
@@ -439,7 +448,7 @@ ggplot(QHI_small_wvlgth, aes(x = wavelength, y = CV, group = plot, color = plot)
   theme_spectra() +
   theme(legend.position = "right") +
   guides(colour = guide_legend(override.aes = list(size=5))) +
-  labs(x = "\nWavelength (mm)", y = "CV\n") +
+  labs(x = "\nWavelength (mm)", y = "CV\n") + 
   theme_rgb_CV
 
 # SMOOTHING NOT CORRECT
