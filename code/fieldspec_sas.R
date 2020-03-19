@@ -959,17 +959,20 @@ ggplot(collison_small_wvlgth, aes(x = wavelength, y = CV, group=veg_type, color 
   labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n")
 
 
-#  collison PCA ----
+#  QHI PCA ----
 
+# for all QHI measurements 
 pca <- QHI_small 
 
 
+
+# simple pca
 pca <- prcomp(pca[,4:5], scale = TRUE, center = TRUE) # for adding number of ranks (rank. = 4)
 
 summary(pca)
 
 (p_pca <-autoplot(pca, loadings = TRUE, loadings.label = TRUE,
-                  data = collison_small, colour = 'veg_type', alpha = 0.5))
+                  data = QHI_small, colour = 'veg_type', alpha = 0.5))
 #ggsave(p_pca, path = "figures", filename = "pca_attempt.png", height = 8, width = 10)
 
 (p_pca <-autoplot(pca, loadings = TRUE, loadings.label = TRUE,
@@ -980,7 +983,7 @@ ggbiplot(pca, ellipse=TRUE,  labels=rownames(QHI), groups=QHI)
 (p_pca <- autoplot(pam(pca), frame = TRUE, frame.type = 'norm'))
 
 
-# pca
+# detailed pca; adapted from: http://www.sthda.com/english/articles/31-principal-component-methods-in-r-practical-guide/112-pca-principal-component-analysis-essentials/#pca-data-format
 res.pca <- PCA(pca[,4:5], scale.unit = TRUE, ncp = 5, graph = TRUE)
 
 # pca results
@@ -1039,6 +1042,43 @@ fviz_pca_ind(res.pca,
              axes.linetype = "dashed",
              xlab = "PC1", ylab = "PC2", 
              ggtheme = theme_spectra())
+
+# pca for all QHI measurements, with band selection
+pca_lowD <- QHI %>%
+  filter(wavelength %in% band_selection$wavelength) %>%
+  group_by(veg_type, plot, id) %>%
+  summarise(spec_mean = mean(reflectance),
+            CV = mean(sd(reflectance)/mean(reflectance)))
+
+res.pca_lowD <- PCA(pca_lowD[,4:5], scale.unit = TRUE, ncp = 5, graph = TRUE)
+
+# pca 
+fviz_pca_ind(res.pca_lowD,
+             geom.ind = "point", # show points only (nbut not "text")
+             col.ind = QHI_small$veg_type, # color by groups
+             palette = c("#ffa544", "#2b299b", "gray65"),
+             addEllipses = TRUE, # Concentration ellipses
+             # ellipse.type = "confidence",
+             ellipse.level = 0.95, # confidence level specification
+             mean.point = TRUE, # braycenter mean point
+             legend.title = "Groups",
+             axes.linetype = "dashed",
+             xlab = "PC1", ylab = "PC2", 
+             ggtheme = theme_spectra())
+# biplot
+fviz_pca_biplot(res.pca_lowD,
+                repel = TRUE, 
+                geom.ind = "point", # show points only (nbut not "text")
+                col.ind = QHI_small$veg_type, # color by groups
+                palette = c("#ffa544", "#2b299b", "gray65"),
+                addEllipses = TRUE, # Concentration ellipses
+                # ellipse.type = "confidence",
+                ellipse.level = 0.95, # confidence level specification
+                mean.point = TRUE, # braycenter mean point
+                legend.title = "Groups",
+                axes.linetype = "dashed",
+                xlab = "PC1", ylab = "PC2", 
+                ggtheme = theme_spectra())
 
 # PS2 ----
 
@@ -1179,9 +1219,22 @@ ggplot(PS2_small_wvlgth, aes(x = wavelength, y = CV, group=veg_type, color = veg
 
 # PS2 PCA ----
 
-pca <- PS2
+pca_PS2 <- PS2_small
 
-pca <- prcomp(pca, scale = TRUE)
+res.pca_PS2 <- PCA(pca_PS2[,4:5], scale.unit = TRUE, ncp = 5, graph = TRUE)
+
+# pca 
+fviz_pca_ind(res.pca_PS2,
+             geom.ind = "point", # show points only (nbut not "text")
+             col.ind = PS2_small$plot, # color by groups
+             addEllipses = TRUE, # Concentration ellipses
+             # ellipse.type = "confidence",
+             ellipse.level = 0.95, # confidence level specification
+             mean.point = TRUE, # braycenter mean point
+             legend.title = "Groups",
+             axes.linetype = "dashed",
+             xlab = "PC1", ylab = "PC2", 
+             ggtheme = theme_spectra())
 
 
 
