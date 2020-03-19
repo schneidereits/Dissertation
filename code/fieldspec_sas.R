@@ -267,6 +267,7 @@ QHI %>% filter(reflectance>100) %>%
 QHI <- QHI %>%
   filter(!id %in% c(100, 104, 106, 147, 172, 207, 208))
 
+# group by id
 QHI_small <- QHI %>%
   group_by(veg_type, plot, id) %>%
   summarise(spec_mean = mean(reflectance),
@@ -323,7 +324,7 @@ library(ggpmisc)
 
 # need to spruce up https://www.rdocumentation.org/packages/ggpmisc/versions/0.3.3/topics/stat_peaks
 # plot of ISI by wavelength and local minima
-ggplot(ISI, aes(x=wavelength, y=ISI)) +
+ggplot(collison_ISI, aes(x=wavelength, y=ISI)) +
   geom_line() +
   theme_cowplot() +
   stat_valleys(colour = "red", span = 3) +
@@ -357,8 +358,6 @@ ggplot(SZU, aes(x=n, y=D_ISIi)) +
    # scale_color_viridis_d(option = "C") +
    guides(colour = guide_legend(override.aes = list(size=5))))
 #ggsave(p_QHI, path = "figures", filename = "spec_sig.png", height = 10, width = 12)
-
-
 
 # single wavelengths plot
 (p_QHI <-  ggplot(QHI, aes(x = wavelength, y = reflectance, group = id, color = plot)) + 
@@ -396,7 +395,6 @@ ggplot(QHI_small, aes(x=veg_type, y=spec_mean, fill=veg_type)) +
     geom_point(data = QHI_small, aes(x=veg_type, y=spec_mean, colour=plot),
                position = position_jitter(width = .05), size = 2) +
     geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
-    scale_color_manual(palette = "Paired") +
     scale_fill_manual(values = c("#ffa544", "#2b299b", "gray65")) +
     theme_cowplot())
 #ggsave(p_QHI, path = "figures", filename = "cloud_specmean.png", height = 8, width = 10)
@@ -415,18 +413,16 @@ ggplot(QHI_small, aes(x=veg_type, y=CV, fill=veg_type)) +
     geom_flat_violin(data = QHI_small, aes(x=veg_type, y=CV, fill=veg_type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = QHI_small, aes(x=veg_type, y=CV, colour=plot),
-               position = position_jitter(width = .15), size = 3) +
+               position = position_jitter(width = .15), size = 2) +
     geom_boxplot(data = QHI_small, aes(x=veg_type, y=CV),
                  width=0.2, fill="white", alpha = 0.3) +
     scale_fill_manual(values = c("#ffa544", "#2b299b", "gray65")) +
-    scale_color_brewer(palette = "Paired") +
     theme_cowplot())
 # ggsave(p_QHI, path = "figures", filename = "cloud_CV.png", height = 8, width = 10)
 
 
 # group by wavelength 
-
-QHI_small_wvlgth <- QHI %>%
+QHI_wavelength <- QHI %>%
   group_by(veg_type, plot, wavelength) %>%
   summarise(spec_mean = mean(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance)))
@@ -434,7 +430,7 @@ QHI_small_wvlgth <- QHI %>%
 
 # GD advice: split full spec into regions (via background colors) and make seperate raincloud plot at each spec_region. (for full snazzyness add color of spec_region to backround)
 #plot spectral mean
-(p_QHI <- ggplot(QHI_small_wvlgth, aes(x = wavelength, y = spec_mean, group = plot, color = plot)) + 
+(p_QHI <- ggplot(QHI_wavelength, aes(x = wavelength, y = spec_mean, group = plot, color = plot)) + 
     geom_line(alpha = 0.7, size=1.) + 
     guides(colour = guide_legend(override.aes = list(size=5))) +
     scale_color_brewer(palette = "Paired") +
@@ -446,7 +442,7 @@ QHI_small_wvlgth <- QHI %>%
 #ggsave(p_QHI, path = "figures", filename = "spec_sig_plot.png", height = 8, width = 10)
 
 ## SMOOTHING NOT CORRECT
-ggplot(QHI_small_wvlgth, aes(x = wavelength, y = spec_mean, group=veg_type, color = veg_type)) + 
+ggplot(QHI_wavelength, aes(x = wavelength, y = spec_mean, group=veg_type, color = veg_type)) + 
   geom_smooth(alpha = 0.2, se=TRUE) + 
   theme_spectra() +
   labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n") +
@@ -454,7 +450,7 @@ ggplot(QHI_small_wvlgth, aes(x = wavelength, y = spec_mean, group=veg_type, colo
 
 # plot CV
 
-ggplot(QHI_small_wvlgth, aes(x = wavelength, y = CV, group = plot, color = plot)) + 
+ggplot(QHI_wavelength, aes(x = wavelength, y = CV, group = plot, color = plot)) + 
   geom_line(alpha = 0.9) + 
   theme_spectra() +
   theme(legend.position = "right") +
@@ -463,7 +459,7 @@ ggplot(QHI_small_wvlgth, aes(x = wavelength, y = CV, group = plot, color = plot)
   theme_rgb_CV
 
 # SMOOTHING NOT CORRECT
-ggplot(QHI_small_wvlgth, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
+ggplot(QHI_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
   geom_smooth(alpha = 0.2, se=TRUE) + 
   theme_spectra() +
   labs(x = "\nWavelength (mm)", y = "CV\n") +
@@ -492,8 +488,15 @@ ggplot(QHI_small_wvlgth, aes(x = wavelength, y = CV, group=veg_type, color = veg
     guides(colour = guide_legend(override.aes = list(size=5))))
 #ggsave(p_test_3, path = "figures", filename = "spec_sig_collison.png", height = 8, width = 10)
 
+# group by id
 collison_small <- collison %>%
   group_by(veg_type, plot, id) %>%
+  summarise(spec_mean = mean(reflectance),
+            CV = mean(sd(reflectance)/mean(reflectance)))
+
+# group by wavelength grouping
+collison_wavelength <- collison %>%
+  group_by(veg_type, plot, wavelength) %>%
   summarise(spec_mean = mean(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance)))
 
@@ -531,7 +534,7 @@ ggplot(collison_small, aes(x=veg_type, y=CV, fill=veg_type)) +
     geom_flat_violin(data = collison_small, aes(x=veg_type, y=CV, fill=veg_type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = collison_small, aes(x=veg_type, y=CV, colour=plot),
-               position = position_jitter(width = .15), size = 3) +
+               position = position_jitter(width = .15), size = 2) +
     geom_boxplot(data = collison_small, aes(x=veg_type, y=CV),
                  width=0.2, fill="white", alpha = 0.3) +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
@@ -540,7 +543,7 @@ ggplot(collison_small, aes(x=veg_type, y=CV, fill=veg_type)) +
 # ggsave(p_collison, path = "figures", filename = "cloud_CV_collison.png", height = 8, width = 10)
 
 # plots mean reflectance 
-(p_col_mean <- ggplot(collison_small_wvlgth, aes(x = wavelength, y = spec_mean, group = plot, color = plot)) + 
+(p_col_mean <- ggplot(collison_wavelength, aes(x = wavelength, y = spec_mean, group = plot, color = plot)) + 
     geom_line(alpha = 0.7, size=1.) + 
     guides(colour = guide_legend(override.aes = list(size=5))) +
     scale_color_brewer(palette = "Paired") +
@@ -551,7 +554,7 @@ ggplot(collison_small, aes(x=veg_type, y=CV, fill=veg_type)) +
 #ggsave(p_collison, path = "figures", filename = "spec_sig_plot_collison.png", height = 8, width = 10)
 
 ##  smoothed plots mean reflectance SMOOTHING NOT CORRECT
-ggplot(collison_small_wvlgth, aes(x = wavelength, y = spec_mean, group=veg_type, color = veg_type)) + 
+ggplot(collison_wavelength, aes(x = wavelength, y = spec_mean, group=veg_type, color = veg_type)) + 
   geom_smooth(alpha = 0.2, se=TRUE) + 
   theme_spectra() +
   scale_color_manual(values = c("#ffa544", "#2b299b")) +
@@ -559,7 +562,7 @@ ggplot(collison_small_wvlgth, aes(x = wavelength, y = spec_mean, group=veg_type,
 
 # plot CV
 
-(p_col_CV <- ggplot(collison_small_wvlgth, aes(x = wavelength, y = CV, group = plot, color = plot)) + 
+(p_col_CV <- ggplot(collison_wavelength, aes(x = wavelength, y = CV, group = plot, color = plot)) + 
     geom_line(alpha = 0.7, size=1.) + 
     guides(colour = guide_legend(override.aes = list(size=5))) +
     scale_color_brewer(palette = "Paired") +
@@ -569,7 +572,7 @@ ggplot(collison_small_wvlgth, aes(x = wavelength, y = spec_mean, group=veg_type,
     theme_rgb_CV)
 
 # SMOOTHING NOT CORRECT
-ggplot(collison_small_wvlgth, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
+ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
   geom_smooth(alpha = 0.2, se=TRUE) + 
   scale_color_manual(values = c("#ffa544", "#2b299b")) +
   theme_spectra() +
@@ -578,7 +581,7 @@ ggplot(collison_small_wvlgth, aes(x = wavelength, y = CV, group=veg_type, color 
 #  collison facet plot ----
 #  spectral mean and CV violin plots by region ----
 
-collison_small_wvlgth <- collison %>%
+collison_wavelength <- collison %>%
   group_by(veg_type, plot, wavelength) %>%
   summarise(spec_mean = mean(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance))) %>%
@@ -590,13 +593,13 @@ collison_small_wvlgth <- collison %>%
 
 # blue mean
 (p_blue_mean <- ggplot() +
-    geom_flat_violin(data = subset(collison_small_wvlgth, region %in% c("blue")), 
+    geom_flat_violin(data = subset(collison_wavelength, region %in% c("blue")), 
                      aes(x=veg_type, y=spec_mean, fill=veg_type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-      geom_point(data = subset(collison_small_wvlgth, region %in% c("blue")),
+      geom_point(data = subset(collison_wavelength, region %in% c("blue")),
                aes(x=veg_type, y=spec_mean, colour=plot),
                position = position_jitter(width = .05), size = .5) +
-     geom_boxplot(data = subset(collison_small_wvlgth, region %in% c("blue")),
+     geom_boxplot(data = subset(collison_wavelength, region %in% c("blue")),
                  aes(x=veg_type, y=spec_mean),
                  width=0.2, fill="white", alpha = 0.3) +
     scale_color_brewer(palette = "Paired") +
@@ -609,13 +612,13 @@ collison_small_wvlgth <- collison %>%
 
 # blue CV
 (p_blue_CV <- ggplot() +
-    geom_flat_violin(data = subset(collison_small_wvlgth, region %in% c("blue")), 
+    geom_flat_violin(data = subset(collison_wavelength, region %in% c("blue")), 
                      aes(x=veg_type, y=CV, fill=veg_type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = subset(collison_small_wvlgth, region %in% c("blue")),
+    geom_point(data = subset(collison_wavelength, region %in% c("blue")),
                aes(x=veg_type, y=CV, colour=plot),
                position = position_jitter(width = .05), size = .5) +
-    geom_boxplot(data = subset(collison_small_wvlgth, region %in% c("blue")),
+    geom_boxplot(data = subset(collison_wavelength, region %in% c("blue")),
                  aes(x=veg_type, y=CV),
                  width=0.2, fill="white", alpha = 0.3) +
     scale_color_brewer(palette = "Paired") +
@@ -627,13 +630,13 @@ collison_small_wvlgth <- collison %>%
 
 # green mean
 (p_green_mean <- ggplot() +
-    geom_flat_violin(data = subset(collison_small_wvlgth, region %in% c("green")), 
+    geom_flat_violin(data = subset(collison_wavelength, region %in% c("green")), 
                      aes(x=veg_type, y=spec_mean, fill=veg_type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = subset(collison_small_wvlgth, region %in% c("green")),
+    geom_point(data = subset(collison_wavelength, region %in% c("green")),
                aes(x=veg_type, y=spec_mean, colour=plot),
                position = position_jitter(width = .05), size = .5) +
-    geom_boxplot(data = subset(collison_small_wvlgth, region %in% c("green")),
+    geom_boxplot(data = subset(collison_wavelength, region %in% c("green")),
                  aes(x=veg_type, y=spec_mean),
                  width=0.2, fill="white", alpha = 0.3) +
     scale_color_brewer(palette = "Paired") +
@@ -645,13 +648,13 @@ collison_small_wvlgth <- collison %>%
 
 # green CV
 (p_green_CV <- ggplot() +
-    geom_flat_violin(data = subset(collison_small_wvlgth, region %in% c("green")), 
+    geom_flat_violin(data = subset(collison_wavelength, region %in% c("green")), 
                      aes(x=veg_type, y=CV, fill=veg_type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = subset(collison_small_wvlgth, region %in% c("green")),
+    geom_point(data = subset(collison_wavelength, region %in% c("green")),
                aes(x=veg_type, y=CV, colour=plot),
                position = position_jitter(width = .05), size = .5) +
-    geom_boxplot(data = subset(collison_small_wvlgth, region %in% c("green")),
+    geom_boxplot(data = subset(collison_wavelength, region %in% c("green")),
                  aes(x=veg_type, y=CV),
                  width=0.2, fill="white", alpha = 0.3) +
     scale_color_brewer(palette = "Paired") +
@@ -663,13 +666,13 @@ collison_small_wvlgth <- collison %>%
 
 # red mean
 (p_red_mean <- ggplot() +
-    geom_flat_violin(data = subset(collison_small_wvlgth, region %in% c("red")), 
+    geom_flat_violin(data = subset(collison_wavelength, region %in% c("red")), 
                      aes(x=veg_type, y=spec_mean, fill=veg_type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = subset(collison_small_wvlgth, region %in% c("red")),
+    geom_point(data = subset(collison_wavelength, region %in% c("red")),
                aes(x=veg_type, y=spec_mean, colour=plot),
                position = position_jitter(width = .05), size = .5) +
-    geom_boxplot(data = subset(collison_small_wvlgth, region %in% c("red")),
+    geom_boxplot(data = subset(collison_wavelength, region %in% c("red")),
                  aes(x=veg_type, y=spec_mean),
                  width=0.2, fill="white", alpha = 0.3) +
     scale_color_brewer(palette = "Paired") +
@@ -681,13 +684,13 @@ collison_small_wvlgth <- collison %>%
 
 # red CV
 (p_red_CV <- ggplot() +
-    geom_flat_violin(data = subset(collison_small_wvlgth, region %in% c("red")), 
+    geom_flat_violin(data = subset(collison_wavelength, region %in% c("red")), 
                      aes(x=veg_type, y=CV, fill=veg_type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = subset(collison_small_wvlgth, region %in% c("red")),
+    geom_point(data = subset(collison_wavelength, region %in% c("red")),
                aes(x=veg_type, y=CV, colour=plot),
                position = position_jitter(width = .05), size = .5) +
-    geom_boxplot(data = subset(collison_small_wvlgth, region %in% c("red")),
+    geom_boxplot(data = subset(collison_wavelength, region %in% c("red")),
                  aes(x=veg_type, y=CV),
                  width=0.2, fill="white", alpha = 0.3) +
     scale_color_brewer(palette = "Paired") +
@@ -699,13 +702,13 @@ collison_small_wvlgth <- collison %>%
 
 # NIR mean
 (p_NIR_mean <- ggplot() +
-    geom_flat_violin(data = subset(collison_small_wvlgth, region %in% c("NIR")), 
+    geom_flat_violin(data = subset(collison_wavelength, region %in% c("NIR")), 
                      aes(x=veg_type, y=spec_mean, fill=veg_type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = subset(collison_small_wvlgth, region %in% c("NIR")),
+    geom_point(data = subset(collison_wavelength, region %in% c("NIR")),
                aes(x=veg_type, y=spec_mean, colour=plot),
                position = position_jitter(width = .05), size = 1) +
-    geom_boxplot(data = subset(collison_small_wvlgth, region %in% c("NIR")),
+    geom_boxplot(data = subset(collison_wavelength, region %in% c("NIR")),
                  aes(x=veg_type, y=spec_mean),
                  width=0.2, fill="white", alpha = 0.3) +
     scale_color_brewer(palette = "Paired") +
@@ -717,13 +720,13 @@ collison_small_wvlgth <- collison %>%
 
 # NIR CV
 (p_NIR_CV <- ggplot() +
-    geom_flat_violin(data = subset(collison_small_wvlgth, region %in% c("NIR")), 
+    geom_flat_violin(data = subset(collison_wavelength, region %in% c("NIR")), 
                      aes(x=veg_type, y=CV, fill=veg_type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = subset(collison_small_wvlgth, region %in% c("NIR")),
+    geom_point(data = subset(collison_wavelength, region %in% c("NIR")),
                aes(x=veg_type, y=CV, colour=plot),
                position = position_jitter(width = .05), size = 1) +
-    geom_boxplot(data = subset(collison_small_wvlgth, region %in% c("NIR")),
+    geom_boxplot(data = subset(collison_wavelength, region %in% c("NIR")),
                  aes(x=veg_type, y=CV),
                  width=0.2, fill="white", alpha = 0.3) +
     scale_color_brewer(palette = "Paired") +
@@ -735,13 +738,13 @@ collison_small_wvlgth <- collison %>%
 
 # IR mean
 (p_IR_mean <- ggplot() +
-    geom_flat_violin(data = subset(collison_small_wvlgth, region %in% c("IR")), 
+    geom_flat_violin(data = subset(collison_wavelength, region %in% c("IR")), 
                      aes(x=veg_type, y=spec_mean, fill=veg_type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = subset(collison_small_wvlgth, region %in% c("IR")),
+    geom_point(data = subset(collison_wavelength, region %in% c("IR")),
                aes(x=veg_type, y=spec_mean, colour=plot),
                position = position_jitter(width = .05), size = 1) +
-    geom_boxplot(data = subset(collison_small_wvlgth, region %in% c("IR")),
+    geom_boxplot(data = subset(collison_wavelength, region %in% c("IR")),
                  aes(x=veg_type, y=spec_mean),
                  width=0.2, fill="white", alpha = 0.3) +
     scale_color_brewer(palette = "Paired") +
@@ -753,13 +756,13 @@ collison_small_wvlgth <- collison %>%
 
 # IR CV
 (p_IR_CV <- ggplot() +
-    geom_flat_violin(data = subset(collison_small_wvlgth, region %in% c("IR")), 
+    geom_flat_violin(data = subset(collison_wavelength, region %in% c("IR")), 
                      aes(x=veg_type, y=CV, fill=veg_type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = subset(collison_small_wvlgth, region %in% c("IR")),
+    geom_point(data = subset(collison_wavelength, region %in% c("IR")),
                aes(x=veg_type, y=CV, colour=plot),
                position = position_jitter(width = .05), size = 1) +
-    geom_boxplot(data = subset(collison_small_wvlgth, region %in% c("IR")),
+    geom_boxplot(data = subset(collison_wavelength, region %in% c("IR")),
                  aes(x=veg_type, y=CV),
                  width=0.2, fill="white", alpha = 0.3) +
     scale_color_brewer(palette = "Paired") +
@@ -834,9 +837,10 @@ collison_small <- collison %>%
    theme_classic())
 
 # linear model for H1
+m_H1a <- glm(data = collison_small, spec_mean ~ veg_type + plot)
+
 m_H1a <- lmer(data = collison_small, spec_mean ~ veg_type + (1|plot))
 
-m_H1a <- glm(data = collison_small, spec_mean ~ veg_type + plot)
 
 summary(m_H1a)
 
@@ -847,7 +851,8 @@ plot(m_H1a)
 # visulise fixed effect
 (fe.effects <- plot_model(m_H1a, show.values = TRUE))
 
-ggplot(collison_small_wvlgth, aes(x = wavelength, y = spec_mean, group=veg_type, color = veg_type)) + 
+
+ggplot(collison_wavelength, aes(x = wavelength, y = spec_mean, group=veg_type, color = veg_type)) + 
   geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
   stat_smooth(method = "lm", aes(fill = veg_type, color = veg_type), se=TRUE )+
   theme_spectra() +
@@ -871,7 +876,7 @@ plot(m_H1b)
 # visulise fixed effect
 (fe.effects <- plot_model(m_H1b, show.values = TRUE))
 
-ggplot(collison_small_wvlgth, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
+ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
   geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
   stat_smooth(method = "lm", aes(fill = veg_type, color = veg_type), se=TRUE )+
   theme_spectra() +
@@ -924,7 +929,7 @@ plot(m_H3a)
 # visulise fixed effect
 (fe.effects <- plot_model(m_H3a, show.values = TRUE))
 
-ggplot(collison_small_wvlgth, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
+ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
   geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
   stat_smooth(method = "lm", aes(fill = veg_type, color = veg_type), se=TRUE )+
   theme_spectra() +
@@ -952,7 +957,7 @@ plot(m_H3b)
 # visulise fixed effect
 (fe.effects <- plot_model(m_H3b, show.values = TRUE))
 
-ggplot(collison_small_wvlgth, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
+ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
   geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
   stat_smooth(method = "lm", aes(fill = veg_type, color = veg_type), se=TRUE )+
   theme_spectra() +
@@ -963,8 +968,6 @@ ggplot(collison_small_wvlgth, aes(x = wavelength, y = CV, group=veg_type, color 
 
 # for all QHI measurements 
 pca <- QHI_small 
-
-
 
 # simple pca
 pca <- prcomp(pca[,4:5], scale = TRUE, center = TRUE) # for adding number of ranks (rank. = 4)
@@ -1174,26 +1177,24 @@ ggplot(PS2_small, aes(x=veg_type, y=CV, fill=veg_type)) +
 # ggsave(p_QHI, path = "figures", filename = "cloud_CV.png", height = 8, width = 10)
 
 # group by wavelength 
-
-PS2_small_wvlgth <- PS2 %>%
+PS2_wavelength <- PS2 %>%
   group_by(veg_type, plot, wavelength) %>%
   summarise(spec_mean = mean(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance)))
 
 # GD advice: split full spec into regions (via background colors) and make seperate raincloud plot at each spec_region. (for full snazzyness add color of spec_region to backround)
 #plot spectral mean
-(p_PS2 <- ggplot(PS2_small_wvlgth, aes(x = wavelength, y = spec_mean, group = plot, color = plot)) + 
+(p_PS2 <- ggplot(PS2_wavelength, aes(x = wavelength, y = spec_mean, group = plot, color = plot)) + 
     geom_line(alpha = 0.7, size=1.) + 
     theme_spectra() +
     theme(legend.position = "right") +
     guides(colour = guide_legend(override.aes = list(size=5))) +
-    scale_color_manual(values = c("#ffa544", "#2b299b")) +
     labs(x = "\nWavelength (mm)", y = "CV\n"))
 #ggsave(p_QHI, path = "figures", filename = "spec_sig_plot.png", height = 8, width = 10)
 
 
 ## SMOOTHING NOT CORRECT
-ggplot(PS2_small_wvlgth, aes(x = wavelength, y = spec_mean, group=veg_type, color = veg_type)) + 
+ggplot(PS2_wavelength, aes(x = wavelength, y = spec_mean, group=veg_type, color = veg_type)) + 
   geom_smooth(alpha = 0.2, se=TRUE) + 
   theme_spectra() +
   scale_color_manual(values = c("#ffa544", "#2b299b")) +
@@ -1201,16 +1202,15 @@ ggplot(PS2_small_wvlgth, aes(x = wavelength, y = spec_mean, group=veg_type, colo
 
 # plot CV
 
-ggplot(PS2_small_wvlgth, aes(x = wavelength, y = CV, group = plot, color = plot)) + 
+ggplot(PS2_wavelength, aes(x = wavelength, y = CV, group = plot, color = plot)) + 
   geom_line(alpha = 0.9) + 
   theme_spectra() +
   theme(legend.position = "right") +
-  scale_color_manual(values = c("#ffa544", "#2b299b")) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
   labs(x = "\nWavelength (mm)", y = "CV\n")
 
 # SMOOTHING NOT CORRECT
-ggplot(PS2_small_wvlgth, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
+ggplot(PS2_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
   geom_smooth(alpha = 0.2, se=TRUE) + 
   theme_spectra() +
   scale_color_manual(values = c("#ffa544", "#2b299b")) +
