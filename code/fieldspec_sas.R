@@ -252,7 +252,7 @@ QHI <- QHI %>%
 QHI %>% filter(reflectance>100) %>%
   count(id)
 
-filter(wavelength %in% band_selection$wavelength) %>%
+filter(wavelength %in% ISI_band_selection$wavelength) %>%
 
 # remove measuments with reflectance values over 100
 QHI <- QHI %>%
@@ -282,7 +282,29 @@ filter(id %in% c("249", "250")) %>%
          correction_factor = (reference[id == "250"] / reference[id == "249"]),
          reflectance = reflectance/correction_factor)
 
-#  ISI band selection ----
+#  band selection ----
+
+# supervised band selection
+
+
+supervised_band_selection <- tibble(wavelength = 
+                                      # need to sequence by 0.01 to subsequently filter wavelengths
+                                      c(seq(430, 450, by = 0.01), # Chlorophyll & carotenoid absorption
+                                        seq(660, 680, by = 0.01), # Max absorption of chlorophyll
+                                        seq(700, 725, by = 0.01), # Middle of red-edge transition
+                                        seq(745, 755, by = 0.01), # End of red-edge transition
+                                        seq(920, 985, by = 0.01)))# Vascular plant structures & H20 
+
+supervised_band_selection <- collison %>%
+  filter(wavelength %in% supervised_band_selection$wavelength)
+ 
+                 
+         
+  filter(wavelength %in% c(430:450, 660:680, 700:725, 745:755, 920:985))# %>%
+  group_by(veg_type, plot, id) %>%
+  summarise(spec_mean = mean(reflectance),
+            CV = mean(sd(reflectance)/mean(reflectance)))
+  
 
 collison_ISI <- collison %>%
   filter(veg_type %in% c("KO" , "HE")) %>%
@@ -290,7 +312,7 @@ collison_ISI <- collison %>%
   summarise(ISI = (1.96*(mean(reflectance[veg_type=="HE"]) + mean(reflectance[veg_type=="KO"])))/
                         abs(sd(reflectance[veg_type=="HE"] - sd(reflectance[veg_type=="KO"])))) 
 
-band_selection <- collison_ISI %>%
+ISI_band_selection <- collison_ISI %>%
     mutate(n = row_number()) %>%
      # filter wavelengths that are local ISI minima
     filter(n %in% find_peaks(-collison_ISI$ISI))
@@ -899,7 +921,7 @@ ggplot(collison, aes(x = wavelength, y = reflectance, group = veg_type, color = 
 
 # reduced dimentionality; product of ISI band selection
 lowD <- collison %>%
-  filter(wavelength %in% band_selection$wavelength) %>%
+  filter(wavelength %in% ISI_band_selection$wavelength) %>%
   group_by(veg_type, plot, id) %>%
   summarise(spec_mean = mean(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance)))
@@ -1043,7 +1065,7 @@ fviz_pca_ind(res.pca,
 
 # pca for all QHI measurements, with band selection
 pca_lowD <- QHI %>%
-  filter(wavelength %in% band_selection$wavelength) %>%
+  filter(wavelength %in% ISI_band_selection$wavelength) %>%
   group_by(veg_type, plot, id) %>%
   summarise(spec_mean = mean(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance)))
