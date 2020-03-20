@@ -16,6 +16,7 @@ library(viridis) # color pallet
 library(grid) # for pannel plot
 library(FactoMineR) # for pca
 library(factoextra) # for pca visulizaiton
+library(ggpmisc) # for ISI minima visulizaiton
 
 
 source("https://gist.githubusercontent.com/benmarwick/2a1bb0133ff568cbe28d/raw/fb53bd97121f7f9ce947837ef1a4c65a73bffb3f/geom_flat_violin.R")
@@ -286,7 +287,6 @@ filter(id %in% c("249", "250")) %>%
 
 # supervised band selection
 
-
 supervised_band_selection <- tibble(wavelength = 
                                       # need to sequence by 0.01 to subsequently filter wavelengths
                                       c(seq(430, 450, by = 0.01), # Chlorophyll & carotenoid absorption
@@ -296,15 +296,13 @@ supervised_band_selection <- tibble(wavelength =
                                         seq(920, 985, by = 0.01)))# Vascular plant structures & H20 
 
 supervised_band_selection <- collison %>%
-  filter(wavelength %in% supervised_band_selection$wavelength)
- 
-                 
-         
-  filter(wavelength %in% c(430:450, 660:680, 700:725, 745:755, 920:985))# %>%
+  filter(wavelength %in% supervised_band_selection$wavelength) %>%
   group_by(veg_type, plot, id) %>%
   summarise(spec_mean = mean(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance)))
-  
+ 
+
+# ISI band selection and SZU 
 
 collison_ISI <- collison %>%
   filter(veg_type %in% c("KO" , "HE")) %>%
@@ -331,9 +329,12 @@ SZU <- collison_ISI %>%
 # the selcted wavelengths according to SZU
 head(SZU, n=5)
 
-
-library(ggpmisc)
-
+# reduced dimentionality; product of ISI band selection
+lowD <- collison %>%
+  filter(wavelength %in% ISI_band_selection$wavelength) %>%
+  group_by(veg_type, plot, id) %>%
+  summarise(spec_mean = mean(reflectance),
+            CV = mean(sd(reflectance)/mean(reflectance)))
 
 # need to spruce up https://www.rdocumentation.org/packages/ggpmisc/versions/0.3.3/topics/stat_peaks
 # plot of ISI by wavelength and local minima
@@ -919,13 +920,6 @@ ggplot(collison, aes(x = wavelength, y = reflectance, group = veg_type, color = 
 
 # spectral mean
 
-# reduced dimentionality; product of ISI band selection
-lowD <- collison %>%
-  filter(wavelength %in% ISI_band_selection$wavelength) %>%
-  group_by(veg_type, plot, id) %>%
-  summarise(spec_mean = mean(reflectance),
-            CV = mean(sd(reflectance)/mean(reflectance)))
-
 (hist <- ggplot(lowD, aes(x = spec_mean)) +
     geom_histogram() +
     theme_classic())
@@ -973,6 +967,65 @@ plot(m_H3b)
 (re.effects <- plot_model(m_H3b, type = "re", show.values = TRUE))
 # visulise fixed effect
 (fe.effects <- plot_model(m_H3b, show.values = TRUE))
+
+ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
+  geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
+  stat_smooth(method = "lm", aes(fill = veg_type, color = veg_type), se=TRUE )+
+  theme_spectra() +
+  labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n")
+
+
+# models with supervised band selection for dimention reduction 
+
+# spectral mean
+
+(hist <- ggplot(supervised_band_selection, aes(x = spec_mean)) +
+    geom_histogram() +
+    theme_classic())
+
+# linear model with band selection
+
+m_H3c <- glm(data = supervised_band_selection, spec_mean ~ veg_type + plot)
+
+m_H3c <- lmer(data = supervised_band_selection, spec_mean ~ veg_type + (1|plot))
+
+summary(m_H3c)
+
+plot(m_H3c)
+
+
+# Visualises random effects 
+(re.effects <- plot_model(m_H3c, type = "re", show.values = TRUE))
+# visulise fixed effect
+(fe.effects <- plot_model(m_H3c, show.values = TRUE))
+
+ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
+  geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
+  stat_smooth(method = "lm", aes(fill = veg_type, color = veg_type), se=TRUE )+
+  theme_spectra() +
+  labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n")
+
+# CV
+
+(hist <- ggplot(supervised_band_selection, aes(x = CV)) +
+    geom_histogram() +
+    theme_classic())
+
+# linear model with band selection
+
+m_H3d <- glm(data = supervised_band_selection, CV ~ veg_type + plot)
+
+m_H3d <- lmer(data = supervised_band_selection, CV ~ veg_type + (1|plot))
+
+summary(m_H3d)
+
+plot(m_H3d)
+
+
+# Visualises random effects 
+(re.effects <- plot_model(m_H3d, type = "re", show.values = TRUE))
+# visulise fixed effect
+(fe.effects <- plot_model(m_H3d, show.values = TRUE))
 
 ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
   geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
