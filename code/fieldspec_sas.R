@@ -843,12 +843,15 @@ print(p_IR_CV + rremove("legend")  + rremove("xylab"), vp = define_region(row = 
 library(lme4)
 library(sjPlot)  # to visualise model outputs
 library(ggeffects)  # to visualise model predictions
-library(glmmTMB) # to vusualise model predictions
+library(glmmTMB) # to visualise model predictions
+library(dotwhisker) # to visulaise effect whiskerplots
 
 collison_small <- collison %>%
   group_by(veg_type, plot, id) %>%
   summarise(spec_mean = mean(reflectance),
-            CV = mean(sd(reflectance)/mean(reflectance)))
+            CV = mean(sd(reflectance)/mean(reflectance))) #%>%
+  mutate(spec_mean = scale(spec_mean, center = TRUE, scale = TRUE))
+
 
 (hist <- ggplot(collison_small, aes(x = spec_mean)) +
    geom_histogram() +
@@ -863,6 +866,8 @@ m_H1a <- lmer(data = collison_small, spec_mean ~ veg_type + (1|plot))
 summary(m_H1a)
 
 plot(m_H1a)
+qqnorm(resid(m_H1a))
+qqline(resid(m_H1a))  # points fall nicely onto the line - good!
 
 # Visualises random effects 
 (re.effects <- plot_model(m_H1a, type = "re", show.values = TRUE))
@@ -888,6 +893,8 @@ m_H1b <- lmer(data = collison_small, CV ~ veg_type + (1|plot))
 summary(m_H1b)
 
 plot(m_H1b)
+qqnorm(resid(m_H1b))
+qqline(resid(m_H1b)) 
 
 # Visualises random effects 
 (re.effects <- plot_model(m_H1b, type = "re", show.values = TRUE))
@@ -933,6 +940,8 @@ m_H3a <- lmer(data = lowD, spec_mean ~ veg_type + (1|plot))
 summary(m_H3a)
 
 plot(m_H3a)
+qqnorm(resid(m_H3a))
+qqline(resid(m_H3a)) 
 
 
 # Visualises random effects 
@@ -961,6 +970,8 @@ m_H3b <- lmer(data = lowD, CV ~ veg_type + (1|plot))
 summary(m_H3b)
 
 plot(m_H3b)
+qqnorm(resid(m_H3b))
+qqline(resid(m_H3b)) 
 
 
 # Visualises random effects 
@@ -992,6 +1003,8 @@ m_H3c <- lmer(data = supervised_band_selection, spec_mean ~ veg_type + (1|plot))
 summary(m_H3c)
 
 plot(m_H3c)
+qqnorm(resid(m_H3c))
+qqline(resid(m_H3c)) 
 
 
 # Visualises random effects 
@@ -1020,6 +1033,8 @@ m_H3d <- lmer(data = supervised_band_selection, CV ~ veg_type + (1|plot))
 summary(m_H3d)
 
 plot(m_H3d)
+qqnorm(resid(m_H3d))
+qqline(resid(m_H3d)) 
 
 
 # Visualises random effects 
@@ -1032,6 +1047,30 @@ ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = 
   stat_smooth(method = "lm", aes(fill = veg_type, color = veg_type), se=TRUE )+
   theme_spectra() +
   labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n")
+
+
+# combined model vis
+
+library(broom)
+
+# spectral mean
+
+dwplot(list(m_H1a, m_H3a, m_H3c), 
+       vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 1)) +
+  theme_spectra() +
+  theme(legend.position = c(0.8, 0.5),
+        legend.justification = c(0, 0),
+        legend.title.align = .5)
+
+# CV
+
+# effect sizes and error dont seem to correspond with model summary...
+dwplot(list(m_H1b, m_H3b, m_H3d), 
+       vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 1)) +
+  theme_spectra() +
+  theme(legend.position = c(0.8, 0.8),
+        legend.justification = c(0, 0),
+        legend.title.align = .5)
 
 
 #  QHI PCA ----
