@@ -1072,6 +1072,21 @@ dwplot(list(m_H1b, m_H3b, m_H3d),
         legend.justification = c(0, 0),
         legend.title.align = .5)
 
+# If needed I could use ggpredict to creat boxplot of predicted spec_mean and cv by VT by Model (but might not be compatable with lme4)
+# https://strengejacke.github.io/ggeffects/reference/ggpredict.html
+
+
+
+dat <- ggpredict(fit, terms = c("c172code", "c161sex"))
+ggplot(dat, aes(x, predicted, colour = group)) +
+  geom_point(position = position_dodge(.1)) +
+  geom_errorbar(
+    aes(ymin = conf.low, ymax = conf.high),
+    position = position_dodge(.1)
+  ) +
+  scale_x_discrete(breaks = 1:3, labels = get_x_labels(dat))
+
+
 
 #  QHI PCA ----
 
