@@ -17,3 +17,31 @@ unique(QHI_cover$year) # Check years
 # Confirm species IDs and spellings are consistent
 
 # Calculate biodiversity metrics
+
+
+
+# sorting plot
+
+sort_QHI <- QHI_cover %>%
+  #add_column(n="plot") %>%
+  mutate(n = "plot",
+         n2 = "year") %>%
+ # unite("plot2" , c(n,plot)) %>%
+  unite("year2", c(n2, year)) %>%
+  group_by(sub_name, year2, plot) %>%
+  #filter(name == "Arctagrostis latifolia" | name == "Dryas integrifolia" | name == "Eriophorum angustifolium") %>%
+  filter(name == "Lupinus arcticus") %>%
+  summarise(test = first(name),
+            cover = first(cover))
+  
+
+
+ggplot(sort_QHI, aes(x=plot, y= cover, color= year2, shape = test)) +
+       geom_point() +
+  geom_line() +
+  facet_wrap(.~sub_name) 
+
+  
+  
+
+
