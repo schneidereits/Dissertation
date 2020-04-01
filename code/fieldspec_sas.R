@@ -45,29 +45,31 @@ theme_spectra <- function(){
                                            size = 3, linetype = "blank"))
 }
 
+
+
 theme_rgb_mean <- list( annotate("rect", xmin = 400, xmax = 500, ymin = 0.5,
-                                 ymax = 100, alpha = .05, fill = "blue"),
+                                 ymax = 100, alpha = .15, fill = "blue"),
                         annotate("rect", xmin = 500, xmax = 600, ymin = 0.5, 
-                                 ymax = 100, alpha = .05, fill = "green"), 
+                                 ymax = 100, alpha = .15, fill = "green"), 
                         annotate("rect", xmin = 600, xmax = 680, ymin = 0.5, 
-                                 ymax = 100, alpha = .05, fill = "red"), 
+                                 ymax = 100, alpha = .15, fill = "red"), 
                         annotate("rect", xmin = 680, xmax = 800, ymin = 0.5, 
-                                 ymax = 100, alpha = .05, fill = "tomato"),
+                                 ymax = 100, alpha = .15, fill = "tomato"),
                         annotate("rect", xmin = 800, xmax = 985, ymin = 0.5, 
-                                 ymax = 100, alpha = .05, fill = "orange"),
+                                 ymax = 100, alpha = .15, fill = "darkgrey"),
                         scale_y_continuous(expand = expand_scale(mult = c(0, .1))),
                         scale_x_continuous(expand = expand_scale(mult = c(0, .1))))
 
 theme_rgb_CV <- list(annotate("rect", xmin = 400, xmax = 500, ymin = 0, ymax = 0.5, 
-                          alpha = .05, fill = "blue"),
+                          alpha = .15, fill = "blue"),
                      annotate("rect", xmin = 500, xmax = 600, ymin = 0, ymax = 0.5, 
-                          alpha = .05, fill = "green"),
+                          alpha = .15, fill = "green"),
                      annotate("rect", xmin = 600, xmax = 680, ymin = 0, ymax = 0.5, 
-                          alpha = .05, fill = "red"),
+                          alpha = .15, fill = "red"),
                      annotate("rect", xmin = 680, xmax = 800, ymin = 0, ymax = 0.5, 
-                          alpha = .05, fill = "tomato"),
+                          alpha = .15, fill = "tomato"),
                      annotate("rect", xmin = 800, xmax = 985, ymin = 0, ymax = 0.5, 
-                         alpha = .05, fill = "orange"))
+                         alpha = .15, fill = "darkgrey"))
   
 scale_color_QHI <- list(scale_color_manual(values = c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FFB90F", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF", "#A8A8A8")))
 scale_color_collison <- list(scale_color_manual(values = c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FFB90F", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF")))
@@ -312,8 +314,8 @@ collison_ISI <- collison %>%
 
 ISI_band_selection <- collison_ISI %>%
     mutate(n = row_number()) %>%
-     # filter wavelengths that are local ISI minima
-    filter(n %in% find_peaks(-collison_ISI$ISI))
+     # filter wavelengths that are local ISI minima; (-) is to denote minima
+    filter(n %in% find_peaks(-collison_ISI$ISI))          
  
 
 SZU <- collison_ISI %>%
@@ -338,27 +340,31 @@ lowD <- collison %>%
 
 # need to spruce up https://www.rdocumentation.org/packages/ggpmisc/versions/0.3.3/topics/stat_peaks
 # plot of ISI by wavelength and local minima
-ggplot(collison_ISI, aes(x=wavelength, y=ISI)) +
+(p_ISI <-  ggplot(collison_ISI, aes(x=wavelength, y=ISI)) +
   geom_line() +
   theme_cowplot() +
-  stat_valleys(colour = "red", span = 3) +
+  stat_valleys(span = 3, shape = 1, size = 2, color = "black", fill = NA) +
   scale_y_continuous(expand = expand_scale(mult = c(0, .1))) +
   scale_x_continuous(expand = expand_scale(mult = c(0, .1))) +
   annotate("rect", xmin = 400, xmax = 500, ymin = 16,
-           ymax = 23, alpha = .05, fill = "blue") + 
+           ymax = 23, alpha = .15, fill = "blue") + 
   annotate("rect", xmin = 500, xmax = 600, ymin = 16, 
-         ymax = 23, alpha = .05, fill = "green") +
+         ymax = 23, alpha = .15, fill = "green") +
   annotate("rect", xmin = 600, xmax = 680, ymin = 16, 
-         ymax = 23, alpha = .05, fill = "red") + 
+         ymax = 23, alpha = .15, fill = "red") + 
   annotate("rect", xmin = 680, xmax = 800, ymin = 16, 
-         ymax = 23, alpha = .05, fill = "tomato") +
+         ymax = 23, alpha = .15, fill = "tomato") +
   annotate("rect", xmin = 800, xmax = 985, ymin = 16, 
-         ymax = 23, alpha = .05, fill = "orange")
+         ymax = 23, alpha = .15, fill = "darkgrey"))
+
+#ggsave(p_ISI, path = "figures", filename = "ISI_by_wavelength.png", height = 10, width = 12)
   
 # plot of trends in accumulated D_ISIi values
-ggplot(SZU, aes(x=n, y=D_ISIi)) +
+(p_SZU <- ggplot(SZU, aes(x=n, y=D_ISIi)) +
   geom_line() +
-  theme_cowplot() 
+  theme_cowplot())
+
+#ggsave(p_SZU, path = "figures", filename = "SZU.png", height = 10, width = 12)
 
 #  QHI vis -------
 
@@ -454,6 +460,7 @@ QHI_wavelength <- QHI %>%
     theme(legend.position = "right") +
     theme_rgb_mean)
 
+
 #ggsave(p_QHI, path = "figures", filename = "spec_sig_plot.png", height = 8, width = 10)
 
 ## SMOOTHING NOT CORRECT
@@ -473,6 +480,8 @@ ggplot(QHI_wavelength, aes(x = wavelength, y = CV, group = plot, color = plot)) 
   labs(x = "\nWavelength (mm)", y = "CV\n") + 
   scale_color_QHI +
   theme_rgb_CV
+
+#ggsave(p_QHI, path = "figures", filename = "CV_plot.png", height = 8, width = 10)
 
 # SMOOTHING NOT CORRECT
 ggplot(QHI_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
@@ -569,7 +578,7 @@ ggplot(collison_small, aes(x=veg_type, y=CV, fill=veg_type)) +
     theme(legend.position = "bottom") +
     scale_color_collison +
     theme_rgb_mean)
-#ggsave(p_collison, path = "figures", filename = "spec_sig_plot_collison.png", height = 8, width = 10)
+#ggsave(p_col_mean, path = "figures", filename = "spec_sig_plot_collison.png", height = 8, width = 10)
 
 ##  smoothed plots mean reflectance SMOOTHING NOT CORRECT
 ggplot(collison_wavelength, aes(x = wavelength, y = spec_mean, group=veg_type, color = veg_type)) + 
@@ -589,6 +598,8 @@ ggplot(collison_wavelength, aes(x = wavelength, y = spec_mean, group=veg_type, c
     theme(legend.position = "bottom") +
     scale_color_collison +
     theme_rgb_CV)
+
+#ggsave(p_col_CV, path = "figures", filename = "CV_plot_collison.png", height = 8, width = 10)
 
 # SMOOTHING NOT CORRECT
 ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
@@ -770,7 +781,7 @@ collison_wavelength <- collison %>%
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
     theme_cowplot() +
     theme(panel.background =  element_rect(fill = "white"),
-          plot.background = element_rect(color = "orange")))
+          plot.background = element_rect(color = "darkgrey")))
 
 
 # IR CV
@@ -789,7 +800,7 @@ collison_wavelength <- collison %>%
     theme_cowplot() +
     ylim(0.1, 0.4) +
     theme(panel.background =  element_rect(fill = "white"),
-          plot.background = element_rect(color = "orange")))
+          plot.background = element_rect(color = "darkgrey")))
 
 
 #  facet plot for spectral mean and cv ----
@@ -807,6 +818,7 @@ define_region <- function(row, col){
   viewport(layout.pos.row = row, layout.pos.col = col)
   
 } 
+
 
 # Arrange the plots
 print(p_col_mean, vp = define_region(row = 1:2, col = 1:5))   # Span over two columns
@@ -1157,7 +1169,7 @@ fviz_pca_var(res.pca, col.var = "contrib",
              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"))
 
 # grouped by elipsise
-fviz_pca_ind(res.pca,
+(p_pca <- fviz_pca_ind(res.pca,
              geom.ind = "point", # show points only (nbut not "text")
              col.ind = QHI_small$veg_type, # color by groups
              palette = c("#ffa544", "#2b299b", "gray65"),
@@ -1168,7 +1180,11 @@ fviz_pca_ind(res.pca,
              legend.title = "Groups",
              axes.linetype = "dashed",
              xlab = "PC1", ylab = "PC2", 
-             ggtheme = theme_spectra())
+             ggtheme = theme_spectra()))
+
+#ggsave(p_pca, path = "figures", filename = "QHI_pca.png", height = 10, width = 12)
+
+
 
 # pca for all QHI measurements, with band selection
 pca_lowD <- QHI %>%
@@ -1180,7 +1196,7 @@ pca_lowD <- QHI %>%
 res.pca_lowD <- PCA(pca_lowD[,4:5], scale.unit = TRUE, ncp = 5, graph = TRUE)
 
 # pca 
-fviz_pca_ind(res.pca_lowD,
+(p_pca <- fviz_pca_ind(res.pca_lowD,
              geom.ind = "point", # show points only (nbut not "text")
              col.ind = QHI_small$veg_type, # color by groups
              palette = c("#ffa544", "#2b299b", "gray65"),
@@ -1191,9 +1207,12 @@ fviz_pca_ind(res.pca_lowD,
              legend.title = "Groups",
              axes.linetype = "dashed",
              xlab = "PC1", ylab = "PC2", 
-             ggtheme = theme_spectra())
+             ggtheme = theme_spectra()))
+
+#ggsave(p_pca, path = "figures", filename = "QHI_lowD_pca.png", height = 10, width = 12)
+
 # biplot
-fviz_pca_biplot(res.pca_lowD,
+(p_pca <- fviz_pca_biplot(res.pca_lowD,
                 repel = TRUE, 
                 geom.ind = "point", # show points only (nbut not "text")
                 col.ind = QHI_small$veg_type, # color by groups
@@ -1205,7 +1224,9 @@ fviz_pca_biplot(res.pca_lowD,
                 legend.title = "Groups",
                 axes.linetype = "dashed",
                 xlab = "PC1", ylab = "PC2", 
-                ggtheme = theme_spectra())
+                ggtheme = theme_spectra()))
+
+#ggsave(p_pca, path = "figures", filename = "QHI_lowD_biplot.png", height = 10, width = 12)
 
 # PS2 ----
 
@@ -1347,9 +1368,26 @@ pca_PS2 <- PS2_small
 
 res.pca_PS2 <- PCA(pca_PS2[,4:5], scale.unit = TRUE, ncp = 5, graph = TRUE)
 
-# pca 
-fviz_pca_ind(res.pca_PS2,
-             geom.ind = "point", # show points only (nbut not "text")
+
+# PS2 pca by vegtype
+
+# PS2 pca 
+(p_PS2 <- fviz_pca_ind(res.pca_PS2,
+                       geom.ind = FALSE, # show points only (nbut not "text")
+                       col.ind = PS2_small$veg_type, # color by groups
+                       addEllipses = TRUE, # Concentration ellipses
+                       # ellipse.type = "confidence",
+                       ellipse.level = 0.95, # confidence level specification
+                       mean.point = TRUE, # braycenter mean point
+                       legend.title = "Groups",
+                       axes.linetype = "dashed",
+                       xlab = "PC1", ylab = "PC2", 
+                       ggtheme = theme_spectra()))
+#ggsave(p_PS2, path = "figures", filename = "PS2_pca.png", height = 10, width = 12)
+
+# PS2 pca by plot #FIX SHAPES
+(p_PS2 <- fviz_pca_ind(res.pca_PS2,
+             geom.ind = FALSE, # show points only (nbut not "text")
              col.ind = PS2_small$plot, # color by groups
              addEllipses = TRUE, # Concentration ellipses
              # ellipse.type = "confidence",
@@ -1358,7 +1396,22 @@ fviz_pca_ind(res.pca_PS2,
              legend.title = "Groups",
              axes.linetype = "dashed",
              xlab = "PC1", ylab = "PC2", 
-             ggtheme = theme_spectra())
+             ggtheme = theme_spectra()))
+
+#ggsave(p_PS2, path = "figures", filename = "PS2_plot_pca.png", height = 10, width = 12)
+
+# PS2 biplot
+fviz_pca_biplot(res.pca_PS2,
+                geom.ind = FALSE, # show points only (nbut not "text")
+                col.ind = PS2_small$plot, # color by groups
+                addEllipses = TRUE, # Concentration ellipses
+                # ellipse.type = "confidence",
+                ellipse.level = 0.95, # confidence level specification
+                mean.point = TRUE, # braycenter mean point
+                legend.title = "Groups",
+                axes.linetype = "dashed",
+                xlab = "PC1", ylab = "PC2", 
+                ggtheme = theme_spectra())
 
 
 
