@@ -242,7 +242,8 @@ QHI <- QHI %>%
          reference = parse_number(as.character(reference))/100,
          target = parse_number(as.character(target))/100,
          veg_type = as.factor(veg_type),
-         veg_type =  fct_explicit_na(veg_type, na_level = "mixed")) %>%
+         veg_type =  fct_explicit_na(veg_type, na_level = "mixed"),
+         year = "2019") %>%
   drop_na(reflectance) %>% 
   drop_na(wavelength) %>%
   drop_na(reference) %>%
@@ -263,8 +264,9 @@ QHI <- QHI %>%
 
 # group by id
 QHI_small <- QHI %>%
-  group_by(veg_type, plot, id) %>%
+  group_by(year, veg_type, plot, id) %>%
   summarise(spec_mean = mean(reflectance),
+            spec_SD = sd(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance)))
 
 collison <- QHI %>%
@@ -272,9 +274,6 @@ collison <- QHI %>%
 
 PS2 <- QHI %>%
   filter(veg_type == "mixed")
-
-
-
 
 ##### correction factros for 250-259 reflectance. but to small. need > 3. also dont know how to apply to refletance 
 #HE1_corr <- full_QHI %>%
@@ -284,6 +283,27 @@ filter(id %in% c("249", "250")) %>%
          reflectance = parse_number(as.character(reflectance))/100,
          correction_factor = (reference[id == "250"] / reference[id == "249"]),
          reflectance = reflectance/correction_factor)
+
+
+# spectral data 2018 #NOTE: THAT THESE ARE GROUPED BY PLOT
+
+spec_2018 <- read_csv("data/spec_bio.csv")
+
+spec_2018 <- spec_2018 %>%
+  select(site, plot, Reflectance_mean, Reflectance_sd, Reflectance_cv) %>%
+  mutate(year = "2018",
+         veg_type = site) %>%
+  rename(spec_mean = Reflectance_mean,
+         spec_SD = Reflectance_sd,
+         CV = Reflectance_cv) %>%
+  # to correspond with QHI plot formate
+  unite("plot", c(site, plot))
+
+# binding 2018 & 2019# NOTE:
+QHI_year <- bind_rows(QHI_small, spec_2018)
+
+
+
 
 #  band selection ----
 
@@ -366,6 +386,7 @@ lowD <- collison %>%
 
 #ggsave(p_SZU, path = "figures", filename = "SZU.png", height = 10, width = 12)
 
+
 #  QHI vis -------
 
 # single wavelengths VT
@@ -400,7 +421,7 @@ facet_wrap(.~id)
 
 
 # violin of mean by vegetation type
-ggplot(QHI_small, aes(x=veg_type, y=spec_mean, fill=veg_type)) + 
+ggplot(QHI_year, aes(x=year, y=spec_mean, fill=veg_type)) + 
   geom_violin(trim=FALSE, alpha = .5, aes(fill = veg_type)) +
   geom_point(position = position_jitter(0.05)) +
   geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
@@ -1225,6 +1246,25 @@ res.pca_lowD <- PCA(pca_lowD[,4:5], scale.unit = TRUE, ncp = 5, graph = TRUE)
                 axes.linetype = "dashed",
                 xlab = "PC1", ylab = "PC2", 
                 ggtheme = theme_spectra()))
+
+
+# multi year PCA
+res.pca_QHI_year <- PCA(QHI_year[,c(5,7)], scale.unit = TRUE, ncp = 5, graph = TRUE)
+
+
+# pca 
+(p_pca <- fviz_pca_ind(res.pca_QHI_year,
+                       geom.ind = "point", # show points only (nbut not "text")
+                       col.ind = QHI_year$veg_type, # color by groups
+                       palette = c("#ffa544", "#2b299b", "gray65"),
+                       addEllipses = TRUE, # Concentration ellipses
+                       # ellipse.type = "confidence",
+                       ellipse.level = 0.95, # confidence level specification
+                       mean.point = TRUE, # braycenter mean point
+                       legend.title = "Groups",
+                       axes.linetype = "dashed",
+                       xlab = "PC1", ylab = "PC2", 
+                       ggtheme = theme_spectra()))
 
 #ggsave(p_pca, path = "figures", filename = "QHI_lowD_biplot.png", height = 10, width = 12)
 
