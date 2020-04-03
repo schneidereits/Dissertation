@@ -1,0 +1,338 @@
+﻿Y,X,,Status,Tissue,Count,Height (cm),Herbivory,Notes,Photo
+1,1,Poa arctica,Standing dead,Stem,3,8.4,,Record  species which are in the plot but weren’t hit,FALSE
+,,Salix arctica,Live,Leaf,3,,,Oxytropis nigrescens ,FALSE
+,,Poa arctica,Standing dead,Stem,1,,,Thamnolia subuliformis,FALSE
+,,Salix arctica,Live,Stem,1,,,Alectoria ochroleuca,FALSE
+,,XXXlitter,,,,,,,FALSE
+1,2,Lupinus arcticus,Standing dead,Stem,1,3.3,,,FALSE
+,,Poa arctica,Standing dead,Leaf,1,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+1,3,Arctagrostis latifolia,Live,Leaf,1,11.5,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+1,4,Luzula arctica,Live,Seed pod,1,20.4,,,FALSE
+,,Luzula arctica,Live,Stem,1,,,,FALSE
+,,Luzula arctica,Live,Leaf,1,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,Luzula arctica,Standing dead,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+1,5,Poa arctica,Live,Leaf,1,8.4,,,FALSE
+,,Dryas integrifolia,Live,Leaf,2,,,,FALSE
+,,Cetraria cucculata,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+1,6,XXXlitter,,,1,0,,,FALSE
+1,7,Dryas integrifolia,Live,Leaf,1,8.2,,,FALSE
+,,Salix arctica,Standing dead,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+1,8,Dryas integrifolia,Live,Leaf,1,3.1,,,FALSE
+,,Salix arctica,Standing dead,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+1,9,Salix reticulata,Live,Leaf,1,5.9,,,FALSE
+,,Dryas integrifolia,Live,Leaf,3,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+1,10,Lupinus arcticus,Live,Leaf,1,8,,,FALSE
+,,Lupinus arcticus,Live,Stem,1,,,,FALSE
+,,Senecio astropurpureus,Live,Leaf,1,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,3,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+2,1,Poa arctica,Standing dead,Leaf,1,8.5,,,FALSE
+,,Poa arctica,Live,Leaf,1,,,,FALSE
+,,Poa arctica,Live,Stem,1,,,,FALSE
+,,Salix arctica,Live,Leaf,1,,,,FALSE
+,,Polygonum bistorta,Live,Leaf,1,,,,FALSE
+,,Salix arctica,Live,Stem,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+2,2,Poa arctica,Live,Leaf,2,13.3,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,Poa arctica,Standing dead,Leaf,1,,,,FALSE
+,,Dryas integrifolia,Live,Stem,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+2,3,Lupinus arcticus,Live,Leaf,3,9.2,,,FALSE
+,,Senecio astropurpureus,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+2,4,Lupinus arcticus,Live,Leaf,1,9.5,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,Dryas integrifolia,Live,Stem,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+2,5,Cetraria islandica,Live,Leaf,1,1.8,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+2,6,Dryas integrifolia,Live,Leaf,1,5.1,,,FALSE
+,,Senecio astropurpureus,Standing dead,Stem,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+2,7,Dryas integrifolia,Live,Leaf,2,3.9,,,FALSE
+,,Dryas integrifolia,Standing dead,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+2,8,Dryas integrifolia,Live,Leaf,2,1.7,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+2,9,Salix arctica,Live,Leaf,2,1.9,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+2,10,Salix arctica,Live,Leaf,2,5.6,,,FALSE
+,,Dryas integrifolia,Live,Leaf,3,,,,FALSE
+,,Poa arctica,Live,Leaf,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+3,1,Lupinus arcticus,Live,Leaf,1,5.5,,,FALSE
+,,Lupinus arcticus,Live,Stem,1,,,,FALSE
+,,Salix arctica,Live,Leaf,2,,,,FALSE
+,,Salix arctica,Standing dead,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+3,2,Poa arctica,Live,Stem,1,13.2,,,FALSE
+,,Poa arctica,Standing dead,Stem,1,,,,FALSE
+,,Lupinus arcticus,Live,Leaf,1,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+3,3,Poa arctica,Standing dead,Flower stalk,1,8.8,,,FALSE
+,,Poa arctica,Live,Leaf,,,,,FALSE
+,,Senecio astropurpureus,Live,Leaf,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+3,4,Lupinus arcticus,Live,Leaf,1,8.8,,,FALSE
+,,Poa arctica,Standing dead,Flower stalk,1,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,Dryas integrifolia,Standing dead,Leaf,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+3,5,Dryas integrifolia,Live,Leaf,4,5.1,,,FALSE
+,,Dryas integrifolia,Standing dead,Flower stalk,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+3,6,Dryas integrifolia,Live,Leaf,2,2.9,,,FALSE
+,,Dryas integrifolia,Standing dead,Leaf,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+3,7,Dryas integrifolia,Live,Leaf,1,3.7,,,FALSE
+,,Dryas integrifolia,Standing dead,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+3,8,XXXothermoss,,,,0,,,FALSE
+3,9,Dryas integrifolia,Live,Leaf,3,1.6,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+3,10,Pedicularis vertisilata,Live,Leaf,1,3.5,,,FALSE
+,,Dryas integrifolia,Live,Leaf,2,,,,FALSE
+,,Dryas integrifolia,Standing dead,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+4,1,Lupinus arcticus,Live,Leaf,3,7.2,,,FALSE
+,,Luzula arctica,Standing dead,Leaf,1,,,,FALSE
+,,Salix arctica,Live,Leaf,1,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+4,2,Lupinus arcticus,Live,Leaf,2,9.7,,,FALSE
+,,Salix arctica,Live,Leaf,2,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,Luzula arctica,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+4,3,Dryas integrifolia,Live,Leaf,3,4.8,,,FALSE
+,,Dryas integrifolia,Standing dead,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+4,4,Poa arctica,Live,Leaf,1,6.8,,,FALSE
+,,Dryas integrifolia,Live,Leaf,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+4,5,Luzula arctica,Live,Leaf,1,1.7,,,FALSE
+,,Salix arctica,Standing dead,Leaf,1,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+4,6,Oxytropis maydalliana,Live,Leaf,1,4.9,,Check Oxytropis ,FALSE
+,,Oxytropis maydalliana,Live,Stem,1,,,,FALSE
+,,Pedicularis vertisilata,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+4,7,Dryas integrifolia,Live,Leaf,3,3.6,,,FALSE
+,,Dryas integrifolia,Standing dead,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+4,8,Poa arctica,Standing dead,Flower stalk,1,6.9,,,FALSE
+,,XXXbareground,,,,,,,FALSE
+,9,XXXbareground,,,,0,,,FALSE
+,10,Salix arctica,Live,Leaf,2,2.7,,,FALSE
+,,Salix arctica,Live,Stem,1,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,Dryas integrifolia,Standing dead,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+5,1,Lupinus arcticus,Live,Leaf,1,5.3,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,Dryas integrifolia,Standing dead,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+5,2,Poa arctica,Live,Leaf,1,12.3,,,FALSE
+,,Salix arctica,Live,Leaf,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+5,3,Poa arctica,Live,Leaf,1,3.8,,,FALSE
+,,Dryas integrifolia,Live,Leaf,2,,,,FALSE
+,,Dryas integrifolia,Standing dead,Leaf,3,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+5,4,Salix arctica,Live,Leaf,3,4.3,,,FALSE
+,,Dryas integrifolia,Standing dead,Leaf,,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+5,5,Lupinus arcticus,Live,Leaf,1,6.1,,,FALSE
+,,Lupinus arcticus,Live,Stem,1,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+5,6,Salix arctica,Standing dead,Flower,1,4,,,FALSE
+,,Salix arctica,Live,Leaf,1,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+5,7,Salix arctica,Live,Leaf,1,5.4,,,FALSE
+,,Dryas integrifolia,Live,Leaf,3,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+5,8,XXXbareground,,,,0,,,FALSE
+5,9,XXXbareground,,,,0,,,FALSE
+5,10,Salix arctica,Live,Leaf,1,3.2,,,FALSE
+,,Salix arctica,Live,Stem,1,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,Dryas integrifolia,Live,Stem,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+6,1,Salix arctica,Live,Leaf,1,4.3,,,FALSE
+,,Dryas integrifolia,Live,Leaf,,,,,FALSE
+,,Poa arctica,Standing dead,Leaf,,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+6,2,Salix arctica,Live,Leaf,1,2.3,,,FALSE
+,,Salix arctica,Standing dead,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+6,3,Poa arctica,Live,Leaf,3,6.4,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+6,4,Dryas integrifolia,Live,Stem,1,12.9,,,FALSE
+,,Salix arctica,Live,Leaf,1,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+6,5,Dryas integrifolia,Live,Leaf,3,2,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+6,6,Lupinus arcticus,Live,Leaf,1,5.7,,,FALSE
+,,Dryas integrifolia,Live,Leaf,4,,,,FALSE
+,,Dryas integrifolia,Standing dead,Leaf,3,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+6,7,Salix arctica,Live,Leaf,2,1.4,,,FALSE
+,,Salix arctica,Standing dead,Leaf,1,,,,FALSE
+,,XXXbareground,,,,,,,FALSE
+6,8,XXXbareground,,,,0,,,FALSE
+6,9,XXXbareground,,,,0,,,FALSE
+6,10,XXXbareground,,,,0,,,FALSE
+7,1,Lupinus arcticus,Live,Leaf,2,8.6,,,FALSE
+,,Salix arctica,Standing dead,Leaf,1,,,,FALSE
+,,Salix arctica,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+7,2,Lupinus arcticus,Live,Leaf,3,11.3,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+7,3,Lupinus arcticus,Live,Leaf,1,12,,,FALSE
+,,Poa arctica,Live,Leaf,1,,,,FALSE
+,,Salix arctica,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+7,4,Salix arctica,Live,Leaf,1,8.7,,,FALSE
+,,Poa arctica,Live,Leaf,1,,,,FALSE
+,,Dryas integrifolia,Standing dead,Leaf,1,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+7,5,Poa arctica,Standing dead,Leaf,2,1.9,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+7,6,Dryas integrifolia,Live,Leaf,4,2.2,,,FALSE
+,,Lupinus arcticus,Standing dead,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+7,7,Salix arctica,Live,Leaf,1,1.6,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,,XXXbareground,,,,,,,FALSE
+7,8,XXXbareground,,,,,,,FALSE
+7,9,XXXbareground,,,,,,,FALSE
+7,10,Salix arctica,Standing dead,N/A,1,0,,,FALSE
+8,1,Poa arctica,Standing dead,Leaf,2,1.5,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+8,2,Lupinus arcticus,Live,Leaf,2,5.2,,,FALSE
+,,Lupinus arcticus,Live,Stem,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+8,3,Lupinus arcticus,Live,Leaf,2,11.4,,,FALSE
+,,Poa arctica,Live,Leaf,2,,,,FALSE
+,,Cardamine digitalis,Live,Leaf,1,,,,FALSE
+,,Salix arctica,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+8,4,Lupinus arcticus,Live,Leaf,1,11.5,,,FALSE
+,,Poa arctica,Live,Leaf,1,,,,FALSE
+,,Salix arctica,Standing dead,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+8,5,Lupinus arcticus,Live,Leaf,3,8.5,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+8,6,Lupinus arcticus,Standing dead,Leaf,1,3.2,,,FALSE
+,,Dryas integrifolia,Live,Leaf,3,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+8,7,Cardamine digitalis,Live,Leaf,,3.7,,,FALSE
+,,Dryas integrifolia,Live,Leaf,2,,,,FALSE
+,,Dryas integrifolia,Standing dead,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+8,8,Salix arctica,Live,Leaf,1,2.2,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,Dryas integrifolia,Standing dead,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,,XXXbareground,,,,,,,FALSE
+8,9,Salix arctica,Live,Leaf,1,4,,,FALSE
+,,XXXbareground,,,,,,,FALSE
+8,10,XXXbareground,,,,0,,,FALSE
+9,1,Lupinus arcticus,Live,Leaf,1,6.9,,,FALSE
+,,Salix arctica,Standing dead,Stem,1,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+9,2,Lupinus arcticus,Live,Leaf,3,6.1,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+9,3,Lupinus arcticus,Live,Leaf,1,5.9,,,FALSE
+,,Poa arctica,Standing dead,Leaf,3,,,,FALSE
+,,Salix arctica,Standing dead,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+9,4,Lupinus arcticus,Live,Leaf,2,8,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+9,5,Lupinus arcticus,Live,Leaf,1,6.2,,,FALSE
+,,Lupinus arcticus,Live,Stem,1,,,,FALSE
+,,Lupinus arcticus,Standing dead,Stem,1,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+9,6,Lupinus arcticus,Live,Leaf,1,5.2,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,Lupinus arcticus,Standing dead,Flower stalk,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+9,7,Salix arctica,Live,Leaf,1,1.9,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,Dryas integrifolia,Standing dead,Stem,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+9,8,Lupinus arcticus,Live,Leaf,2,9,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+9,9,Dryas integrifolia,Live,Leaf,2,1.6,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+9,10,Oxytropis maydalliana,Live,Leaf,1,3.5,,,FALSE
+,,Oxytropis maydalliana,Live,Stem,1,,,,FALSE
+,,Salix arctica,Live,Stem,1,,,,FALSE
+,,XXXbareground,,,,,,,FALSE
+10,1,Salix arctica,Live,Leaf,2,5.9,,,FALSE
+,,Salix arctica,Standing dead,Leaf,1,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+10,2,Lupinus arcticus,Live,Leaf,2,6,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+10,3,Poa arctica,Live,Leaf,4,6.4,,,FALSE
+,,Poa arctica,Standing dead,Leaf,2,,,,FALSE
+,,Lupinus arcticus,Standing dead,Flower stalk,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+10,4,Lupinus arcticus,Live,Leaf,2,8.5,,,FALSE
+,,Astralagus umbelletus,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+10,5,Lupinus arcticus,Standing dead,Stem,1,2.6,,,FALSE
+,,Lupinus arcticus,Live,Leaf,1,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+10,6,Dryas integrifolia,Live,Leaf,1,1.1,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+10,7,Lupinus arcticus,Live,Leaf,2,7.6,,,FALSE
+,,Lupinus arcticus,Standing dead,Flower stalk,1,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,8,Lupinus arcticus,Live,Leaf,3,8.1,,,FALSE
+,,Lupinus arcticus,Live,Stem,2,,,,FALSE
+,,Salix arctica,Live,Leaf,1,,,,FALSE
+,,Dryas integrifolia,Standing dead,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+10,9,Dryas integrifolia,Live,Leaf,2,3.6,,,FALSE
+,,Dryas integrifolia,Standing dead,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+10,10,Arctagrostis latifolia,Live,Leaf,2,41.2,,,FALSE
+,,Arctagrostis latifolia,Standing dead,Leaf,1,,,,FALSE
+,,Arctagrostis latifolia,Live,Stem,1,,,,FALSE
+,,Salix arctica,Standing dead,Leaf,1,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,,,,,FALSE

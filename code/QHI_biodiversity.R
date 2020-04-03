@@ -1,4 +1,8 @@
 # Starter script for Shawn
+# 31.3.2020
+
+
+# loading data ---- 
 
 QHI_pointframe <- read.csv("data/QHI_biodiversity/Herschel_ITEXdata_1999-2018_updated.csv")
 head(QHI_pointframe)
@@ -10,17 +14,21 @@ head(QHI_cover)
 levels(QHI_cover$name) # Checking all spelling is correct
 unique(QHI_cover$year) # Check years
 
-# Integrate 2019 data
 
-# Check plot order using cover of different species - especially in KO
+# Steps 
+# 1 Integrate 2019 data
+# 2 Check plot order using cover of different species - especially in KO
+# 3 Confirm species IDs and spellings are consistent
+# 4 Calculate biodiversity metrics
 
-# Confirm species IDs and spellings are consistent
+# 2019 data
 
-# Calculate biodiversity metrics
+library(readr)
+pointfr_2019_sas <- read_csv("data/QHI_biodiversity/QHI_pointfr_2019_sas.csv")
 
+str(pointfr_2019_sas)
 
-
-# sorting plot
+# sorting plot ----
 
 sort_QHI <- QHI_cover %>%
   #add_column(n="plot") %>%

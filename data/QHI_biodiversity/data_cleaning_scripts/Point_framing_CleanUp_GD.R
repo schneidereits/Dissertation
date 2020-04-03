@@ -17,7 +17,7 @@ library(ggplot2)
 # Setting the working directory to where the csv files are and loading them in
 # Careful not to have any other csvs in that folder
 
-setwd("D:/TeamShrub/Point Framing/CSVs")
+setwd("data/QHI_biodiversity/Point_framing_siteplot/")
 list <- list.files(pattern = ".csv")
 
 # A function to add a filename (i.e. plot number) column
@@ -33,8 +33,16 @@ pointfr <- ldply(list, read_csv_filename)
 # Turning SP01.csv, SP02.csv, etc., into just SP01
 
 pointfr <- pointfr %>% separate(Plot, c("PlotN", "filename"), sep="\\.") 
-pointfr <- pointfr %>% select (-filename)
+pointfr <- pointfr %>% 
+  select (-filename )%>% 
+  # to replace NA with coridinates of first value
+  fill(X, Y) %>%
+  mutate(year = "2019")
+
 head(pointfr)
+
+str(pointfr)
+
 
 # Checking the data
 
@@ -42,6 +50,7 @@ head(pointfr)
 
 36*36 # Meant to have 1296 HEIGHT observations
 
+length(pointfr$Height)
 summary(pointfr$Height) # 5542 observations in total, of which 4265 NAs
 5542-4265    # 1277
 1296-1277 # 19 height observations missing

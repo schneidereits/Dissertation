@@ -1,0 +1,342 @@
+﻿Y,X,,Status,Tissue,Count,Height (cm),Herbivory,Notes,Photo
+1,1,Alopecurus alpinus,Standing dead,Leaf,1,6.2,,Record  species which are in the plot but weren’t hit,FALSE
+,,Oxytropis campestris,Live,Leaf,2,,,XXXfungus,FALSE
+,,Dryas integrifolia,Live,Leaf,2,,,Polygonum viviparum,FALSE
+,,XXXlitter,,,,,,Cetraria cucculata,FALSE
+1,2,Alopecurus alpinus,Live,Leaf,1,11.9,,XXXcrustous,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,3,,,Luzula arctica,FALSE
+,,Saussurea angustifolia,Live,Leaf,1,,,Polygonum bistorta,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,Just outside plot:,FALSE
+1,3,Alopecurus alpinus,Live,Leaf,1,14,,Castileja elegance,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,3,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+1,4,Dryas integrifolia,Live,Leaf,2,2.1,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+1,5,Alopecurus alpinus,Live,Leaf,1,7.3,,,FALSE
+,,Alopecurus alpinus,Standing dead,Flower stalk,1,,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,2,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+1,6,Alopecurus alpinus,Live,Leaf,1,11.6,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+1,7,Alopecurus alpinus,Live,Leaf,2,6.3,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,2,,,,FALSE
+,,XXXbareground,,,,,,,FALSE
+1,8,Alopecurus alpinus,Live,Leaf,3,7.4,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,2,,,,FALSE
+,,XXXbareground,,,,,,,FALSE
+1,9,Alopecurus alpinus,Live,Leaf,2,8.8,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,,XXXbareground,,,,,,,FALSE
+1,10,Salix arctica,Live,Leaf,1,4.5,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,2,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+2,1,Alopecurus alpinus,Standing dead,Leaf,4,5.9,,,FALSE
+,,Dryas integrifolia,Live,Leaf,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+2,2,Alopecurus alpinus,Live,Leaf,1,9.1,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,1,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,Dryas integrifolia,Standing dead,Leaf,1,,,,FALSE
+2,3,Salix arctica,Live,Leaf,1,3.9,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,1,,,,FALSE
+,,Salix arctica,Standing dead,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+2,4,Salix arctica,Standing dead,Flower,1,3.5,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,Dryas integrifolia,Live,Stem,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+2,5,Alopecurus alpinus,Live,Leaf,1,4.7,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+2,6,Alopecurus alpinus,Live,Leaf,2,7.7,,,FALSE
+,,Salix arctica,Live,Leaf,1,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,XXXbareground,,,,,,,FALSE
+2,7,Alopecurus alpinus,Live,Leaf,2,4.7,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+2,8,Alopecurus alpinus,Standing dead,Flower stalk,1,5.4,,,FALSE
+,,Alopecurus alpinus,Live,Leaf,1,,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,2,,,,FALSE
+,,XXXbareground,,,,,,,FALSE
+2,9,Alopecurus alpinus,Standing dead,Leaf,1,4,,,FALSE
+,,XXXbareground,,,,,,,FALSE
+2,10,Dryas integrifolia,Live,Leaf,3,2.6,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+3,1,Alopecurus alpinus,Standing dead,Leaf,3,12,,,FALSE
+,,Astralagus umbelletus,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+3,2,Alopecurus alpinus,Live,Leaf,1,9.4,,,FALSE
+,,Salix arctica,Live,Leaf,1,,,,FALSE
+,,Salix arctica,Live,Stem,1,,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,3,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+3,3,Alopecurus alpinus,Standing dead,Leaf,3,4.5,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+3,4,Alopecurus alpinus,Standing dead,Leaf,2,3.6,,,FALSE
+,,Dryas integrifolia,Live,Leaf,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+3,5,Alopecurus alpinus,Live,Leaf,1,4.6,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,2,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,2,,,,FALSE
+,,Dryas integrifolia,Live,Stem,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+3,6,Alopecurus alpinus,Standing dead,Leaf,2,3,,,FALSE
+,,Dryas integrifolia,Live,Leaf,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+3,7,Alopecurus alpinus,Standing dead,Leaf,2,5.1,,,FALSE
+,,Dryas integrifolia,Live,Leaf,2,,,,FALSE
+,,Dryas integrifolia,Live,Stem,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+3,8,Dryas integrifolia,Live,Leaf,3,3.1,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+3,9,Alopecurus alpinus,Live,Leaf,1,17.5,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+3,10,Alopecurus alpinus,Live,Leaf,2,16.9,,,FALSE
+,,Alopecurus alpinus,Standing dead,Flower stalk,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+4,1,Alopecurus alpinus,Live,Leaf,2,10.2,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,4,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+4,2,Alopecurus alpinus,Standing dead,Leaf,2,4.6,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+4,3,Alopecurus alpinus,Standing dead,Leaf,2,1.5,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+4,4,Dryas integrifolia,Live,Leaf,3,1.2,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+4,5,Dryas integrifolia,Live,Leaf,2,2.6,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+4,6,Alopecurus alpinus,Standing dead,Leaf,2,1.9,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+4,7,Alopecurus alpinus,Standing dead,Leaf,2,3.3,,,FALSE
+,,Dryas integrifolia,Live,Leaf,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+4,8,Alopecurus alpinus,Live,Leaf,1,8.1,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,3,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,2,,,,FALSE
+,,Dryas integrifolia,Live,Stem,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+4,9,Alopecurus alpinus,Live,Leaf,2,5.7,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+4,10,XXXlitter,,,,0,,,FALSE
+5,1,Alopecurus alpinus,Live,Leaf,2,13.4,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,1,,,,FALSE
+,,Salix arctica,Live,Leaf,2,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+5,2,Alopecurus alpinus,Live,Leaf,4,14.7,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+5,3,Astralagus umbelletus,Live,Leaf,1,4,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,1,,,,FALSE
+,,Dryas integrifolia,Live,Stem,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+5,4,Dryas integrifolia,Live,Leaf,3,3.2,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+5,5,Alopecurus alpinus,Live,Leaf,2,4.9,,,FALSE
+,,Salix arctica,Live,Leaf,1,,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,3,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+5,6,Alopecurus alpinus,Live,Leaf,1,8.8,,,FALSE
+,,Dryas integrifolia,Live,Leaf,3,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+5,7,Dryas integrifolia,Live,Leaf,3,3.9,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+5,8,Alopecurus alpinus,Live,Leaf,1,6.1,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,1,,,,FALSE
+,,Salix arctica,Live,Leaf,1,,,,FALSE
+,,Oxytropis nigrescens,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+5,9,Alopecurus alpinus,Standing dead,Leaf,2,5.1,,,FALSE
+,,Dryas integrifolia,Live,Leaf,2,,,,FALSE
+,,Dryas integrifolia,Live,Stem,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+5,10,Dryas integrifolia,Live,Leaf,2,2.9,,,FALSE
+,,Alopecurus alpinus,Standing dead,Flower stalk,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+6,1,Alopecurus alpinus,Live,Leaf,1,17.3,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,3,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+6,2,Alopecurus alpinus,Standing dead,Flower stalk,1,16.5,,,FALSE
+,,Alopecurus alpinus,Live,Leaf,1,,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,2,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+6,3,Alopecurus alpinus,Live,Leaf,2,15.4,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,1,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,2,,,,FALSE
+,,Salix arctica,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+6,4,Alopecurus alpinus,Standing dead,Leaf,2,5.7,,,FALSE
+,,Salix arctica,Live,Leaf,1,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+6,5,Alopecurus alpinus,Live,Leaf,2,5.9,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+6,6,Alopecurus alpinus,Standing dead,Leaf,2,6.5,,,FALSE
+,,Alopecurus alpinus,Live,Stem,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+6,7,Alopecurus alpinus,Live,Leaf,1,6.1,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+6,8,Alopecurus alpinus,Live,Leaf,1,11,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,2,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+6,9,Alopecurus alpinus,Live,Leaf,1,13.6,,,FALSE
+,,Astralagus umbelletus,Live,Leaf,1,,,,FALSE
+,,Astralagus umbelletus,Live,Stem,1,,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+6,10,Alopecurus alpinus,Standing dead,Flower stalk,1,19.4,,,FALSE
+,,Alopecurus alpinus,Live,Leaf,2,,,,FALSE
+,,Salix arctica,Live,Leaf,2,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+7,1,Alopecurus alpinus,Live,Leaf,3,21.3,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+7,2,Alopecurus alpinus,Live,Leaf,2,15,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,2,,,,FALSE
+,,Dryas integrifolia,Standing dead,Leaf,1,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+7,3,Alopecurus alpinus,Live,Leaf,1,9.4,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+7,4,Alopecurus alpinus,Live,Leaf,1,7.5,,,FALSE
+,,Salix arctica,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+7,5,Alopecurus alpinus,Live,Leaf,2,9.7,,,FALSE
+,,Dryas integrifolia,Live,Leaf,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+7,6,Alopecurus alpinus,Live,Leaf,2,7.2,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,1,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+7,7,Alopecurus alpinus,Live,Leaf,2,12,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+7,8,Alopecurus alpinus,Live,Leaf,2,17.1,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,1,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+7,9,Alopecurus alpinus,Live,Leaf,4,16.5,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+7,10,Alopecurus alpinus,Live,Leaf,1,4.5,,,FALSE
+,,Dryas integrifolia,Standing dead,Leaf,1,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+8,1,Alopecurus alpinus,Standing dead,Leaf,2,5.8,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+8,2,Alopecurus alpinus,Live,Leaf,1,7.4,,,FALSE
+,,Salix arctica,Live,Leaf,1,,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+8,3,Alopecurus alpinus,Standing dead,Leaf,3,5,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+8,4,Alopecurus alpinus,Live,Leaf,1,11.3,,,FALSE
+,,Salix arctica,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+8,5,Alopecurus alpinus,Live,Leaf,1,11.9,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+8,6,Alopecurus alpinus,Live,Leaf,2,14.2,,,FALSE
+,,Salix arctica,Live,Leaf,1,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+8,7,Alopecurus alpinus,Standing dead,Leaf,1,4.7,,,FALSE
+,,Alopecurus alpinus,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+8,8,Alopecurus alpinus,Live,Leaf,4,12.8,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+8,9,Alopecurus alpinus,Standing dead,Flower stalk,1,2.7,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+8,10,Alopecurus alpinus,Standing dead,Flower stalk,1,14.9,,,FALSE
+,,Alopecurus alpinus,Live,Leaf,2,,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,1,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+9,1,Alopecurus alpinus,Live,Leaf,1,6.8,,,FALSE
+,,Alopecurus alpinus,Standing dead,Flower stalk,1,,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+9,2,Alopecurus alpinus,Standing dead,Flower stalk,1,27.4,,,FALSE
+,,Alopecurus alpinus,Live,Leaf,1,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+9,3,Alopecurus alpinus,Standing dead,Leaf,1,2.3,,,FALSE
+,,Alopecurus alpinus,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+9,4,Alopecurus alpinus,Live,Leaf,3,13.8,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,4,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+9,5,Alopecurus alpinus,Standing dead,Leaf,2,4.6,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+9,6,Dryas integrifolia,Standing dead,Flower,1,15.3,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,3,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+9,7,XXXlitter,,,,0,,,FALSE
+9,8,Alopecurus alpinus,Standing dead,Leaf,1,6.6,,,FALSE
+,,Dryas integrifolia,Live,Leaf,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+9,9,Alopecurus alpinus,Live,Leaf,2,9.4,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,1,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,3,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+9,10,Alopecurus alpinus,Standing dead,Leaf,1,5.7,,,FALSE
+,,Alopecurus alpinus,Live,Leaf,1,,,,FALSE
+,,Salix arctica,Live,Leaf,1,,,,FALSE
+,,Salix arctica,Live,Stem,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+10,1,Alopecurus alpinus,Live,Leaf,2,11.4,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,3,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+10,2,Astralagus umbelletus,Live,Leaf,1,12.8,,,FALSE
+,,Alopecurus alpinus,Live,Leaf,1,,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,2,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,3,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+10,3,Dryas integrifolia,Standing dead,Flower,1,4.2,,,FALSE
+,,Dryas integrifolia,Live,Leaf,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+10,4,Alopecurus alpinus,Standing dead,Leaf,1,3.9,,,FALSE
+,,Alopecurus alpinus,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+10,5,Alopecurus alpinus,Standing dead,Flower stalk,1,6.4,,,FALSE
+,,Salix arctica,Live,Leaf,1,,,,FALSE
+,,Pedicularis vertisilata,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+10,6,Alopecurus alpinus,Live,Leaf,2,8.2,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,3,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+10,7,Alopecurus alpinus,Live,Leaf,2,9.2,,,FALSE
+,,Astralagus umbelletus,Live,Leaf,1,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,2,,,,FALSE
+,,Cardamine digitalis,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+10,8,Alopecurus alpinus,Live,Leaf,1,7.9,,,FALSE
+,,Alopecurus alpinus,Standing dead,Leaf,3,,,,FALSE
+,,Dryas integrifolia,Live,Leaf,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+10,9,Dryas integrifolia,Live,Leaf,3,2.8,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+10,10,Alopecurus alpinus,Standing dead,Leaf,1,4.5,,,FALSE
+,,Salix arctica,Live,Leaf,1,,,,FALSE

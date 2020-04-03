@@ -1,0 +1,372 @@
+﻿Y,X,,Status,Tissue,Count,Height (cm),Herbivory,Notes,Photo
+1,1,XXXcarex,,,,12.8,,Record  species which are in the plot but weren’t hit,FALSE
+,,Eriophorum vaginatum,Live,Flower,1,,,Lemming runway and holes,FALSE
+,,Salix reticulata,,,,,,,FALSE
+,,XXXlitter,,,,,,Saxifraga nelsoniana,FALSE
+,,XXXothermoss,,,,,,Pedicularis capitata,FALSE
+,2,XXXcarex,Standing dead,Flower stalk,,14,,Poa arctica,FALSE
+,,Senecio astropurpureus,,,1,,,Thamnolia subuliformis,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,3,XXXcarex,,,4,15.1,,,FALSE
+,,XXXcarex,Standing dead,,6,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,4,XXXcarex,,,3,9.4,,,FALSE
+,,Eriophorum vaginatum,,,2,,,,FALSE
+,,Eriophorum vaginatum,Standing dead,,1,,,,FALSE
+,,Salix pulchra,,Stem,,3.9,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,5,Eriophorum vaginatum,Standing dead,,4,6.3,,,FALSE
+,,Eriophorum vaginatum,Live,,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,6,Eriophorum vaginatum,Standing dead,,5,5.2,,,FALSE
+,,Eriophorum vaginatum,Live,,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,7,Arctagrostis latifolia,Standing dead,,,14.9,,,FALSE
+,,Eriophorum vaginatum,Live,,4,,,,FALSE
+,,Eriophorum vaginatum,Standing dead,,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,8,Eriophorum vaginatum,Live,,6,9.8,,,FALSE
+,,Eriophorum vaginatum,Standing dead,,4,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,9,Eriophorum vaginatum,Live,,3,7.9,,,FALSE
+,,,Standing dead,,2,,,,FALSE
+,,Polygonum bistorta,,,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,10,Arctagrostis latifolia,Standing dead,,,9.4,,,FALSE
+,,Salix pulchra,,,,5.5,,,FALSE
+,,Salix reticulata,,,,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+2,1,Arctagrostis latifolia,Standing dead,,,14.5,,,FALSE
+,,Eriophorum vaginatum,Standing dead,,5,,,,FALSE
+,,Salix pulchra,Live,,2,9.2,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,2,XXXcarex,Live,,2,14.8,,,FALSE
+,,Salix pulchra,,,,7.6,,,FALSE
+,,Eriophorum vaginatum,Standing dead,,4,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,3,XXXcarex,Live,,6,12.6,,,FALSE
+,,XXXcarex,Standing dead,,5,,,,FALSE
+,,Salix reticulata,Live,,1,,,,FALSE
+,,Cardamine digitalis,Live,,1,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,4,XXXcarex,,,2,17.5,,,FALSE
+,,Salix reticulata,,,2,,,,FALSE
+,,XXXcarex,Standing dead,,3,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,5,Eriophorum vaginatum,Standing dead,,8,6.7,,,FALSE
+,,Eriophorum vaginatum,Live,,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,6,Eriophorum vaginatum,Live,,2,4.5,,,FALSE
+,,Eriophorum vaginatum,Standing dead,,4,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,7,Eriophorum vaginatum,Standing dead,,4,3.5,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,8,Eriophorum vaginatum,Live,,4,19.4,,,FALSE
+,,,Standing dead,,6,,,,FALSE
+,,Salix reticulata,,,,,,,FALSE
+,,Cardamine digitalis,,,,,,,FALSE
+,,Saussurea angustifolia,,,,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,9,Eriophorum vaginatum,Standing dead,,3,8.6,,,FALSE
+,,Salix pulchra,,,2,6.6,,,FALSE
+,,Dryas integrifolia,,,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,10,Eriophorum vaginatum,Standing dead,,6,11.8,,,FALSE
+,,Arctagrostis latifolia,Standing dead,,2,,,,FALSE
+,,XXXcarex,Live,,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+3,1,Eriophorum vaginatum,Live,,5,13.6,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,2,Eriophorum vaginatum,Live,,2,12.2,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,3,Arctagrostis latifolia,,,,17.3,,,FALSE
+,,Salix pulchra,,Stem,,8.4,,,FALSE
+,,XXXpeltigera,,,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,4,XXXothermoss,,,,1,,,FALSE
+,5,Eriophorum vaginatum,Live,,,4.1,,,FALSE
+,,Eriophorum vaginatum,Standing dead,,2,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,6,Eriophorum vaginatum,Live,,4,7.2,,,FALSE
+,,Eriophorum vaginatum,Standing dead,,5,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,7,Eriophorum vaginatum,Live,,2,7.7,,,FALSE
+,,Eriophorum vaginatum,Standing dead,,5,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,8,Salix pulchra,,,,10.1,,,FALSE
+,,Salix reticulata,,,,,,,FALSE
+,,Senecio astropurpureus,,,,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,9,Arctagrostis latifolia,Standing dead,,3,15.8,,,FALSE
+,,Salix pulchra,,Stem,,6.5,,,FALSE
+,,Eriophorum vaginatum,Live,,,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,10,Arctagrostis latifolia,Standing dead,Leaf,,13.2,,,FALSE
+,,Arctagrostis latifolia,Standing dead,Flower stalk,,,,,FALSE
+,,Eriophorum vaginatum,Live,,3,,,,FALSE
+,,Senecio astropurpureus,,,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+4,1,Eriophorum vaginatum,Live,Flower stalk,1,18.8,,,FALSE
+,,Eriophorum vaginatum,Live,Leaf,3,,,,FALSE
+,,Eriophorum vaginatum,Standing dead,Leaf,11,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,2,Eriophorum vaginatum,Live,Leaf,5,4.8,,,FALSE
+,,Eriophorum vaginatum,Standing dead,Leaf,4,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,3,Hierochole alpine,Live,Flower stalk,1,26.8,,,FALSE
+,,Eriophorum vaginatum,Standing dead,Leaf,2,,,,FALSE
+,,Eriophorum vaginatum,Live,Leaf,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,4,Eriophorum vaginatum,Live,Leaf,2,7.1,,,FALSE
+,,Eriophorum vaginatum,Standing dead,Leaf,4,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,5,Salix pulchra,,,,8,,,FALSE
+,,Eriophorum vaginatum,,,,,,,FALSE
+,,Salix pulchra,,,,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,6,Eriophorum vaginatum,Live,,3,8.1,,,FALSE
+,,,Standing dead,,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,7,Eriophorum vaginatum,Standing dead,,,15.7,,,FALSE
+,,Eriophorum vaginatum,Live,,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,8,Arctagrostis latifolia,Live,,,15.5,,,FALSE
+,,Eriophorum vaginatum,Standing dead,,,,,,FALSE
+,,Salix reticulata,,,,,,,FALSE
+,,Salix pulchra,,Stem,,3,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,9,Eriophorum vaginatum,Standing dead,,4,12,,,FALSE
+,,Arctagrostis latifolia,,,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,10,Eriophorum vaginatum,Standing dead,,4,9.7,,,FALSE
+,,Arctagrostis latifolia,Live,,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+5,1,Arctagrostis latifolia,,,2,26.6,,,FALSE
+,,Arctagrostis latifolia,Standing dead,,,,,,FALSE
+,,Eriophorum vaginatum,Live,,,,,,FALSE
+,,Eriophorum vaginatum,Standing dead,,2,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,2,Eriophorum vaginatum,Standing dead,,5,6.4,,,FALSE
+,,Eriophorum vaginatum,Live,,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,3,Eriophorum vaginatum,Standing dead,,4,6.6,,,FALSE
+,,Eriophorum vaginatum,Live,,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,4,Eriophorum vaginatum,Live,,3,4.7,,,FALSE
+,,,Standing dead,,5,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,5,Eriophorum vaginatum,Live,Flower stalk,,8.6,,,FALSE
+,,Eriophorum vaginatum,Live,Leaf,8,,,,FALSE
+,,Eriophorum vaginatum,Standing dead,Leaf,1,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,6,Salix pulchra,,,,10.1,,,FALSE
+,,Salix pulchra,,Stem,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,7,XXXcarex,,,,12.4,,,FALSE
+,,Salix reticulata,,,2,,,,FALSE
+,,XXXcarex,Standing dead,,2,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,8,Arctagrostis latifolia,,,1,7.2,,,FALSE
+,,Arctagrostis latifolia,Standing dead,,1,,,,FALSE
+,,Senecio astropurpureus,,,,,,,FALSE
+,,Eriophorum vaginatum,Standing dead,,5,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,9,Eriophorum vaginatum,Live,,7,11.6,,,FALSE
+,,Eriophorum vaginatum,Standing dead,,4,,,,FALSE
+,,Arctagrostis latifolia,Standing dead,,,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,10,Salix pulchra,,,2,12.1,,,FALSE
+,,Salix pulchra,,Stem,,,,,FALSE
+,,Stellaria longipes,Standing dead,,,,,,FALSE
+,,Cardamine digitalis,,,,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+6,1,Eriophorum vaginatum,Live,,2,5.6,,,FALSE
+,,Eriophorum vaginatum,Standing dead,,9,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,2,Eriophorum vaginatum,Standing dead,,,10.4,,,FALSE
+,,,Live,,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,3,Eriophorum vaginatum,Live,,2,3.5,,,FALSE
+,,Eriophorum vaginatum,Standing dead,,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,4,Salix pulchra,Live,Leaf,,7,,,FALSE
+,,,,Stem,,,,,FALSE
+,,XXXcarex,Live,Leaf,,,,,FALSE
+,,Eriophorum vaginatum,Standing dead,,9,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,5,Eriophorum vaginatum,Standing dead,,3,18.3,,,FALSE
+,,Arctagrostis latifolia,,,,,,,FALSE
+,,Eriophorum vaginatum,Live,,2,,,,FALSE
+,,XXXcarex,,,,,,,FALSE
+,,Salix pulchra,,,,10.9,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,6,Arctagrostis latifolia,Standing dead,Flower stalk,,11.2,,,FALSE
+,,Arctagrostis latifolia,Live,Leaf,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,7,Arctagrostis latifolia,Live,Flower stalk,,44.6,,,FALSE
+,,Arctagrostis latifolia,,Leaf,2,,,,FALSE
+,,Arctagrostis latifolia,Standing dead,Leaf,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,8,Arctagrostis latifolia,Standing dead,Flower stalk,,15.4,,,FALSE
+,,Eriophorum vaginatum,Live,,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,9,Salix pulchra,,,,10.2,,,FALSE
+,,Eriophorum vaginatum,Live,,2,,,,FALSE
+,,Salix phlebophylla,,,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,10,Salix pulchra,,,,8.2,,,FALSE
+,,Eriophorum vaginatum,Live,,,,,,FALSE
+,,Eriophorum vaginatum,Standing dead,,,,,,FALSE
+,,XXXpeltigera,,,,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+7,1,Eriophorum vaginatum,,,,6.3,,,FALSE
+,,Eriophorum vaginatum,Standing dead,,,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,2,Eriophorum vaginatum,Standing dead,,4,4.3,,,FALSE
+,,,Live,,3,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,3,Eriophorum vaginatum,Live,,2,8.7,,,FALSE
+,,,Standing dead,,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,4,XXXcarex,Live,Leaf,2,12.5,,,FALSE
+,,Eriophorum vaginatum,Live,,1,,,,FALSE
+,,Eriophorum vaginatum,Standing dead,,4,,,,FALSE
+,,Salix pulchra,,,,6.9,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,5,Arctagrostis latifolia,Live,Leaf,2,22.7,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,6,Arctagrostis latifolia,Standing dead,Flower stalk,,17.4,,,FALSE
+,,Salix pulchra,,Leaf,,11.9,,,FALSE
+,,Salix pulchra,,Stem,,,,,FALSE
+,,Eriophorum vaginatum,Live,,,,,,FALSE
+,,Eriophorum vaginatum,Standing dead,,,,,,FALSE
+,,Senecio astropurpureus,,,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,7,Arctagrostis latifolia,Standing dead,Flower stalk,,14.2,,,FALSE
+,,XXXcarex,,,,,,,FALSE
+,,Eriophorum vaginatum,Live,,,,,,FALSE
+,,Eriophorum vaginatum,Standing dead,,5,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,8,Eriophorum vaginatum,Live,,4,8,,,FALSE
+,,,Standing dead,,4,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,9,Salix phlebophylla,Live,,3,3.9,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,10,Salix pulchra,,,,5.9,,,FALSE
+,,Salix phlebophylla,,,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+8,1,Eriophorum vaginatum,Live,,3,9,,,FALSE
+,,Eriophorum vaginatum,Standing dead,,5,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,2,Eriophorum vaginatum,Live,,2,6.3,,,FALSE
+,,Eriophorum vaginatum,Standing dead,,4,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,3,XXXcarex,,,,25.6,,,FALSE
+,,Eriophorum vaginatum,Live,Leaf,,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,4,XXXpeltigera,,,,1.3,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,5,XXXcarex,Live,Leaf,4,16.3,,,FALSE
+,,Eriophorum vaginatum,Live,Leaf,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,6,XXXcarex,Live,Leaf,,9.9,,,FALSE
+,,XXXcarex,Standing dead,Leaf,2,,,,FALSE
+,,Salix pulchra,,,,5,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,7,Eriophorum vaginatum,Standing dead,,2,6.2,,,FALSE
+,,Eriophorum vaginatum,Live,,1,,,,FALSE
+,,XXXpeltigera,,,,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,8,Eriophorum vaginatum,Live,,7,10.9,,,FALSE
+,,Eriophorum vaginatum,Standing dead,,9,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,9,Eriophorum vaginatum,Live,,4,12.2,,,FALSE
+,,XXXcarex,,,,,,,FALSE
+,,Salix phlebophylla,,,3,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,10,Eriophorum vaginatum,Standing dead,,4,11.2,,,FALSE
+,,Eriophorum vaginatum,Live,,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+9,1,Eriophorum vaginatum,Standing dead,,4,8.2,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,2,Eriophorum vaginatum,Standing dead,,5,6.1,,,FALSE
+,,Eriophorum vaginatum,Live,,1,,,,FALSE
+,,Salix pulchra,Live,Stem,1,2,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,3,Salix pulchra,Live,Leaf,3,11.9,,,FALSE
+,,Cardamine digitalis,,,,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,4,XXXpeltigera,,,,,,,FALSE
+,5,XXXcarex,,,,2.4,,,FALSE
+,,XXXothermoss,,,,12,,,FALSE
+,6,Eriophorum vaginatum,Standing dead,,4,3.2,,,FALSE
+,,Eriophorum vaginatum,Live,,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,7,Eriophorum vaginatum,Live,,4,10.4,,,FALSE
+,,,Standing dead,,5,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,8,XXXcarex,Standing dead,Flower stalk,1,18.5,,,FALSE
+,,Arctagrostis latifolia,Standing dead,Flower stalk,1,,,,FALSE
+,,Arctagrostis latifolia,Live,Leaf,1,,,,FALSE
+,,Senecio astropurpureus,Live,Leaf,1,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,9,Eriophorum vaginatum,Live,Leaf,3,17,,,FALSE
+,,XXXcarex,Live,,2,,,,FALSE
+,,Eriophorum vaginatum,Standing dead,,3,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,10,Eriophorum vaginatum,Standing dead,Leaf,4,7.8,,,FALSE
+,,XXXcarex,Standing dead,Leaf,1,,,,FALSE
+,,Eriophorum vaginatum,Live,Leaf,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+10,1,XXXcarex,Live,Leaf,2,17.1,,,FALSE
+,,Eriophorum vaginatum,Live,,3,,,,FALSE
+,,Eriophorum vaginatum,Standing dead,,5,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,2,Eriophorum vaginatum,Live,,3,9.9,,,FALSE
+,,Eriophorum vaginatum,Standing dead,,7,,,,FALSE
+,,Stellaria longipes,,,,,,,FALSE
+,,Senecio astropurpureus,,,,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,3,XXXcarex,,,,19.8,,,FALSE
+,,Salix pulchra,,Stem,,12.7,,,FALSE
+,,Dryas integrifolia,,,2,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,4,XXXcarex,Standing dead,,,11.9,,,FALSE
+,,Polygonum bistorta,,,,,,,FALSE
+,,XXXcarex,Live,,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,5,XXXcarex,Standing dead,,,3.2,,,FALSE
+,,XXXpeltigera,,,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,6,XXXcarex,Live,Leaf,,12.3,,,FALSE
+,,Eriophorum vaginatum,Live,,2,,,,FALSE
+,,XXXcarex,Standing dead,,4,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,,XXXothermoss,,,,,,,FALSE
+,7,XXXcarex,Live,Leaf,4,18.4,,,FALSE
+,,Salix pulchra,,,,6.6,,,FALSE
+,,Eriophorum vaginatum,Live,,,,,,FALSE
+,,Eriophorum vaginatum,Standing dead,,6,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,8,Eriophorum vaginatum,Live,Leaf,3,14.1,,,FALSE
+,,XXXcarex,Live,Leaf,2,,,,FALSE
+,,Salix phlebophylla,,,2,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,9,Eriophorum vaginatum,Live,Leaf,3,12.2,,,FALSE
+,,Eriophorum vaginatum,Standing dead,Leaf,5,,,,FALSE
+,,XXXlitter,,,,,,,FALSE
+,10,Eriophorum vaginatum,Standing dead,Leaf,4,7.2,,,FALSE
+,,Eriophorum vaginatum,Live,Leaf,2,,,,FALSE
