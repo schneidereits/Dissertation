@@ -12,7 +12,9 @@ library(data.table)
 library(plyr) # Load plyr first to avoid clashes with dplyr
 library(dplyr)
 library(tidyr)
+library(tidyverse)
 library(ggplot2)
+
 
 # Setting the working directory to where the csv files are and loading them in
 # Careful not to have any other csvs in that folder
@@ -33,14 +35,31 @@ pointfr <- ldply(list, read_csv_filename)
 # Turning SP01.csv, SP02.csv, etc., into just SP01
 
 pointfr <- pointfr %>% separate(Plot, c("PlotN", "filename"), sep="\\.") 
+
+
 pointfr <- pointfr %>% 
   select (-filename )%>% 
   # to replace NA with coridinates of first value
   fill(X, Y) %>%
-  mutate(year = "2019")
+  mutate(YEAR = "2019",
+         SITE = "QHI", 
+         # extract only vegetation type
+         SUBSITE = case_when(grepl("HE|KO", PlotN) ~
+                            stringr::str_extract(PlotN, "HE|KO")),
+         # create plot colomn and remove vegetation type
+         PLOT = PlotN, 
+         PLOT = str_remove_all(PLOT, "HE|KO"),
+         TRTMT = "CTL", 
+         Hit.Order = "N/A") %>%
+  rename(STATUS = Status,
+         TISSUE = Tissue, 
+         Abundance = Count)
+
+# add in baseR as colonm was not recognized as object in dpylr
+colnames(pointfr)[3] <- "Species"
 
 head(pointfr)
-colnames(pointfr)[3] <- "Species"
+
 
 
 str(pointfr)

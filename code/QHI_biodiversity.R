@@ -3,7 +3,7 @@
 
 
 # loading data ---- 
-
+setwd("~/Documents/university work/Dissertation/Dissertation")
 QHI_pointframe <- read.csv("data/QHI_biodiversity/Herschel_ITEXdata_1999-2018_updated.csv")
 head(QHI_pointframe)
 levels(QHI_pointframe$SPP) # Checking all spelling is correct
