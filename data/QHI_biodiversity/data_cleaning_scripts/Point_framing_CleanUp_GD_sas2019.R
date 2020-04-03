@@ -37,6 +37,7 @@ pointfr <- ldply(list, read_csv_filename)
 pointfr <- pointfr %>% separate(Plot, c("PlotN", "filename"), sep="\\.") 
 
 
+
 pointfr <- pointfr %>% 
   select (-filename )%>% 
   # to replace NA with coridinates of first value
@@ -56,32 +57,32 @@ pointfr <- pointfr %>%
          Abundance = Count)
 
 # add in baseR as colonm was not recognized as object in dpylr
-colnames(pointfr)[3] <- "Species"
+colnames(pointfr)[3] <- "SPP"
 
 head(pointfr)
-
-
-
 str(pointfr)
 
 
 # Checking the data
 
 # Does each of the 36 sub-plots have 36 height observations? ------NO------
-
 36*36 # Meant to have 1296 HEIGHT observations
 
-length(pointfr$Height)
-summary(pointfr$Height) # 5542 observations in total, of which 4265 NAs
-5542-4265    # 1277
-1296-1277 # 19 height observations missing
+pointfr %>% filter(!is.na(Height..cm.)) 
+58+1234 # 1292 
+1296-1292 # 4 are misssing
+
+length(pointfr$Height..cm.)
+summary(pointfr$Height..cm.) # 4294 observation in total, of which 3002are NAs
 
 # Do all observations have spatial XY coordinates (multiple rows can share the same XY coordinates)
 
 unique(pointfr$X) 
 unique(pointfr$Y) # No NAs, all fine
 
-# summary(pointfr$X) # 11 NAs in the X column
+
+
+#summary(pointfr$X) # 11 NAs in the X column
 # which(is.na(pointfr$X)) # Rows 3836-3846 - went back and deleted them, they were just extra blank rows
 
 # Do all unique locations have a height reading? -----NO------
@@ -92,7 +93,7 @@ unique(pointfr$Y) # No NAs, all fine
 # A reality check on the height values (no >100 cm)
 # Corrected a 2m tall gramminoid to 19.6cm (SP10 1x5)
 # Highest height 103cm
-summary(pointfr$Height)
+summary(pointfr$Height..cm.)
 
 # How many subplots are missing observations
 
@@ -109,24 +110,24 @@ summary(pointfr$Height)
 
 # Need to make the variables characters to make the change
 
-pointfr$Status <- as.character(pointfr$Status)
-pointfr$Tissue <- as.character(pointfr$Tissue)
-pointfr[pointfr$Species == 'XXXothermoss',]$Tissue <- "NA"
-pointfr[pointfr$Species == 'XXXothermoss',]$Status <- "Live"
+pointfr$STATUS <- as.character(pointfr$STATUS)
+pointfr$TISSUE <- as.character(pointfr$TISSUE)
+pointfr[pointfr$SPP == 'XXXothermoss',]$TISSUE <- "NA"
+pointfr[pointfr$SPP == 'XXXothermoss',]$STATUS <- "Live"
 
 # Ensuring that all row/observations with a value of 'XXXlitter' in column C have 'Dead' in the Status variable.
 
-pointfr[pointfr$Species == 'XXXlitter',]$Status <-  "Dead"
+pointfr[pointfr$SPP== 'XXXlitter',]$STATUS <-  "Dead"
   
 # Standardising the case (live vs Live) used in the Status column
 # Making the variables factors again
-pointfr$Status <- as.factor(pointfr$Status)
-pointfr$Tissue <- as.factor(pointfr$Tissue)
+pointfr$STATUS <- as.factor(pointfr$STATUS)
+pointfr$TISSUE <- as.factor(pointfr$TISSUE)
 
 
-pointfr$Status <- recode(pointfr$Status, live="Live")
-levels(pointfr$Status)
-levels(pointfr$Tissue) # Need to make blank cells, N/A and NA all NAs
+pointfr$STATUS <- recode(pointfr$STATUS, live="Live")
+levels(pointfr$STATUS)
+levels(pointfr$TISSUE) # Need to make blank cells, N/A and NA all NAs
 
 # Empty rows to NAs
 
@@ -141,22 +142,22 @@ pointfr <- pointfr %>% mutate_each(funs(empty_as_na))
 str(pointfr)
 
 # As a side effect of transforming spaces and blank cells to NAs, R now thinks factors are characters, changing them back
-pointfr$Status <- as.factor(pointfr$Status)
-pointfr$Species <- as.factor(pointfr$Species)
-pointfr$Tissue <- as.factor(pointfr$Tissue)
+pointfr$STATUS <- as.factor(pointfr$STATUS)
+pointfr$SPP <- as.factor(pointfr$SPP)
+pointfr$TISSUE <- as.factor(pointfr$TISSUE)
 pointfr$PlotN <- as.factor(pointfr$PlotN)
 str(pointfr)
 
 # Changing them to NA
-pointfr$Status <- recode(pointfr$Status, "N/A"="NA")
-levels(pointfr$Status)
+pointfr$STATUS <- recode(pointfr$STATUS, "N/A"="NA")
+levels(pointfr$STATUS)
 
-pointfr$Tissue <- recode(pointfr$Tissue, "N/A"="NA")
-levels(pointfr$Tissue)
+pointfr$TISSUE <- recode(pointfr$TISSUE, "N/A"="NA")
+levels(pointfr$TISSUE)
 
 # Standardising Equisetum and Equisetum spp. to be the same
 levels(pointfr$Species)
 pointfr$Species <- recode(pointfr$Species, "Equisetum spp." = "Equisetum")
 
 
-write.csv(pointfr, file="pointfr.csv")
+#write.csv(pointfr, file="pointfr.csv")

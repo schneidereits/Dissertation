@@ -21,12 +21,27 @@ unique(QHI_cover$year) # Check years
 # 3 Confirm species IDs and spellings are consistent
 # 4 Calculate biodiversity metrics
 
-# 2019 data
+# integreating 2019 data ----
 
-library(readr)
-pointfr_2019_sas <- read_csv("data/QHI_biodiversity/QHI_pointfr_2019_sas.csv")
+# checking column correspondance
+str(QHI_pointframe)
+str(pointfr)
+head(QHI_pointframe, 1)
+head(pointfr, 1)
 
-str(pointfr_2019_sas)
+QHI_pointframe <- QHI_pointframe %>%
+  mutate(Height..cm. = as.numeric(Height..cm.))
+
+pointfr_2019 <- pointfr %>%
+  mutate(YEAR = as.integer(YEAR),
+         PLOT = as.integer(PLOT),
+         # replace na with 0 to match QHI_pointframe
+         Abundance = ifelse(is.na(Abundance), 0, Abundance),
+         Height..cm. = ifelse(is.na(Height..cm.), 0, Height..cm.)) %>%
+  select(-Herbivory, -Notes, -Photo, -PlotN)
+
+QHI_pointframe_full <- bind_rows(QHI_pointframe, pointfr_2019)
+str(QHI_pointframe_full)
 
 # sorting plot ----
 
