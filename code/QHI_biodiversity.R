@@ -22,30 +22,6 @@ unique(QHI_cover$year) # Check years
 # 3 Confirm species IDs and spellings are consistent
 # 4 Calculate biodiversity metrics
 
-# integreating 2019 data ----
-
-# checking column correspondance
-str(QHI_pointframe)
-str(pointfr)
-head(QHI_pointframe, 1)
-head(pointfr, 1)
-
-QHI_pointframe <- QHI_pointframe %>%
-  mutate(Height..cm. = as.numeric(Height..cm.))
-
-
-
-pointfr_2019 <- pointfr %>%
-  mutate(YEAR = as.integer(YEAR),
-         PLOT = as.integer(PLOT),
-         # replace na with 0 to match QHI_pointframe
-         Abundance = ifelse(is.na(Abundance), 0, Abundance),
-         Height..cm. = ifelse(is.na(Height..cm.), 0, Height..cm.)) %>%
-  select(-Herbivory, -Notes, -Photo, -PlotN)
-
-QHI_pointframe_full <- bind_rows(QHI_pointframe, pointfr_2019)
-str(QHI_pointframe_full)
-
 unique(sort(QHI_pointframe_full$SPP))
 # species with spelling error
 # Kobresia myotosoides
@@ -73,18 +49,37 @@ sort_QHI <- QHI_cover %>%
   unite("year2", c(n2, year)) %>%
   group_by(sub_name, year2, PLOT) %>%
   #filter(name == "Arctagrostis latifolia" | name == "Dryas integrifolia" | name == "Eriophorum angustifolium" | name =="Lupinus arcticus") %>%
-  filter(Species == "Salix pulchra " | Species == "SALPUL") %>%
+  filter(Species == "Lupinus arcticus" | Species == "LUPARC") %>%
   summarise(Species = first(Species),
             cover = first(cover))
   
-
 
 ggplot(sort_QHI, aes(x=PLOT, y= cover, color= year2)) +
        geom_point() +
   geom_line() +
   facet_wrap(.~sub_name) 
 
+# KO 2017, 2018, 2019  need to be flipped 
+
   
+# filter and prep 2018 & 2019 data ----
+
+pointfr_2018_2019 <- QHI_pointframe_full %>%
+  filter(YEAR == "2018" | YEAR == "2019") %>%
+  # flip KO plots are they were found to be reverse. HE stays the same (not pretty but it works)
+  mutate(PLOT = case_when(SUBSITE == "HE" & PLOT == 1 ~ 1,
+                          SUBSITE == "HE" & PLOT == 2 ~ 2,
+                          SUBSITE == "HE" & PLOT == 3 ~ 3,
+                          SUBSITE == "HE" & PLOT == 4 ~ 4,
+                          SUBSITE == "HE" & PLOT == 5 ~ 5,
+                          SUBSITE == "HE" & PLOT == 6 ~ 6,
+                          SUBSITE == "KO" & PLOT == 1 ~ 6,
+                          SUBSITE == "KO" & PLOT == 2 ~ 5,
+                          SUBSITE == "KO" & PLOT == 3 ~ 4,
+                          SUBSITE == "KO" & PLOT == 4 ~ 3,
+                          SUBSITE == "KO" & PLOT == 5 ~ 2,
+                          SUBSITE == "KO" & PLOT == 6 ~ 1))
   
 
-
+mutate(cg = case_when(carb <= 2 ~ "low",
+                      carb > 2  ~ "high")
