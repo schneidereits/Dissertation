@@ -8,6 +8,7 @@
 abundance <- read.csv("scripts/users/gdaskalova/Herschel_ITEXdata_1999-2018.csv", stringsAsFactors = FALSE, strip.white = TRUE)
 head(abundance)
 
+
 # Note that depending on how the data has been entered, species names may not be in a usable format. For the Herschel data abbreviations have been used so it requires an additional step later to convert these into species names. If data is entered electronically in the future this step can be bypassed.
 
 # Subset for desired year to add

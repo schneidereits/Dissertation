@@ -164,3 +164,48 @@ pointfr$SPP <- recode(pointfr$SPP, "Poa arctica " = "Poa arctica")
 pointfr$SPP <- recode(pointfr$SPP, "Senecio atropurpureus " = "Senecio atropurpureus")
 
 #write.csv(pointfr, file="pointfr_2019.csv")
+
+# binding 2019 point framing to 1999-2018 data ----
+
+setwd("~/Documents/university work/Dissertation/Dissertation/data/QHI_biodiversity/")
+QHI_pointframe <- read.csv("data/QHI_biodiversity/Herschel_ITEXdata_1999-2018_updated.csv")
+head(QHI_pointframe)
+levels(QHI_pointframe$SPP) # Checking all spelling is correct
+unique(QHI_pointframe$YEAR) # Check years
+
+str(QHI_pointframe)
+str(pointfr)
+head(QHI_pointframe, 1)
+head(pointfr, 1)
+
+QHI_pointframe <- QHI_pointframe %>%
+  mutate(Height..cm. = as.numeric(Height..cm.))
+
+
+pointfr_2019 <- pointfr %>%
+  mutate(YEAR = as.integer(YEAR),
+         PLOT = as.integer(PLOT),
+         # replace na with 0 to match QHI_pointframe
+         Abundance = ifelse(is.na(Abundance), 0, Abundance),
+         Height..cm. = ifelse(is.na(Height..cm.), 0, Height..cm.)) %>%
+  select(-Herbivory, -Notes, -Photo, -PlotN)
+
+QHI_pointframe_full <- bind_rows(QHI_pointframe, pointfr_2019)
+str(QHI_pointframe_full)
+
+unique(sort(QHI_pointframe_full$SPP))
+# species with spelling error
+# Kobresia myotosoides
+# "Pedicularis longsdorfi"     "Pedicularis longsdorfi "  
+# "Cetraria spp that is brown" "Cladina (brown)"
+# "Poa ?"  "Poa arctica  "Poa arctica "
+#  "Senecio astropurpureus" "Senecio atropurpureus"
+
+
+QHI_pointframe_full$SPP <- recode(QHI_pointframe_full$SPP, "Pedicularis longsdorfi " = "Pedicularis longsdorfi")
+QHI_pointframe_full$SPP <- recode(QHI_pointframe_full$SPP, "Kobresia myosuroides" = "Kobresia myotosoides")
+QHI_pointframe_full$SPP <- recode(QHI_pointframe_full$SPP, "Poa arctica " = "Poa arctica")
+QHI_pointframe_full$SPP <- recode(QHI_pointframe_full$SPP, "Senecio atropurpureus " = "Senecio atropurpureus")
+# still need to confirm Cetraria spp that is brown" "Cladina (brown)" , "Poa ?",  "Cetraria spp"
+
+write.csv(pointfr, file="pointfr_1999-2019.csv")
