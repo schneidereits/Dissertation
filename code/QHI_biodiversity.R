@@ -1,15 +1,16 @@
 # Starter script for Shawn
 # 31.3.2020
 
+library(tidyverse)
 
 # loading data ---- 
 setwd("~/Documents/university work/Dissertation/Dissertation")
-QHI_pointframe <- read.csv("data/QHI_biodiversity/Herschel_ITEXdata_1999-2018_updated.csv")
+QHI_pointframe <- read.csv("Dissertation/data/QHI_biodiversity/Herschel_ITEXdata_1999-2018_updated.csv")
 head(QHI_pointframe)
 levels(QHI_pointframe$SPP) # Checking all spelling is correct
 unique(QHI_pointframe$YEAR) # Check years
 
-QHI_cover <- read.csv("data/QHI_biodiversity/QHI_cover_1999_2018_ITEX_updated.csv")
+QHI_cover <- read.csv("Dissertation/data/QHI_biodiversity/QHI_cover_1999_2019_sas.csv")
 head(QHI_cover)
 levels(QHI_cover$name) # Checking all spelling is correct
 unique(QHI_cover$year) # Check years
@@ -31,8 +32,6 @@ head(pointfr, 1)
 
 QHI_pointframe <- QHI_pointframe %>%
   mutate(Height..cm. = as.numeric(Height..cm.))
-
-
 
 
 
@@ -72,15 +71,15 @@ sort_QHI <- QHI_cover %>%
          n2 = "year") %>%
  # unite("plot2" , c(n,plot)) %>%
   unite("year2", c(n2, year)) %>%
-  group_by(sub_name, year2, plot) %>%
-  #filter(name == "Arctagrostis latifolia" | name == "Dryas integrifolia" | name == "Eriophorum angustifolium") %>%
-  filter(name == "Lupinus arcticus") %>%
-  summarise(test = first(name),
+  group_by(sub_name, year2, PLOT) %>%
+  #filter(name == "Arctagrostis latifolia" | name == "Dryas integrifolia" | name == "Eriophorum angustifolium" | name =="Lupinus arcticus") %>%
+  filter(Species == "Salix pulchra " | Species == "SALPUL") %>%
+  summarise(Species = first(Species),
             cover = first(cover))
   
 
 
-ggplot(sort_QHI, aes(x=plot, y= cover, color= year2, shape = test)) +
+ggplot(sort_QHI, aes(x=PLOT, y= cover, color= year2)) +
        geom_point() +
   geom_line() +
   facet_wrap(.~sub_name) 
