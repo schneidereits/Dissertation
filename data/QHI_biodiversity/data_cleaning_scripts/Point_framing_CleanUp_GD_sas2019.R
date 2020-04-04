@@ -156,8 +156,11 @@ pointfr$TISSUE <- recode(pointfr$TISSUE, "N/A"="NA")
 levels(pointfr$TISSUE)
 
 # Standardising Equisetum and Equisetum spp. to be the same
-levels(pointfr$Species)
-pointfr$Species <- recode(pointfr$Species, "Equisetum spp." = "Equisetum")
+levels(pointfr$SPP)
+pointfr$SPP <- recode(pointfr$SPP, "Equisetum spp." = "Equisetum")
+pointfr$SPP <- recode(pointfr$SPP, "Pedicularis longsdorfi " = "Pedicularis longsdorfi")
+pointfr$SPP <- recode(pointfr$SPP, "Kobresia myosuroides" = "Kobresia myotosoides")
+pointfr$SPP <- recode(pointfr$SPP, "Poa arctica " = "Poa arctica")
+pointfr$SPP <- recode(pointfr$SPP, "Senecio atropurpureus " = "Senecio atropurpureus")
 
-
-#write.csv(pointfr, file="pointfr.csv")
+#write.csv(pointfr, file="pointfr_2019.csv")
