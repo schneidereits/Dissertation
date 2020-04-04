@@ -183,6 +183,8 @@ QHI_pointframe <- QHI_pointframe %>%
 
 
 pointfr_2019 <- pointfr %>%
+  # NEED TO CONFIRM WITH IMS AND GD: all NA species are standing dead under directly under Eriophorum vaginatum, so NA probably are Eriophorum vaginatum? 
+  fill(SPP) %>%
   mutate(YEAR = as.integer(YEAR),
          PLOT = as.integer(PLOT),
          # replace na with 0 to match QHI_pointframe
@@ -208,4 +210,8 @@ QHI_pointframe_full$SPP <- recode(QHI_pointframe_full$SPP, "Poa arctica " = "Poa
 QHI_pointframe_full$SPP <- recode(QHI_pointframe_full$SPP, "Senecio atropurpureus " = "Senecio atropurpureus")
 # still need to confirm Cetraria spp that is brown" "Cladina (brown)" , "Poa ?",  "Cetraria spp"
 
-write.csv(pointfr, file="pointfr_1999-2019.csv")
+# set wd to save location 
+setwd("~/Documents/university work/Dissertation/Dissertation/data/QHI_biodiversity")
+write.csv(QHI_pointframe_full, file="pointfr_1999-2019.csv")
+# setback
+setwd("~/Documents/university work/Dissertation/")
