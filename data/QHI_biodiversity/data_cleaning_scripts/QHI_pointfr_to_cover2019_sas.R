@@ -5,7 +5,7 @@
 # Note - make sure the species names are consistent!
 
 # Import Data -------------------------------------------------------------------
-abundance <- read.csv("scripts/users/gdaskalova/Herschel_ITEXdata_1999-2018.csv", stringsAsFactors = FALSE, strip.white = TRUE)
+abundance <- read.csv("Dissertation/data/QHI_biodiversity/pointfr_1999-2019.csv", stringsAsFactors = FALSE, strip.white = TRUE)
 head(abundance)
 
 
@@ -46,6 +46,9 @@ cover$YEAR <- substr(cover$plotID, 4,7)
 # Check for missing data
 as.data.frame(unique(cover[is.na(cover$Species),1]))
 # Check carefully that no abbreviations or wrong species names have made their way in
+# WHAT IS MEANT BY ABBREVIAITONS; SALIX BROWN ONES OR ALL THE SHORT SPP NAME AKA: SALARC
+
+
 
 #Match column names to ITEX dataset-----------------------------------
 cover$sub_id <- ""
@@ -63,7 +66,7 @@ cover$sub_ele <- ""
 cover[cover$SITE=="HE",]$sub_ele <- 76;cover[cover$SITE=="KO",]$sub_ele <- 73
 
 #Create output dataset with relevant and ordered columns
-QHI_cover_1999_2018_ITEX <- cover[,c(7:11,1,12,13,5,14,15,16)]
+QHI_cover_1999_2019_sas <- cover[,c(7:11,1,12,13,5,14,15,16)]
 
 #Write csv if required-------------------
-write.csv(QHI_cover_1999_2018_ITEX, file="scripts/users/gdaskalova/QHI_cover_1999_2018_ITEX.csv")
+write.csv(QHI_cover_1999_2019_sas, file="~/Documents/university work/Dissertation/Dissertation/data/QHI_biodiversity/QHI_cover_1999_2019_sas.csv")

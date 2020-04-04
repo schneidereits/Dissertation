@@ -15874,7 +15874,7 @@
 "15873","QHI","HE","CTL",1,2015,"Eriophorum vaginatum","LIVE","LEAF",5,6,NA,5,1
 "15874","QHI","HE","CTL",1,2015,"Salix phlebophylla","LIVE","LEAF",5,6,NA,1,1
 "15875","QHI","HE","CTL",1,2015,"XXXlitter","LITTER",NA,5,6,NA,1,1
-"15876","QHI","HE","CTL",1,2015,"Kobresia myotosoides","LIVE","FLOWERSTALK",6,6,NA,1,159
+"15876","QHI","HE","CTL",1,2015,"Kobresia myosuroides","LIVE","FLOWERSTALK",6,6,NA,1,159
 "15877","QHI","HE","CTL",1,2015,"Eriophorum vaginatum","LIVE","LEAF",6,6,NA,5,1
 "15878","QHI","HE","CTL",1,2015,"Eriophorum vaginatum","STANDINGDEAD","LEAF",6,6,NA,1,1
 "15879","QHI","HE","CTL",1,2015,"Salix pulchra","LIVE","STEM",6,6,NA,1,36
@@ -16094,7 +16094,7 @@
 "16093","QHI","HE","CTL",2,2015,"XXXlitter","LITTER",NA,6,1,NA,1,1
 "16094","QHI","HE","CTL",2,2015,"Kobresia sibirica","LIVE","FLOWER",7,1,NA,1,151
 "16095","QHI","HE","CTL",2,2015,"Kobresia sibirica","LIVE","LEAF",7,1,NA,1,1
-"16096","QHI","HE","CTL",2,2015,"Kobresia myotosoides","LIVE","LEAF",7,1,NA,1,1
+"16096","QHI","HE","CTL",2,2015,"Kobresia myosuroides","LIVE","LEAF",7,1,NA,1,1
 "16097","QHI","HE","CTL",2,2015,"Eriophorum vaginatum","LIVE","LEAF",7,1,NA,2,1
 "16098","QHI","HE","CTL",2,2015,"Eriophorum vaginatum","STANDINGDEAD","LEAF",7,1,NA,4,1
 "16099","QHI","HE","CTL",2,2015,"Thamnolia subuliformis","LIVE","LEAF",7,1,NA,1,1
@@ -16135,7 +16135,7 @@
 "16134","QHI","HE","CTL",2,2015,"Pedicularis capitata","LIVE","LEAF",7,2,NA,2,1
 "16135","QHI","HE","CTL",2,2015,"XXXothermoss","LIVE","LEAF",7,2,NA,1,1
 "16136","QHI","HE","CTL",2,2015,"XXXlitter","LITTER",NA,7,2,NA,1,1
-"16137","QHI","HE","CTL",2,2015,"Kobresia myotosoides","LIVE","LEAF",8,2,NA,1,388
+"16137","QHI","HE","CTL",2,2015,"Kobresia myosuroides","LIVE","LEAF",8,2,NA,1,388
 "16138","QHI","HE","CTL",2,2015,"Eriophorum vaginatum","LIVE","LEAF",8,2,NA,1,1
 "16139","QHI","HE","CTL",2,2015,"Eriophorum vaginatum","STANDINGDEAD","LEAF",8,2,NA,1,1
 "16140","QHI","HE","CTL",2,2015,"Arctagrostis latifolia","LIVE","LEAF",8,2,NA,1,1
@@ -31763,7 +31763,7 @@
 "31762","QHI","HE","CTL",4,2018,"XXXlitter","Litter","N/A",1,8,"N/A",1,1
 "31763","QHI","HE","CTL",4,2018,"XXXcarex","Live","Flower stalk",2,8,"N/A",1,170
 "31764","QHI","HE","CTL",4,2018,"XXXcarex","Live","Leaf",2,8,"N/A",1,1
-"31765","QHI","HE","CTL",4,2018,"Pedicularis longsdorfi","Live","Flower",2,8,"N/A",1,1
+"31765","QHI","HE","CTL",4,2018,"Pedicularis longsdorfi ","Live","Flower",2,8,"N/A",1,1
 "31766","QHI","HE","CTL",4,2018,"XXXcarex","Standing dead","Leaf",2,8,"N/A",2,1
 "31767","QHI","HE","CTL",4,2018,"XXXlitter","Litter","N/A",2,8,"N/A",1,1
 "31768","QHI","HE","CTL",4,2018,"XXXcarex","Standing dead","Leaf",3,8,"N/A",1,27
@@ -32628,7 +32628,7 @@
 "32627","QHI","HE","CTL",6,2018,"Eriophorum vaginatum","Standing dead","Leaf",7,9,"N/A",1,1
 "32628","QHI","HE","CTL",6,2018,"Salix pulchra","Live","Leaf",7,9,"N/A",1,1
 "32629","QHI","HE","CTL",6,2018,"XXXpeltigera","Live","Leaf",7,9,"N/A",1,1
-"32630","QHI","HE","CTL",6,2018,"Pedicularis longsdorfi","Standing dead","Flower",8,9,"N/A",1,39
+"32630","QHI","HE","CTL",6,2018,"Pedicularis longsdorfi ","Standing dead","Flower",8,9,"N/A",1,39
 "32631","QHI","HE","CTL",6,2018,"Eriophorum vaginatum","Live","Leaf",8,9,"N/A",2,1
 "32632","QHI","HE","CTL",6,2018,"Eriophorum vaginatum","Standing dead","Leaf",8,9,"N/A",2,1
 "32633","QHI","HE","CTL",6,2018,"Pedicularis longsdorfi","Live","Leaf",8,9,"N/A",1,1
@@ -32855,7 +32855,7 @@
 "32854","QHI","KO","CTL",2,2018,"Alopecurus alpinus","Live","Leaf",10,5,"N/A",2,310
 "32855","QHI","KO","CTL",2,2018,"Dryas integrifolia","Live","Leaf",10,5,"N/A",1,1
 "32856","QHI","KO","CTL",2,2018,"XXXlitter","Litter","N/A",10,5,"N/A",1,1
-"32857","QHI","KO","CTL",2,2018,"Poa arctica","Standing dead","Flower stalk",1,6,"N/A",1,35
+"32857","QHI","KO","CTL",2,2018,"Poa arctica ","Standing dead","Flower stalk",1,6,"N/A",1,35
 "32858","QHI","KO","CTL",2,2018,"Poa arctica","Live","Leaf",1,6,"N/A",1,1
 "32859","QHI","KO","CTL",2,2018,"Dryas integrifolia","Live","Leaf",1,6,"N/A",2,1
 "32860","QHI","KO","CTL",2,2018,"XXXlitter","Litter","N/A",1,6,"N/A",1,1
@@ -35021,7 +35021,7 @@
 "35020","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,1,1,"N/A",0,0
 "35021","QHI","HE","CTL",1,2019,"Hierochole alpine","Standing dead","Leaf",2,1,"N/A",1,13.9
 "35022","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live","Leaf",2,1,"N/A",4,0
-"35023","QHI","HE","CTL",1,2019,NA,"Standing dead","Leaf",2,1,"N/A",4,0
+"35023","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead","Leaf",2,1,"N/A",4,0
 "35024","QHI","HE","CTL",1,2019,"XXXothermoss","Live","NA",2,1,"N/A",0,0
 "35025","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,2,1,"N/A",0,0
 "35026","QHI","HE","CTL",1,2019,"Salix pulchra","Live","Leaf",3,1,"N/A",2,10.8
@@ -35039,32 +35039,32 @@
 "35038","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead","Leaf",5,1,"N/A",6,0
 "35039","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,5,1,"N/A",0,0
 "35040","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,6,1,"N/A",1,8.4
-"35041","QHI","HE","CTL",1,2019,NA,"Standing dead",NA,6,1,"N/A",3,0
+"35041","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,6,1,"N/A",3,0
 "35042","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,6,1,"N/A",0,0
 "35043","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,7,1,"N/A",4,7.8
-"35044","QHI","HE","CTL",1,2019,NA,"Standing dead",NA,7,1,"N/A",7,0
+"35044","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,7,1,"N/A",7,0
 "35045","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,7,1,"N/A",0,0
 "35046","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,8,1,"N/A",4,6.1
-"35047","QHI","HE","CTL",1,2019,NA,"Live",NA,8,1,"N/A",2,0
+"35047","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,8,1,"N/A",2,0
 "35048","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,8,1,"N/A",0,0
 "35049","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,9,1,"N/A",2,11.6
-"35050","QHI","HE","CTL",1,2019,NA,"Standing dead",NA,9,1,"N/A",3,0
+"35050","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,9,1,"N/A",3,0
 "35051","QHI","HE","CTL",1,2019,"Salix pulchra",NA,NA,9,1,"N/A",0,14.1
 "35052","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,9,1,"N/A",0,0
 "35053","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,10,1,"N/A",3,17.6
-"35054","QHI","HE","CTL",1,2019,NA,"Standing dead",NA,10,1,"N/A",1,0
+"35054","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,10,1,"N/A",1,0
 "35055","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,10,1,"N/A",0,0
 "35056","QHI","HE","CTL",1,2019,"Hierochole alpine",NA,NA,1,2,"N/A",0,7.7
 "35057","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,1,2,"N/A",2,0
-"35058","QHI","HE","CTL",1,2019,NA,"Live",NA,1,2,"N/A",2,0
+"35058","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,1,2,"N/A",2,0
 "35059","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,1,2,"N/A",0,0
 "35060","QHI","HE","CTL",1,2019,"Hierochole alpine","Live","Flower stalk",2,2,"N/A",1,33.3
 "35061","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,2,2,"N/A",2,0
-"35062","QHI","HE","CTL",1,2019,NA,"Standing dead",NA,2,2,"N/A",1,0
+"35062","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,2,2,"N/A",1,0
 "35063","QHI","HE","CTL",1,2019,"Salix pulchra",NA,NA,2,2,"N/A",0,7.6
 "35064","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,2,2,"N/A",0,0
 "35065","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,3,2,"N/A",0,11.8
-"35066","QHI","HE","CTL",1,2019,NA,"Standing dead",NA,3,2,"N/A",2,0
+"35066","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,3,2,"N/A",2,0
 "35067","QHI","HE","CTL",1,2019,"Salix pulchra","Live","Stem",3,2,"N/A",1,3.4
 "35068","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,3,2,"N/A",0,0
 "35069","QHI","HE","CTL",1,2019,"Polygonum bistorta","Live","Leaf",4,2,"N/A",1,15.8
@@ -35074,11 +35074,11 @@
 "35073","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,4,2,"N/A",3,0
 "35074","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,4,2,"N/A",0,0
 "35075","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live","Flower stalk",5,2,"N/A",0,13.5
-"35076","QHI","HE","CTL",1,2019,NA,"Live","Leaf",5,2,"N/A",3,0
-"35077","QHI","HE","CTL",1,2019,NA,"Standing dead",NA,5,2,"N/A",2,0
+"35076","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live","Leaf",5,2,"N/A",3,0
+"35077","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,5,2,"N/A",2,0
 "35078","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,5,2,"N/A",0,0
 "35079","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,6,2,"N/A",4,18.8
-"35080","QHI","HE","CTL",1,2019,NA,"Live",NA,6,2,"N/A",2,0
+"35080","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,6,2,"N/A",2,0
 "35081","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,6,2,"N/A",0,0
 "35082","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,7,2,"N/A",0,0
 "35083","QHI","HE","CTL",1,2019,"Luzula arctica","Live",NA,7,2,"N/A",1,14
@@ -35086,7 +35086,7 @@
 "35085","QHI","HE","CTL",1,2019,"Salix pulchra","Standing dead",NA,7,2,"N/A",1,10.1
 "35086","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,7,2,"N/A",0,0
 "35087","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,8,2,"N/A",2,12.7
-"35088","QHI","HE","CTL",1,2019,NA,"Standing dead",NA,8,2,"N/A",2,0
+"35088","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,8,2,"N/A",2,0
 "35089","QHI","HE","CTL",1,2019,"Salix pulchra","Live","Stem",8,2,"N/A",1,4.7
 "35090","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,8,2,"N/A",0,0
 "35091","QHI","HE","CTL",1,2019,"Luzula arctica","Standing dead","Flower stalk",9,2,"N/A",1,20.4
@@ -35097,10 +35097,10 @@
 "35096","QHI","HE","CTL",1,2019,"Arctagrostis latifolia","Live","Leaf",10,2,"N/A",1,0
 "35097","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,10,2,"N/A",0,0
 "35098","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live","Leaf",1,3,"N/A",1,14.4
-"35099","QHI","HE","CTL",1,2019,NA,"Standing dead",NA,1,3,"N/A",2,0
+"35099","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,1,3,"N/A",2,0
 "35100","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,1,3,"N/A",0,0
 "35101","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,2,3,"N/A",3,9.9
-"35102","QHI","HE","CTL",1,2019,NA,"Live",NA,2,3,"N/A",1,0
+"35102","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,2,3,"N/A",1,0
 "35103","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,2,3,"N/A",0,0
 "35104","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live","NA",3,3,"N/A",1,6
 "35105","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,3,3,"N/A",2,0
@@ -35118,7 +35118,7 @@
 "35117","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,6,3,"N/A",2,0
 "35118","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,6,3,"N/A",0,0
 "35119","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,7,3,"N/A",4,9.5
-"35120","QHI","HE","CTL",1,2019,NA,"Live",NA,7,3,"N/A",2,0
+"35120","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,7,3,"N/A",2,0
 "35121","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,7,3,"N/A",0,0
 "35122","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,8,3,"N/A",2,7.4
 "35123","QHI","HE","CTL",1,2019,"Salix reticulata",NA,NA,8,3,"N/A",0,0
@@ -35134,10 +35134,10 @@
 "35133","QHI","HE","CTL",1,2019,"XXXothermoss","Live","NA",10,3,"N/A",0,0
 "35134","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,10,3,"N/A",0,0
 "35135","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,1,4,"N/A",6,7.7
-"35136","QHI","HE","CTL",1,2019,NA,"Standing dead",NA,1,4,"N/A",4,0
+"35136","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,1,4,"N/A",4,0
 "35137","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,1,4,"N/A",0,0
 "35138","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,2,4,"N/A",4,9.7
-"35139","QHI","HE","CTL",1,2019,NA,"Standing dead",NA,2,4,"N/A",2,0
+"35139","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,2,4,"N/A",2,0
 "35140","QHI","HE","CTL",1,2019,"Salix pulchra",NA,NA,2,4,"N/A",0,8.3
 "35141","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,2,4,"N/A",0,0
 "35142","QHI","HE","CTL",1,2019,"Arctagrostis latifolia","Live",NA,3,4,"N/A",2,10
@@ -35146,22 +35146,22 @@
 "35145","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,3,4,"N/A",0,0
 "35146","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live","Flower",4,4,"N/A",1,9.5
 "35147","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,4,4,"N/A",1,0
-"35148","QHI","HE","CTL",1,2019,NA,"Standing dead",NA,4,4,"N/A",1,0
+"35148","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,4,4,"N/A",1,0
 "35149","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,4,4,"N/A",0,0
 "35150","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,5,4,"N/A",3,7.9
-"35151","QHI","HE","CTL",1,2019,NA,NA,NA,5,4,"N/A",2,0
+"35151","QHI","HE","CTL",1,2019,"Eriophorum vaginatum",NA,NA,5,4,"N/A",2,0
 "35152","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,5,4,"N/A",0,0
 "35153","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,6,4,"N/A",3,8.9
-"35154","QHI","HE","CTL",1,2019,NA,"Live",NA,6,4,"N/A",2,0
+"35154","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,6,4,"N/A",2,0
 "35155","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,6,4,"N/A",0,0
 "35156","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,7,4,"N/A",4,8.9
-"35157","QHI","HE","CTL",1,2019,NA,"Live",NA,7,4,"N/A",2,0
+"35157","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,7,4,"N/A",2,0
 "35158","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,7,4,"N/A",0,0
 "35159","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,8,4,"N/A",4,16
-"35160","QHI","HE","CTL",1,2019,NA,"Standing dead",NA,8,4,"N/A",4,0
+"35160","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,8,4,"N/A",4,0
 "35161","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,8,4,"N/A",0,0
 "35162","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,9,4,"N/A",2,11.3
-"35163","QHI","HE","CTL",1,2019,NA,"Standing dead",NA,9,4,"N/A",1,0
+"35163","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,9,4,"N/A",1,0
 "35164","QHI","HE","CTL",1,2019,"Pedicularis capitata","Live","Stem",9,4,"N/A",1,0
 "35165","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,9,4,"N/A",0,0
 "35166","QHI","HE","CTL",1,2019,"Arctagrostis latifolia","Standing dead",NA,10,4,"N/A",1,10.1
@@ -35189,30 +35189,30 @@
 "35188","QHI","HE","CTL",1,2019,"Salix phlebophylla",NA,NA,4,5,"N/A",0,0
 "35189","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,4,5,"N/A",0,0
 "35190","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,5,5,"N/A",0,9.8
-"35191","QHI","HE","CTL",1,2019,NA,"Standing dead",NA,5,5,"N/A",3,0
+"35191","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,5,5,"N/A",3,0
 "35192","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,5,5,"N/A",0,0
 "35193","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,6,5,"N/A",5,8.6
 "35194","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,6,5,"N/A",3,0
 "35195","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,6,5,"N/A",0,0
 "35196","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,7,5,"N/A",2,22.2
-"35197","QHI","HE","CTL",1,2019,NA,"Standing dead",NA,7,5,"N/A",3,0
+"35197","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,7,5,"N/A",3,0
 "35198","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,7,5,"N/A",0,0
 "35199","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,8,5,"N/A",4,18.5
-"35200","QHI","HE","CTL",1,2019,NA,"Standing dead",NA,8,5,"N/A",3,0
+"35200","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,8,5,"N/A",3,0
 "35201","QHI","HE","CTL",1,2019,"Saussurea angustifolia",NA,NA,8,5,"N/A",0,0
 "35202","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,8,5,"N/A",0,0
 "35203","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,9,5,"N/A",2,3
 "35204","QHI","HE","CTL",1,2019,"Salix reticulata","Live","Stem",9,5,"N/A",1,0
 "35205","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,9,5,"N/A",0,0
 "35206","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,10,5,"N/A",0,7.2
-"35207","QHI","HE","CTL",1,2019,NA,"Standing dead",NA,10,5,"N/A",2,0
+"35207","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,10,5,"N/A",2,0
 "35208","QHI","HE","CTL",1,2019,"XXXothermoss","Live","NA",10,5,"N/A",0,0
 "35209","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,10,5,"N/A",0,0
 "35210","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,1,6,"N/A",2,8.6
 "35211","QHI","HE","CTL",1,2019,"Salix phlebophylla",NA,NA,1,6,"N/A",0,0
 "35212","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,1,6,"N/A",0,0
 "35213","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,2,6,"N/A",3,15.5
-"35214","QHI","HE","CTL",1,2019,NA,"Standing dead",NA,2,6,"N/A",1,0
+"35214","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,2,6,"N/A",1,0
 "35215","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,2,6,"N/A",0,0
 "35216","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,3,6,"N/A",7,11.7
 "35217","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,3,6,"N/A",3,0
@@ -35224,7 +35224,7 @@
 "35223","QHI","HE","CTL",1,2019,"Hierochole alpine","Live","Flower stalk",5,6,"N/A",1,29.5
 "35224","QHI","HE","CTL",1,2019,"Salix pulchra",NA,NA,5,6,"N/A",2,15.2
 "35225","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,5,6,"N/A",2,0
-"35226","QHI","HE","CTL",1,2019,NA,"Standing dead",NA,5,6,"N/A",3,0
+"35226","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,5,6,"N/A",3,0
 "35227","QHI","HE","CTL",1,2019,"Salix phlebophylla",NA,NA,5,6,"N/A",0,0
 "35228","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,5,6,"N/A",0,0
 "35229","QHI","HE","CTL",1,2019,"Saussurea angustifolia",NA,NA,6,6,"N/A",0,9.9
@@ -35234,7 +35234,7 @@
 "35233","QHI","HE","CTL",1,2019,"XXXothermoss","Live","NA",6,6,"N/A",0,0
 "35234","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,6,6,"N/A",0,0
 "35235","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,7,6,"N/A",2,15.2
-"35236","QHI","HE","CTL",1,2019,NA,"Standing dead",NA,7,6,"N/A",1,0
+"35236","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,7,6,"N/A",1,0
 "35237","QHI","HE","CTL",1,2019,"XXXothermoss","Live","NA",7,6,"N/A",0,0
 "35238","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,7,6,"N/A",0,0
 "35239","QHI","HE","CTL",1,2019,"Salix pulchra",NA,NA,8,6,"N/A",2,20.6
@@ -35244,34 +35244,34 @@
 "35243","QHI","HE","CTL",1,2019,"XXXothermoss","Live","NA",8,6,"N/A",0,0
 "35244","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,8,6,"N/A",0,0
 "35245","QHI","HE","CTL",1,2019,"Salix pulchra",NA,NA,9,6,"N/A",2,18.9
-"35246","QHI","HE","CTL",1,2019,NA,"Live","Stem",9,6,"N/A",1,0
+"35246","QHI","HE","CTL",1,2019,"Salix pulchra","Live","Stem",9,6,"N/A",1,0
 "35247","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,9,6,"N/A",1,0
-"35248","QHI","HE","CTL",1,2019,NA,"Live",NA,9,6,"N/A",2,0
+"35248","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,9,6,"N/A",2,0
 "35249","QHI","HE","CTL",1,2019,"Salix reticulata",NA,NA,9,6,"N/A",0,0
 "35250","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,9,6,"N/A",0,0
 "35251","QHI","HE","CTL",1,2019,"Salix pulchra",NA,"Stem",10,6,"N/A",2,21.8
-"35252","QHI","HE","CTL",1,2019,NA,NA,"Leaf",10,6,"N/A",0,0
+"35252","QHI","HE","CTL",1,2019,"Salix pulchra",NA,"Leaf",10,6,"N/A",0,0
 "35253","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,10,6,"N/A",2,0
 "35254","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,10,6,"N/A",2,0
 "35255","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,10,6,"N/A",0,0
 "35256","QHI","HE","CTL",1,2019,"XXXothermoss","Live","NA",10,6,"N/A",0,0
 "35257","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,1,7,"N/A",2,14.6
-"35258","QHI","HE","CTL",1,2019,NA,"Live",NA,1,7,"N/A",2,0
+"35258","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,1,7,"N/A",2,0
 "35259","QHI","HE","CTL",1,2019,"Salix pulchra","Standing dead",NA,1,7,"N/A",1,4.4
 "35260","QHI","HE","CTL",1,2019,"Stellaria longipes",NA,NA,1,7,"N/A",0,0
 "35261","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,1,7,"N/A",0,0
 "35262","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,2,7,"N/A",3,9.8
 "35263","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,2,7,"N/A",0,0
 "35264","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,3,7,"N/A",4,17.6
-"35265","QHI","HE","CTL",1,2019,NA,"Standing dead",NA,3,7,"N/A",4,0
+"35265","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,3,7,"N/A",4,0
 "35266","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,3,7,"N/A",0,0
 "35267","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,4,7,"N/A",4,16.4
-"35268","QHI","HE","CTL",1,2019,NA,"Standing dead",NA,4,7,"N/A",3,0
+"35268","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,4,7,"N/A",3,0
 "35269","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,4,7,"N/A",0,0
 "35270","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,5,7,"N/A",2,12.8
 "35271","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,5,7,"N/A",0,0
 "35272","QHI","HE","CTL",1,2019,"Salix pulchra","Live","Leaf",5,7,"N/A",1,10
-"35273","QHI","HE","CTL",1,2019,NA,"Live","Flower",5,7,"N/A",1,0
+"35273","QHI","HE","CTL",1,2019,"Salix pulchra","Live","Flower",5,7,"N/A",1,0
 "35274","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,5,7,"N/A",0,0
 "35275","QHI","HE","CTL",1,2019,"Salix pulchra","Live","Leaf",6,7,"N/A",1,9.3
 "35276","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,6,7,"N/A",0,0
@@ -35309,11 +35309,11 @@
 "35308","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,3,8,"N/A",0,0
 "35309","QHI","HE","CTL",1,2019,"XXXothermoss","Live","NA",3,8,"N/A",0,0
 "35310","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,4,8,"N/A",5,11.8
-"35311","QHI","HE","CTL",1,2019,NA,"Standing dead",NA,4,8,"N/A",4,0
+"35311","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,4,8,"N/A",4,0
 "35312","QHI","HE","CTL",1,2019,"Salix reticulata","Live","Stem",4,8,"N/A",0,0
 "35313","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,4,8,"N/A",0,0
 "35314","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,5,8,"N/A",2,11.6
-"35315","QHI","HE","CTL",1,2019,NA,"Standing dead",NA,5,8,"N/A",3,0
+"35315","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,5,8,"N/A",3,0
 "35316","QHI","HE","CTL",1,2019,"XXXpeltigera",NA,NA,5,8,"N/A",0,0
 "35317","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead","Leaf",6,8,"N/A",3,2.1
 "35318","QHI","HE","CTL",1,2019,"XXXothermoss","Live","NA",6,8,"N/A",0,0
@@ -35322,7 +35322,7 @@
 "35321","QHI","HE","CTL",1,2019,"XXXothermoss","Live","NA",7,8,"N/A",0,0
 "35322","QHI","HE","CTL",1,2019,"Salix pulchra",NA,NA,8,8,"N/A",0,10.2
 "35323","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Live",NA,8,8,"N/A",3,0
-"35324","QHI","HE","CTL",1,2019,NA,"Standing dead",NA,8,8,"N/A",3,0
+"35324","QHI","HE","CTL",1,2019,"Eriophorum vaginatum","Standing dead",NA,8,8,"N/A",3,0
 "35325","QHI","HE","CTL",1,2019,"XXXlitter","Dead",NA,8,8,"N/A",0,0
 "35326","QHI","HE","CTL",1,2019,"Polygonum bistorta",NA,NA,9,8,"N/A",1,34.1
 "35327","QHI","HE","CTL",1,2019,"Eriophorum vaginatum",NA,NA,9,8,"N/A",4,0
@@ -35783,7 +35783,7 @@
 "35782","QHI","HE","CTL",2,2019,"XXXlitter","Dead",NA,9,9,"N/A",0,0
 "35783","QHI","HE","CTL",2,2019,"Salix pulchra",NA,NA,10,9,"N/A",0,11.4
 "35784","QHI","HE","CTL",2,2019,"Eriophorum vaginatum","Live",NA,10,9,"N/A",3,0
-"35785","QHI","HE","CTL",2,2019,NA,"Standing dead",NA,10,9,"N/A",7,0
+"35785","QHI","HE","CTL",2,2019,"Eriophorum vaginatum","Standing dead",NA,10,9,"N/A",7,0
 "35786","QHI","HE","CTL",2,2019,"XXXothermoss","Live","NA",10,9,"N/A",0,0
 "35787","QHI","HE","CTL",2,2019,"XXXlitter","Dead",NA,10,9,"N/A",0,0
 "35788","QHI","HE","CTL",2,2019,"Salix pulchra","Live","Stem",1,10,"N/A",2,11.4
@@ -35843,18 +35843,18 @@
 "35842","QHI","HE","CTL",3,2019,"Eriophorum vaginatum","Standing dead","Leaf",4,1,"N/A",5,0
 "35843","QHI","HE","CTL",3,2019,"XXXlitter","Dead",NA,4,1,"N/A",0,0
 "35844","QHI","HE","CTL",3,2019,"Eriophorum vaginatum","Live",NA,5,1,"N/A",5,10.7
-"35845","QHI","HE","CTL",3,2019,NA,"Standing dead",NA,5,1,"N/A",3,0
+"35845","QHI","HE","CTL",3,2019,"Eriophorum vaginatum","Standing dead",NA,5,1,"N/A",3,0
 "35846","QHI","HE","CTL",3,2019,"XXXlitter","Dead",NA,5,1,"N/A",0,0
 "35847","QHI","HE","CTL",3,2019,"Eriophorum vaginatum","Live",NA,6,1,"N/A",4,6.8
 "35848","QHI","HE","CTL",3,2019,"Eriophorum vaginatum","Standing dead",NA,6,1,"N/A",4,0
 "35849","QHI","HE","CTL",3,2019,"XXXlitter","Dead",NA,6,1,"N/A",0,0
 "35850","QHI","HE","CTL",3,2019,"Eriophorum vaginatum","Live","Flower stalk",7,1,"N/A",1,8.8
-"35851","QHI","HE","CTL",3,2019,NA,"Live",NA,7,1,"N/A",2,0
-"35852","QHI","HE","CTL",3,2019,NA,"Standing dead",NA,7,1,"N/A",5,0
+"35851","QHI","HE","CTL",3,2019,"Eriophorum vaginatum","Live",NA,7,1,"N/A",2,0
+"35852","QHI","HE","CTL",3,2019,"Eriophorum vaginatum","Standing dead",NA,7,1,"N/A",5,0
 "35853","QHI","HE","CTL",3,2019,"Salix pulchra","Live","Stem",7,1,"N/A",0,4.7
 "35854","QHI","HE","CTL",3,2019,"XXXlitter","Dead",NA,7,1,"N/A",0,0
 "35855","QHI","HE","CTL",3,2019,"Eriophorum vaginatum","Live",NA,8,1,"N/A",3,15.6
-"35856","QHI","HE","CTL",3,2019,NA,"Standing dead",NA,8,1,"N/A",4,0
+"35856","QHI","HE","CTL",3,2019,"Eriophorum vaginatum","Standing dead",NA,8,1,"N/A",4,0
 "35857","QHI","HE","CTL",3,2019,"Salix pulchra",NA,NA,8,1,"N/A",0,8.6
 "35858","QHI","HE","CTL",3,2019,"XXXlitter","Dead",NA,8,1,"N/A",0,0
 "35859","QHI","HE","CTL",3,2019,"Salix pulchra","Live","Leaf",9,1,"N/A",2,21.9
@@ -35920,7 +35920,7 @@
 "35919","QHI","HE","CTL",3,2019,"Eriophorum vaginatum","Standing dead",NA,6,3,"N/A",1,0
 "35920","QHI","HE","CTL",3,2019,"XXXlitter","Dead",NA,6,3,"N/A",0,0
 "35921","QHI","HE","CTL",3,2019,"Eriophorum vaginatum","Live",NA,7,3,"N/A",2,12.3
-"35922","QHI","HE","CTL",3,2019,NA,"Standing dead",NA,7,3,"N/A",5,0
+"35922","QHI","HE","CTL",3,2019,"Eriophorum vaginatum","Standing dead",NA,7,3,"N/A",5,0
 "35923","QHI","HE","CTL",3,2019,"Arctagrostis latifolia","Standing dead",NA,7,3,"N/A",2,0
 "35924","QHI","HE","CTL",3,2019,"XXXlitter","Dead",NA,7,3,"N/A",0,0
 "35925","QHI","HE","CTL",3,2019,"XXXothermoss","Live","NA",7,3,"N/A",0,0
@@ -36624,7 +36624,7 @@
 "36623","QHI","HE","CTL",5,2019,"Eriophorum vaginatum","Standing dead",NA,8,1,"N/A",4,0
 "36624","QHI","HE","CTL",5,2019,"XXXlitter","Dead",NA,8,1,"N/A",0,0
 "36625","QHI","HE","CTL",5,2019,"Eriophorum vaginatum","Live",NA,9,1,"N/A",3,7.9
-"36626","QHI","HE","CTL",5,2019,NA,"Standing dead",NA,9,1,"N/A",2,0
+"36626","QHI","HE","CTL",5,2019,"Eriophorum vaginatum","Standing dead",NA,9,1,"N/A",2,0
 "36627","QHI","HE","CTL",5,2019,"Polygonum bistorta",NA,NA,9,1,"N/A",0,0
 "36628","QHI","HE","CTL",5,2019,"XXXothermoss","Live","NA",9,1,"N/A",0,0
 "36629","QHI","HE","CTL",5,2019,"Arctagrostis latifolia","Standing dead",NA,10,1,"N/A",0,9.4
@@ -36660,7 +36660,7 @@
 "36659","QHI","HE","CTL",5,2019,"Eriophorum vaginatum","Standing dead",NA,7,2,"N/A",4,3.5
 "36660","QHI","HE","CTL",5,2019,"XXXlitter","Dead",NA,7,2,"N/A",0,0
 "36661","QHI","HE","CTL",5,2019,"Eriophorum vaginatum","Live",NA,8,2,"N/A",4,19.4
-"36662","QHI","HE","CTL",5,2019,NA,"Standing dead",NA,8,2,"N/A",6,0
+"36662","QHI","HE","CTL",5,2019,"Eriophorum vaginatum","Standing dead",NA,8,2,"N/A",6,0
 "36663","QHI","HE","CTL",5,2019,"Salix reticulata",NA,NA,8,2,"N/A",0,0
 "36664","QHI","HE","CTL",5,2019,"Cardamine digitalis",NA,NA,8,2,"N/A",0,0
 "36665","QHI","HE","CTL",5,2019,"Saussurea angustifolia",NA,NA,8,2,"N/A",0,0
@@ -36725,7 +36725,7 @@
 "36724","QHI","HE","CTL",5,2019,"XXXlitter","Dead",NA,5,4,"N/A",0,0
 "36725","QHI","HE","CTL",5,2019,"XXXothermoss","Live","NA",5,4,"N/A",0,0
 "36726","QHI","HE","CTL",5,2019,"Eriophorum vaginatum","Live",NA,6,4,"N/A",3,8.1
-"36727","QHI","HE","CTL",5,2019,NA,"Standing dead",NA,6,4,"N/A",2,0
+"36727","QHI","HE","CTL",5,2019,"Eriophorum vaginatum","Standing dead",NA,6,4,"N/A",2,0
 "36728","QHI","HE","CTL",5,2019,"XXXlitter","Dead",NA,6,4,"N/A",0,0
 "36729","QHI","HE","CTL",5,2019,"XXXothermoss","Live","NA",6,4,"N/A",0,0
 "36730","QHI","HE","CTL",5,2019,"Eriophorum vaginatum","Standing dead",NA,7,4,"N/A",0,15.7
@@ -36754,7 +36754,7 @@
 "36753","QHI","HE","CTL",5,2019,"Eriophorum vaginatum","Live",NA,3,5,"N/A",1,0
 "36754","QHI","HE","CTL",5,2019,"XXXlitter","Dead",NA,3,5,"N/A",0,0
 "36755","QHI","HE","CTL",5,2019,"Eriophorum vaginatum","Live",NA,4,5,"N/A",3,4.7
-"36756","QHI","HE","CTL",5,2019,NA,"Standing dead",NA,4,5,"N/A",5,0
+"36756","QHI","HE","CTL",5,2019,"Eriophorum vaginatum","Standing dead",NA,4,5,"N/A",5,0
 "36757","QHI","HE","CTL",5,2019,"XXXlitter","Dead",NA,4,5,"N/A",0,0
 "36758","QHI","HE","CTL",5,2019,"XXXothermoss","Live","NA",4,5,"N/A",0,0
 "36759","QHI","HE","CTL",5,2019,"Eriophorum vaginatum","Live","Flower stalk",5,5,"N/A",0,8.6
@@ -36786,13 +36786,13 @@
 "36785","QHI","HE","CTL",5,2019,"Eriophorum vaginatum","Standing dead",NA,1,6,"N/A",9,0
 "36786","QHI","HE","CTL",5,2019,"XXXlitter","Dead",NA,1,6,"N/A",0,0
 "36787","QHI","HE","CTL",5,2019,"Eriophorum vaginatum","Standing dead",NA,2,6,"N/A",0,10.4
-"36788","QHI","HE","CTL",5,2019,NA,"Live",NA,2,6,"N/A",2,0
+"36788","QHI","HE","CTL",5,2019,"Eriophorum vaginatum","Live",NA,2,6,"N/A",2,0
 "36789","QHI","HE","CTL",5,2019,"XXXlitter","Dead",NA,2,6,"N/A",0,0
 "36790","QHI","HE","CTL",5,2019,"Eriophorum vaginatum","Live",NA,3,6,"N/A",2,3.5
 "36791","QHI","HE","CTL",5,2019,"Eriophorum vaginatum","Standing dead",NA,3,6,"N/A",1,0
 "36792","QHI","HE","CTL",5,2019,"XXXlitter","Dead",NA,3,6,"N/A",0,0
 "36793","QHI","HE","CTL",5,2019,"Salix pulchra","Live","Leaf",4,6,"N/A",0,7
-"36794","QHI","HE","CTL",5,2019,NA,NA,"Stem",4,6,"N/A",0,0
+"36794","QHI","HE","CTL",5,2019,"Salix pulchra",NA,"Stem",4,6,"N/A",0,0
 "36795","QHI","HE","CTL",5,2019,"XXXcarex","Live","Leaf",4,6,"N/A",0,0
 "36796","QHI","HE","CTL",5,2019,"Eriophorum vaginatum","Standing dead",NA,4,6,"N/A",9,0
 "36797","QHI","HE","CTL",5,2019,"XXXlitter","Dead",NA,4,6,"N/A",0,0
@@ -36827,10 +36827,10 @@
 "36826","QHI","HE","CTL",5,2019,"Eriophorum vaginatum","Standing dead",NA,1,7,"N/A",0,0
 "36827","QHI","HE","CTL",5,2019,"XXXlitter","Dead",NA,1,7,"N/A",0,0
 "36828","QHI","HE","CTL",5,2019,"Eriophorum vaginatum","Standing dead",NA,2,7,"N/A",4,4.3
-"36829","QHI","HE","CTL",5,2019,NA,"Live",NA,2,7,"N/A",3,0
+"36829","QHI","HE","CTL",5,2019,"Eriophorum vaginatum","Live",NA,2,7,"N/A",3,0
 "36830","QHI","HE","CTL",5,2019,"XXXlitter","Dead",NA,2,7,"N/A",0,0
 "36831","QHI","HE","CTL",5,2019,"Eriophorum vaginatum","Live",NA,3,7,"N/A",2,8.7
-"36832","QHI","HE","CTL",5,2019,NA,"Standing dead",NA,3,7,"N/A",2,0
+"36832","QHI","HE","CTL",5,2019,"Eriophorum vaginatum","Standing dead",NA,3,7,"N/A",2,0
 "36833","QHI","HE","CTL",5,2019,"XXXlitter","Dead",NA,3,7,"N/A",0,0
 "36834","QHI","HE","CTL",5,2019,"XXXcarex","Live","Leaf",4,7,"N/A",2,12.5
 "36835","QHI","HE","CTL",5,2019,"Eriophorum vaginatum","Live",NA,4,7,"N/A",1,0
@@ -36852,7 +36852,7 @@
 "36851","QHI","HE","CTL",5,2019,"Eriophorum vaginatum","Standing dead",NA,7,7,"N/A",5,0
 "36852","QHI","HE","CTL",5,2019,"XXXlitter","Dead",NA,7,7,"N/A",0,0
 "36853","QHI","HE","CTL",5,2019,"Eriophorum vaginatum","Live",NA,8,7,"N/A",4,8
-"36854","QHI","HE","CTL",5,2019,NA,"Standing dead",NA,8,7,"N/A",4,0
+"36854","QHI","HE","CTL",5,2019,"Eriophorum vaginatum","Standing dead",NA,8,7,"N/A",4,0
 "36855","QHI","HE","CTL",5,2019,"XXXothermoss","Live","NA",8,7,"N/A",0,0
 "36856","QHI","HE","CTL",5,2019,"Salix phlebophylla","Live",NA,9,7,"N/A",3,3.9
 "36857","QHI","HE","CTL",5,2019,"XXXothermoss","Live","NA",9,7,"N/A",0,0
@@ -36909,7 +36909,7 @@
 "36908","QHI","HE","CTL",5,2019,"XXXlitter","Dead",NA,6,9,"N/A",0,0
 "36909","QHI","HE","CTL",5,2019,"XXXothermoss","Live","NA",6,9,"N/A",0,0
 "36910","QHI","HE","CTL",5,2019,"Eriophorum vaginatum","Live",NA,7,9,"N/A",4,10.4
-"36911","QHI","HE","CTL",5,2019,NA,"Standing dead",NA,7,9,"N/A",5,0
+"36911","QHI","HE","CTL",5,2019,"Eriophorum vaginatum","Standing dead",NA,7,9,"N/A",5,0
 "36912","QHI","HE","CTL",5,2019,"XXXlitter","Dead",NA,7,9,"N/A",0,0
 "36913","QHI","HE","CTL",5,2019,"XXXcarex","Standing dead","Flower stalk",8,9,"N/A",1,18.5
 "36914","QHI","HE","CTL",5,2019,"Arctagrostis latifolia","Standing dead","Flower stalk",8,9,"N/A",1,0
@@ -37039,18 +37039,18 @@
 "37038","QHI","HE","CTL",6,2019,"Eriophorum vaginatum","Standing dead","Leaf",7,2,"N/A",5,0
 "37039","QHI","HE","CTL",6,2019,"XXXlitter","Dead",NA,7,2,"N/A",0,0
 "37040","QHI","HE","CTL",6,2019,"Eriophorum vaginatum","Standing dead",NA,8,2,"N/A",5,9.3
-"37041","QHI","HE","CTL",6,2019,NA,"Live",NA,8,2,"N/A",2,0
+"37041","QHI","HE","CTL",6,2019,"Eriophorum vaginatum","Live",NA,8,2,"N/A",2,0
 "37042","QHI","HE","CTL",6,2019,"XXXlitter","Dead",NA,8,2,"N/A",0,0
 "37043","QHI","HE","CTL",6,2019,"XXXothermoss","Live","NA",8,2,"N/A",0,0
 "37044","QHI","HE","CTL",6,2019,"Eriophorum vaginatum","Live","Leaf",9,2,"N/A",0,11.4
 "37045","QHI","HE","CTL",6,2019,"Salix pulchra",NA,"Stem",9,2,"N/A",0,9.1
-"37046","QHI","HE","CTL",6,2019,NA,"Standing dead","Leaf",9,2,"N/A",0,0
+"37046","QHI","HE","CTL",6,2019,"Salix pulchra","Standing dead","Leaf",9,2,"N/A",0,0
 "37047","QHI","HE","CTL",6,2019,"XXXlitter","Dead",NA,9,2,"N/A",0,0
 "37048","QHI","HE","CTL",6,2019,"Eriophorum vaginatum","Live","Leaf",10,2,"N/A",3,8.5
 "37049","QHI","HE","CTL",6,2019,"Eriophorum vaginatum","Standing dead",NA,10,2,"N/A",5,0
 "37050","QHI","HE","CTL",6,2019,"XXXlitter","Dead",NA,10,2,"N/A",0,0
 "37051","QHI","HE","CTL",6,2019,"Salix pulchra","Live",NA,1,3,"N/A",0,8.5
-"37052","QHI","HE","CTL",6,2019,NA,"Standing dead",NA,1,3,"N/A",0,0
+"37052","QHI","HE","CTL",6,2019,"Salix pulchra","Standing dead",NA,1,3,"N/A",0,0
 "37053","QHI","HE","CTL",6,2019,"XXXpeltigera",NA,NA,1,3,"N/A",0,0
 "37054","QHI","HE","CTL",6,2019,"XXXothermoss","Live","NA",1,3,"N/A",0,0
 "37055","QHI","HE","CTL",6,2019,"Eriophorum vaginatum","Live","Leaf",2,3,"N/A",1,13.2
@@ -37059,12 +37059,12 @@
 "37058","QHI","HE","CTL",6,2019,"Pyrola grandiflora",NA,NA,2,3,"N/A",0,0
 "37059","QHI","HE","CTL",6,2019,"XXXothermoss","Live","NA",2,3,"N/A",0,0
 "37060","QHI","HE","CTL",6,2019,"XXXcarex","Live",NA,3,3,"N/A",1,9.6
-"37061","QHI","HE","CTL",6,2019,NA,"Standing dead",NA,3,3,"N/A",2,0
+"37061","QHI","HE","CTL",6,2019,"XXXcarex","Standing dead",NA,3,3,"N/A",2,0
 "37062","QHI","HE","CTL",6,2019,"Eriophorum vaginatum","Standing dead",NA,3,3,"N/A",2,0
 "37063","QHI","HE","CTL",6,2019,"XXXlitter","Dead",NA,3,3,"N/A",0,0
 "37064","QHI","HE","CTL",6,2019,"XXXothermoss","Live","NA",3,3,"N/A",0,0
 "37065","QHI","HE","CTL",6,2019,"XXXcarex","Live",NA,4,3,"N/A",2,14.4
-"37066","QHI","HE","CTL",6,2019,NA,"Standing dead",NA,4,3,"N/A",4,0
+"37066","QHI","HE","CTL",6,2019,"XXXcarex","Standing dead",NA,4,3,"N/A",4,0
 "37067","QHI","HE","CTL",6,2019,"XXXlitter","Dead",NA,4,3,"N/A",0,0
 "37068","QHI","HE","CTL",6,2019,"XXXcarex","Live",NA,5,3,"N/A",0,18.9
 "37069","QHI","HE","CTL",6,2019,"Eriophorum vaginatum","Standing dead",NA,5,3,"N/A",1,0
