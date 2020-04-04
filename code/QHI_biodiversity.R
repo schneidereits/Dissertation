@@ -32,6 +32,10 @@ head(pointfr, 1)
 QHI_pointframe <- QHI_pointframe %>%
   mutate(Height..cm. = as.numeric(Height..cm.))
 
+
+
+
+
 pointfr_2019 <- pointfr %>%
   mutate(YEAR = as.integer(YEAR),
          PLOT = as.integer(PLOT),
@@ -42,6 +46,23 @@ pointfr_2019 <- pointfr %>%
 
 QHI_pointframe_full <- bind_rows(QHI_pointframe, pointfr_2019)
 str(QHI_pointframe_full)
+
+unique(sort(QHI_pointframe_full$SPP))
+# species with spelling error
+# Kobresia myotosoides
+# "Pedicularis longsdorfi"     "Pedicularis longsdorfi "  
+# "Cetraria spp that is brown" "Cladina (brown)"
+# "Poa ?"  "Poa arctica  "Poa arctica "
+#  "Senecio astropurpureus" "Senecio atropurpureus"
+
+
+QHI_pointframe_full$SPP <- recode(QHI_pointframe_full$SPP, "Pedicularis longsdorfi " = "Pedicularis longsdorfi")
+QHI_pointframe_full$SPP <- recode(QHI_pointframe_full$SPP, "Kobresia myosuroides" = "Kobresia myotosoides")
+QHI_pointframe_full$SPP <- recode(QHI_pointframe_full$SPP, "Poa arctica " = "Poa arctica")
+QHI_pointframe_full$SPP <- recode(QHI_pointframe_full$SPP, "Senecio atropurpureus " = "Senecio atropurpureus")
+# still need to confirm Cetraria spp that is brown" "Cladina (brown)" , "Poa ?",  "Cetraria spp"
+
+
 
 # sorting plot ----
 
