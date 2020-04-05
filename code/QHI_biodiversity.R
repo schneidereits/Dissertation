@@ -217,16 +217,7 @@ biodiv_long$plot_unique <- paste(biodiv_long$sub_name,biodiv_long$PLOT,biodiv_lo
 # remove extra colunms
 biodiv_long <- biodiv_long %>% select(-sub_name, -PLOT, -year)
 
-
-# richness
-# reorder colunms 
-biodiv_long <- biodiv_long[,c(59, 1:58)]
-
-richness <- apply(biodiv_long[,-1]>0,1,sum)
-print(richness)
-
-# shannon & simpson
-
+# diversity indicies 
 
 richness <- ddply(biodiv_long,~plot_unique,function(x) {
   data.frame(richness=sum(x[-1]>0))
@@ -243,97 +234,13 @@ simpson <- ddply(biodiv_long,~plot_unique,function(x) {
 evenness <- ddply(biodiv_long,~plot_unique,function(x) {
   data.frame(evenness=diversity(x[-1], index="shannon")/log(sum(x[-1]>0)))
   })
+
+# bind with bareground data 
   
 t <- left_join(richness, shannon) %>% 
   left_join(simpson) %>%
-  left_join(evenness)
+  left_join(evenness) %>%
+  
 
 
-
-
-
-
-div_mat <- as.data.frame(matrix(NA, nrow = 0, ncol = 4))
-colnames(div_mat) <- c("sub_site","plot","Shan","Simp")
-
-biodiv$SUBSITE <- paste0(biodiv$sub_name, biodiv$PLOT)
-biodiv_long$SUBSITE <- paste0(biodiv_long$sub_name, biodiv_long$PLOT)
-
-sub = unique(biodiv$SUBSITE)
-
-# to check colunms for QHI4
-str(biodiv_long)
-
-for (i in 1:length(sub)){
-  QHI1 <- biodiv_long[biodiv_long$SUBSITE == sub[i],]
-  plt = sort(unique(QHI1$PLOT))
-  for (n in 1:length(plt)){
-    QHI3 <- QHI1[QHI1$PLOT == plt[n],]
-    QHI4 <- QHI3[,4:66]
-    shan <- diversity(QHI4, index = "biodiv")
-    simps <- diversity(QHI4, index = "simpson")
-    
-    row.start <- sum(complete.cases(div_mat)) + 1
-    row.end <- row.start+as.numeric(nrow(QHI3)) - 1
-    
-    div_mat[row.start:row.end,1] <- as.character(QHI3$SUBSITE)
-    div_mat[row.start:row.end,2] <- as.character(QHI3$PLOT)
-    div_mat[row.start:row.end,3] <- shan
-    div_mat[row.start:row.end,4] <- simps
-  }}
-
-biodiv <- div_mat
-biodiv <- arrange(biodiv, sub_site)
-
-# Add species richness
-richness <- QHI70 %>% 
-  dplyr::select(sub_name, PLOT, Species) %>%
-  distinct() %>%
-  group_by(sub_name, PLOT) %>% tally()
-
-colnames(richness)[3] <- "richness"
-
-biodiv70$richness <- richness$richness
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-biodiv <- pointfr_2018_2019   
-head(biodiv)
-
-biodiv$plot_unique <- paste(biodiv$SUBSITE,biodiv$PLOT,biodiv$YEAR,sep="_")
-
-t <- biodiv %>% 
-  select(plot_unique, SPP, Abundance) %>%
-  group_by(plot_unique, SPP) %>%
-  spread(key = SPP, value = Abundance)
-
-
-df1 %>% 
-  spread(Env, Y)  %>%
-  set_rownames(.$Gen) %>%
-  select(-Gen) %>%
-  as.matrix
-
-
-
-biodiv <- biodiv %>%
-  select(plot_unique, Abundance, SPP)
+head(bareground)
