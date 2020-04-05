@@ -148,54 +148,8 @@ bareground_full$Bareground <- bareground$Bareground[match(paste(bareground_full$
 bareground <- bareground_full  # Rename to original
 bareground[is.na(bareground$Bareground),]$Bareground <- 0  # Replace NAs from match with zeros
 
-
-# ** Community composition and diversity measures ----
-# source code: Qikiqtaruk Ecological Monitoring manuscript script
-# Code for all modelling and data visualisation within the manuscript
-# Written by Isla Myers-Smith, Anne Bjorkman, Haydn Thomas, Sandra Angers-Blondin and Gergana Daskalova
-
-
-# Remove rows with no cover
-diversity <- subset(cover_2018_2019, cover>0)
-# Remove non veg
-diversity <- subset(diversity, Species !="XXXlitter" & Species !="XXXlitter " & 
-                      Species !="XXXbareground" & Species !="XXXbareground " & 
-                      Species !="XXXrock" & Species !="XXXrock " & 
-                      Species !="XXXfeces" & Species !="XXXfeces " & 
-                      Species !="XXXstandingwater" & Species !="XXXstandingwater " & 
-                      Species !="XXXspider"& Species !="Xxxspider"& Species !="XXXspider ")
-# Add unique plots
-diversity$plot_unique <- paste(diversity$sub_name,diversity$PLOT,diversity$year,sep="_")
-
-# Convert to relative cover
-plot_cover <- ddply(diversity,.(plot_unique), summarise,
-                    total_cover = sum(cover))
-diversity$total_cover <- plot_cover$total_cover[match(diversity$plot_unique, plot_cover$plot_unique)]
-diversity$rel_cover <- diversity$cover/diversity$total_cover*100
-
-# richness 
-#modified from GD spectra hub
-
-unique(sort(cover_2018_2019$Species))
-
-richness <- cover_2018_2019 %>% 
-  # removing non species 
-  filter(!Species %in% c("XXXbareground", "XXXfeces",
-                         "XXXlitter", "XXXstandingwater", "XXXrock")) %>%
-  # standardizing moss
-  mutate(case_when(Species == "Xxxmoss" ~ "XXXothermoss")) %>%
-  select(sub_name, PLOT, Species, year) %>%
-  distinct() %>%
-  group_by(sub_name, PLOT, year) %>% 
-  tally() 
-
-colnames(richness)[4] <- "richness"
-
-richness <- richness %>%
-  rename()
-
-# bio diverstiy
-# source code from gergana daskalova spectra_hub/02-scale-biodiv-GD.R
+# biodiverstiy ----
+# data filtering adapted gergana daskalova spectra_hub/02-scale-biodiv-GD.R
 
 unique(sort(cover_2018_2019$Species))
 
@@ -213,34 +167,62 @@ biodiv_long[is.na(biodiv_long)] <- 0
 
 # create new unique plot colunm
 biodiv_long$plot_unique <- paste(biodiv_long$sub_name,biodiv_long$PLOT,biodiv_long$year,sep="_")
+# remove 
+#biodiv_long <- biodiv_long %>% select(-sub_name, -PLOT, -year)
 
-# remove extra colunms
-biodiv_long <- biodiv_long %>% select(-sub_name, -PLOT, -year)
+# remove QHI: form plot unique
+biodiv_long <- biodiv_long %>% mutate(plot_unique = str_remove_all(plot_unique, "QHI:"))
 
-# diversity indicies 
+# rearrange colunms
+biodiv_long <- biodiv_long[,c(1:3, 62, 4:61)]
+
+
+
+# diversity indicies ----
 
 richness <- ddply(biodiv_long,~plot_unique,function(x) {
-  data.frame(richness=sum(x[-1]>0))
+  data.frame(richness=sum(x[-c(1:4)]>0))
   })
 
 shannon <- ddply(biodiv_long,~plot_unique,function(x) {
-  data.frame(shannon=diversity(x[-1], index="shannon"))
+  data.frame(shannon=diversity(x[-c(1:4)], index="shannon"))
   })
 
 simpson <- ddply(biodiv_long,~plot_unique,function(x) {
-  data.frame(simposon=diversity(x[-1], index="simpson"))
+  data.frame(simposon=diversity(x[-c(1:4)], index="simpson"))
   })
 
 evenness <- ddply(biodiv_long,~plot_unique,function(x) {
-  data.frame(evenness=diversity(x[-1], index="shannon")/log(sum(x[-1]>0)))
+  data.frame(evenness=diversity(x[-c(1:4)], index="shannon")/log(sum(x[-1]>0)))
   })
 
 # bind with bareground data 
+
+bareground$plot_unique <- paste(bareground$SUBSITE,bareground$PLOT,bareground$YEAR,sep="_")
+bareground <- bareground %>% select(plot_unique, Bareground)
   
-t <- left_join(richness, shannon) %>% 
+QHI_plotdata <- left_join(richness, shannon) %>% 
   left_join(simpson) %>%
   left_join(evenness) %>%
+  left_join(bareground)
   
+# Tissue and status
 
 
-head(bareground)
+
+
+
+
+
+
+# SPP type compositon ratios
+# desiduas vs evergreen
+# serge & grass vs shrub
+# gramanoid
+
+
+
+
+
+
+
