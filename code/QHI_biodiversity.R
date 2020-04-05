@@ -218,19 +218,35 @@ biodiv_long$plot_unique <- paste(biodiv_long$sub_name,biodiv_long$PLOT,biodiv_lo
 biodiv_long <- biodiv_long %>% select(-sub_name, -PLOT, -year)
 
 
-
+# richness
 # reorder colunms 
 biodiv_long <- biodiv_long[,c(59, 1:58)]
 
-t <- apply(biodiv_long[,-1]>0,1,sum)
+richness <- apply(biodiv_long[,-1]>0,1,sum)
+print(richness)
+
+# shannon & simpson
 
 
+richness <- ddply(biodiv_long,~plot_unique,function(x) {
+  data.frame(richness=sum(x[-1]>0))
+  })
 
+shannon <- ddply(biodiv_long,~plot_unique,function(x) {
+  data.frame(shannon=diversity(x[-1], index="shannon"))
+  })
 
-library(vegan)
-t <-  diversity(t, index="shannon")
+simpson <- ddply(biodiv_long,~plot_unique,function(x) {
+  data.frame(simposon=diversity(x[-1], index="simpson"))
+  })
 
-apply(data[,-1]>0,1,sum)
+evenness <- ddply(biodiv_long,~plot_unique,function(x) {
+  data.frame(evenness=diversity(x[-1], index="shannon")/log(sum(x[-1]>0)))
+  })
+  
+t <- left_join(richness, shannon) %>% 
+  left_join(simpson) %>%
+  left_join(evenness)
 
 
 
