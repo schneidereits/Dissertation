@@ -210,8 +210,5 @@ QHI_pointframe_full$SPP <- recode(QHI_pointframe_full$SPP, "Poa arctica " = "Poa
 QHI_pointframe_full$SPP <- recode(QHI_pointframe_full$SPP, "Senecio atropurpureus " = "Senecio atropurpureus")
 # still need to confirm Cetraria spp that is brown" "Cladina (brown)" , "Poa ?",  "Cetraria spp"
 
-# set wd to save location 
-setwd("~/Documents/university work/Dissertation/Dissertation/data/QHI_biodiversity")
-write.csv(QHI_pointframe_full, file="pointfr_1999-2019.csv")
-# setback
-setwd("~/Documents/university work/Dissertation/")
+#  save .csv
+write.csv(QHI_cover_1999_2019_sas, file="~/Documents/university work/Dissertation/Dissertation/data/QHI_biodiversity/pointfr_1999-2019.csv")
