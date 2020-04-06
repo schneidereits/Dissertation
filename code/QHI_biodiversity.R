@@ -205,7 +205,7 @@ evenness <- ddply(biodiv_long,~plot_unique,function(x) {
 
 
   
-# Tissue and status cover ----
+# status (dead cover) ----
 
 # status (dead cover)
 unique(pointfr_2018_2019$STATUS)
@@ -227,7 +227,54 @@ dead <- dead_IDs %>%
   dplyr::count(plot_unique)
 
 # add in baseR as colonm was not recognized as object in dpylr
-colnames(t)[2] <- "dead"
+colnames(dead)[2] <- "dead"
+
+
+# Tissue 
+
+unique(pointfr_2018_2019$TISSUE)
+
+# grouping flower and seed pod together as these are likely to contribure to spectral heteogenetiy 
+
+reproducitve_tissue_IDs <-  pointfr_2018_2019 %>% filter(Height..cm. > 1) %>%
+  filter(TISSUE == "Flower" | 
+           STATUS == "Seed pod") %>%
+  # remove duplicate xy cordinates (none)
+  mutate(duplicated = duplicated(uniqueID)) %>%
+  filter(!duplicated == "TRUE")
+
+# add standardized plot_unique
+reproducitve_tissue_IDs$plot_unique <- paste(reproducitve_tissue_IDs$SUBSITE,
+                                             reproducitve_tissue_IDs$PLOT,
+                                             reproducitve_tissue_IDs$YEAR,sep="_")
+
+reproducitve_tissue <- reproducitve_tissue_IDs %>%
+  dplyr::count(plot_unique)
+
+# add in baseR as colonm was not recognized as object in dpylr
+colnames(reproducitve_tissue)[2] <- "reproductive_tissue"
+
+# total cover ----
+# adpated from 
+
+# Remove rows with no cover
+total_cover <- subset(cover_2018_2019, cover>0)
+# Remove non veg
+diversity <- subset(diversity, name !="XXXlitter" & name !="XXXlitter " & 
+                      name !="XXXbareground" & name !="XXXbareground " & 
+                      name !="XXXrock" & name !="XXXrock " & 
+                      name !="XXXfeces" & name !="XXXfeces " & 
+                      name !="XXXstandingwater" & name !="XXXstandingwater " & 
+                      name !="XXXspider"& name !="Xxxspider"& name !="XXXspider ")
+# Add unique plots
+diversity$plot_unique <- paste(diversity$sub_name,diversity$plot,diversity$year,sep="")
+
+# Convert to relative cover
+plot_cover <- ddply(diversity,.(plot_unique), summarise,
+                    total_cover = sum(cover))
+diversity$total_cover <- plot_cover$total_cover[match(diversity$plot_unique, plot_cover$plot_unique)]
+diversity$rel_cover <- diversity$cover/diversity$total_cover*100
+
 
 
 # binding plot level environmental data ----
@@ -237,7 +284,9 @@ QHI_plotdata <- left_join(richness, shannon) %>%
   left_join(simpson) %>%
   left_join(evenness) %>%
   left_join(Bareground) %>%
-  left_join(dead)
+  left_join(dead) %>%
+  left_join(reproducitve_tissue) %>%
+  replace(is.na(.), 0)
 
 
 
