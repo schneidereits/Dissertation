@@ -348,4 +348,6 @@ QHI_plotdata <- left_join(richness, shannon) %>%
   replace(is.na(.), 0) %>%
   mutate(gram_shrub_ratio = graminoid/shrub)
 
+write.csv(QHI_plotdata, file="~/Documents/university work/Dissertation/Dissertation/data/QHI_biodiversity/QHI_plotdata_2018_2019_sas.csv")
+
 
