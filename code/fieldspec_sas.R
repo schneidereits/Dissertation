@@ -1619,8 +1619,10 @@ QHI_spec_plot <- left_join(QHI_year, QHI_plotdata, value = "plot_unique") %>%
 pca_H2 <- QHI_spec_plot %>%
   filter(year == 2019)
 
+head(pca_H2)
+
 # ncp = 10 (10 variables)
-res.pca_H2 <- PCA(pca_H2[,10:19], scale.unit = TRUE, ncp = 10, graph = TRUE)
+res.pca_H2 <- PCA(pca_H2[,c(5, 7, 9, 12:16, 19)], scale.unit = TRUE, ncp = 10, graph = TRUE)
 
 # eigen values
 
@@ -1670,13 +1672,26 @@ t <- QHI_spec_plot %>%
 
 (p_pca <- fviz_pca_biplot(res.pca_H2,
                        geom.ind = "point", # show points only (nbut not "text")
-                       col.ind = t$veg_type, # color by groups
-                       palette = c("#ffa544", "#2b299b"),
+                       fill.ind = t$plot_unique, # color by groups
+                       pointshape = 21, 
+                       palette = c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FFB90F", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF"),
                        addEllipses = TRUE, # Concentration ellipses
                        # ellipse.type = "confidence",
+                       repel = TRUE,
                        ellipse.level = 0.95, # confidence level specification
                        mean.point = TRUE, # braycenter mean point
-                       legend.title = "Groups",
+                       # to color arrow by variable type
+                        col.var = factor(c("spectral", "spectral", "diversity", "diversity",
+                                  "environmenal", "environmenal", "environmenal", 
+                                   "environmenal", "environmenal")),
+                       gradient.cols = c("#00AFBB", "#00AFBB", "#FC4E07", "#FC4E07",
+                                         "#E7B800",  "#E7B800",  "#E7B800",  "#E7B800",  "#E7B800"),
+                      # col.var = "cos2",
+                      # gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+                      # alternate color gradient gradient.cols = c("blue", "yellow", "red")
+                       legend.title = list(fill = "Sites", color = "cos2"),
                        axes.linetype = "dashed",
-                       xlab = "PC1", ylab = "PC2", 
-                       ggtheme = theme_spectra()))
+                       xlab = "PC1", ylab = "PC2"))
+
+
+# note that there are hundereds of point, but that they perfectly overlay, due to only cv & spec
