@@ -255,25 +255,36 @@ reproducitve_tissue <- reproducitve_tissue_IDs %>%
 colnames(reproducitve_tissue)[2] <- "reproductive_tissue"
 
 # total cover ----
-# adpated from 
 
 # Remove rows with no cover
 total_cover <- subset(cover_2018_2019, cover>0)
 # Remove non veg
-diversity <- subset(diversity, name !="XXXlitter" & name !="XXXlitter " & 
-                      name !="XXXbareground" & name !="XXXbareground " & 
-                      name !="XXXrock" & name !="XXXrock " & 
-                      name !="XXXfeces" & name !="XXXfeces " & 
-                      name !="XXXstandingwater" & name !="XXXstandingwater " & 
-                      name !="XXXspider"& name !="Xxxspider"& name !="XXXspider ")
+total_cover <- subset(total_cover, Species !="XXXlitter" & Species !="XXXlitter " & 
+                      Species !="XXXbareground" & Species !="XXXbareground " & 
+                      Species !="XXXrock" & Species !="XXXrock " &  Species !="XXXothermoss" &
+                      Species !="XXXfeces" & Species !="XXXfeces " & 
+                      Species !="XXXstandingwater" & Species !="XXXstandingwater " & 
+                      Species !="XXXspider"& Species !="Xxxspider"& Species !="XXXspider ")
+
 # Add unique plots
-diversity$plot_unique <- paste(diversity$sub_name,diversity$plot,diversity$year,sep="")
+total_cover$plot_unique <- paste(total_cover$sub_name,
+                                 total_cover$PLOT,
+                                 total_cover$year,sep="_") 
+
+  # remove QHI: from cover data entry formate
+total_cover <- total_cover %>%  mutate(plot_unique = str_remove_all(plot_unique, "QHI:"))
 
 # Convert to relative cover
-plot_cover <- ddply(diversity,.(plot_unique), summarise,
+total_cover <- ddply(total_cover,.(plot_unique), summarise,
                     total_cover = sum(cover))
-diversity$total_cover <- plot_cover$total_cover[match(diversity$plot_unique, plot_cover$plot_unique)]
-diversity$rel_cover <- diversity$cover/diversity$total_cover*100
+
+
+# desiduas vs evergreen cover ----
+
+
+
+
+# gramanoid cover ----
 
 
 
@@ -286,6 +297,7 @@ QHI_plotdata <- left_join(richness, shannon) %>%
   left_join(Bareground) %>%
   left_join(dead) %>%
   left_join(reproducitve_tissue) %>%
+  left_join(total_cover) %>%
   replace(is.na(.), 0)
 
 
