@@ -105,6 +105,9 @@ cover_2018_2019 <- QHI_cover_1999_2019_sas %>%
 # Code for all modelling and data visualisation within the manuscript
 # Written by Isla Myers-Smith, Anne Bjorkman, Haydn Thomas, Sandra Angers-Blondin and Gergana Daskalova
 
+unique(pointfr_2019$SPP)
+
+
 pointfr_2018_2019$uniqueID <- paste(pointfr_2018_2019$YEAR, pointfr_2018_2019$SUBSITE, 
                                     pointfr_2018_2019$PLOT, pointfr_2018_2019$X, pointfr_2018_2019$Y, sep="")  # Assign unique ID to every point
 bareground_IDs <- pointfr_2018_2019[pointfr_2018_2019$SPP=="XXXlitter" | pointfr_2018_2019$SPP=="XXXlitter " | 
@@ -130,23 +133,27 @@ BGs <- as.data.frame(Out)  # Convert into data frame
 BGs <- subset(BGs,V2=="0")  # Extract points for which there are only non-veg data (i.e.i.e. total rows - non-veg rows = 0)
 BGs <- BGs[,1]  # Extract only first column (unique points)
 
-bareground <- pointfr_2018_2019_BGs <- pointfr_2018_2019[pointfr_2018_2019$uniqueID %in% BGs,]  # Create dataframe of bare ground points 
-bareground <- ddply(bareground,.(YEAR, PLOT, SUBSITE), summarise,
-                    Bareground = sum(Abundance))  # Count number of bare ground points per plot
+Bareground <- pointfr_2018_2019_BGs <- pointfr_2018_2019[pointfr_2018_2019$uniqueID %in% BGs,]  # Create dataframe of bare ground points 
+Bareground <- ddply(Bareground,.(YEAR, PLOT, SUBSITE), summarise,
+                    bareground = sum(Abundance))  # Count number of bare ground points per plot
 
 # Create dummy dataframe with all plots because if plots have no bare ground they wont be included
 bareground_full <- ddply(pointfr_2018_2019,.(YEAR, SUBSITE, PLOT), summarise,
-                         Bareground = 0)  
+                         bareground = 0)  
 
 # Replace dummy bareground with real baregound
-bareground_full$Bareground <- bareground$Bareground[match(paste(bareground_full$YEAR,
+bareground_full$bareground <- Bareground$bareground[match(paste(bareground_full$YEAR,
                                                                 bareground_full$SUBSITE,
                                                                 bareground_full$PLOT),
-                                                          paste(bareground$YEAR,
-                                                                bareground$SUBSITE,
-                                                                bareground$PLOT))] 
-bareground <- bareground_full  # Rename to original
-bareground[is.na(bareground$Bareground),]$Bareground <- 0  # Replace NAs from match with zeros
+                                                          paste(Bareground$YEAR,
+                                                                Bareground$SUBSITE,
+                                                                Bareground$PLOT))] 
+Bareground <- bareground_full  # Rename to original
+Bareground[is.na(Bareground$bareground),]$bareground <- 0  # Replace NAs from match with zeros
+
+# adding plot_unique colunm to later bind with other dfs
+Bareground$plot_unique <- paste(bareground$SUBSITE,bareground$PLOT,bareground$YEAR,sep="_")
+Bareground <- Bareground %>% select(plot_unique, bareground) 
 
 # biodiverstiy ----
 # data filtering adapted gergana daskalova spectra_hub/02-scale-biodiv-GD.R
@@ -196,18 +203,98 @@ evenness <- ddply(biodiv_long,~plot_unique,function(x) {
   data.frame(evenness=diversity(x[-c(1:4)], index="shannon")/log(sum(x[-1]>0)))
   })
 
-# bind with bareground data 
 
-bareground$plot_unique <- paste(bareground$SUBSITE,bareground$PLOT,bareground$YEAR,sep="_")
-bareground <- bareground %>% select(plot_unique, Bareground)
   
+# Tissue and status cover ----
+
+# status (dead cover)
+unique(pointfr_2018_2019$STATUS)
+
+str(pointfr_2018_2019)
+
+# filter only top of canopy pointfr hits (ones that are seen by spectrometer)
+dead_IDs <-  pointfr_2018_2019 %>% filter(Height..cm. > 1) %>%
+  filter(STATUS == "Standing dead" | 
+           STATUS == "Dead") %>%
+  # remove duplicate xy cordinates (only one)
+  mutate(duplicated = duplicated(uniqueID)) %>%
+  filter(!duplicated == "TRUE")
+
+# add standardized plot_unique
+dead_IDs$plot_unique <- paste(dead_IDs$SUBSITE,dead_IDs$PLOT,dead_IDs$YEAR,sep="_")
+
+dead <- dead_IDs %>%
+  group_by(plot_unique) %>%
+  summarise(dead = count(plot_unique))
+
+t <- dead %>%
+  dplyr::rename(plot_unique = dead.x)
+
+# add in baseR as colonm was not recognized as object in dpylr
+colnames(dead)[1] <- "plot_unique"
+colnames(dead)[2] <- "dead"
+
+
+
+# binding plot level environmental data ----
+
+
 QHI_plotdata <- left_join(richness, shannon) %>% 
   left_join(simpson) %>%
   left_join(evenness) %>%
-  left_join(bareground)
-  
-# Tissue and status
+  left_join(Bareground) %>%
+  left_join(dead)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Extract only points that have dead vegetation at top of canopy
+pointfr_2018_2019_dead <- pointfr_2018_2019[pointfr_2018_2019$uniqueID %in% dead_IDs,]  
+
+Out=NULL  # Set up loop
+for(i in unique(pointfr_2018_2019_BGs$uniqueID)){  # For each point
+  a <- subset(pointfr_2018_2019_BGs, uniqueID==i)  # create dataframe of all entries for that point
+  b <- a[a$SPP == "XXXlitter" | a$SPP == "XXXlitter " | a$SPP == "XXXbareground" | 
+           a$SPP == "XXXbareground " | a$SPP == "XXXrock" | a$SPP == "XXXrock " | 
+           a$SPP == "XXXfeces" | a$SPP == "XXXfeces " | a$SPP == "XXXstandingwater" | 
+           a$SPP == "XXXstandingwater " | a$SPP == "XXXspider",]  # Identify how many entries are not vegetation
+  c <- nrow(a) - nrow(b)  # Finnd out if any entries are vegetation (i.e. total rows - non-veg rows)
+  Out <- rbind(Out, c(i, c))  # Extract point name and number vegetation entries
+}
+
+BGs <- as.data.frame(Out)  # Convert into data frame
+BGs <- subset(BGs,V2=="0")  # Extract points for which there are only non-veg data (i.e.i.e. total rows - non-veg rows = 0)
+BGs <- BGs[,1]  # Extract only first column (unique points)
+
+bareground <- pointfr_2018_2019_BGs <- pointfr_2018_2019[pointfr_2018_2019$uniqueID %in% BGs,]  # Create dataframe of bare ground points 
+bareground <- ddply(bareground,.(YEAR, PLOT, SUBSITE), summarise,
+                    Bareground = sum(Abundance))  # Count number of bare ground points per plot
+
+# Create dummy dataframe with all plots because if plots have no bare ground they wont be included
+bareground_full <- ddply(pointfr_2018_2019,.(YEAR, SUBSITE, PLOT), summarise,
+                         Bareground = 0)  
+
+# Replace dummy bareground with real baregound
+bareground_full$Bareground <- bareground$Bareground[match(paste(bareground_full$YEAR,
+                                                                bareground_full$SUBSITE,
+                                                                bareground_full$PLOT),
+                                                          paste(bareground$YEAR,
+                                                                bareground$SUBSITE,
+                                                                bareground$PLOT))] 
+bareground <- bareground_full  # Rename to original
+bareground[is.na(bareground$Bareground),]$Bareground <- 0  # Replace NAs from match with zeros
 
 
 
