@@ -224,16 +224,10 @@ dead_IDs <-  pointfr_2018_2019 %>% filter(Height..cm. > 1) %>%
 dead_IDs$plot_unique <- paste(dead_IDs$SUBSITE,dead_IDs$PLOT,dead_IDs$YEAR,sep="_")
 
 dead <- dead_IDs %>%
-  group_by(plot_unique) %>%
-  summarise(dead = count(plot_unique))
-
-t <- dead %>%
-  dplyr::rename(plot_unique = dead.x)
+  dplyr::count(plot_unique)
 
 # add in baseR as colonm was not recognized as object in dpylr
-colnames(dead)[1] <- "plot_unique"
-colnames(dead)[2] <- "dead"
-
+colnames(t)[2] <- "dead"
 
 
 # binding plot level environmental data ----
