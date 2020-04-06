@@ -315,6 +315,14 @@ histogram(QHI_small$spec_mean)
 # binding 2018 & 2019# NOTE:
 QHI_year <- bind_rows(QHI_small, spec_2018)
 
+# adding a unique plot id 
+QHI_year <- QHI_year %>%
+  ungroup() %>%
+  # temporary colunm with only plot number 
+  mutate(plot2 = str_remove_all(plot, "HE|KO"),
+         plot_unique = paste(veg_type,plot2,year,sep="_")) %>%
+  select(-plot2)
+
 
 
 # violin of mean by year
@@ -1586,10 +1594,11 @@ fviz_pca_var(res.pca_QHI_PS2, col.var = "contrib",
 
 # data import
 
-QHI_plotdata <- read_csv("data/QHI_biodiversity/QHI_plotdata_2018_2019_sas.csv")
+QHI_plotdata <- read_csv("data/QHI_biodiversity/QHI_plotdata_2018_2019_sas.csv", 
+                         col_types = cols(X1 = col_skip()))
 
-# adding sperate columns for vegtype, plot, and year
-QHI_plotdata <- QHI_plotdata %>%
+# (redundant) adding sperate columns for vegtype, plot, and year
+#QHI_plotdata <- QHI_plotdata %>%
   mutate(veg_type = case_when(grepl("HE|KO", plot_unique, ignore.case=TRUE) ~ 
                                 stringr::str_extract(plot_unique, "HE|KO")),
          plot = case_when(grepl("_", plot_unique)   ~ 
@@ -1598,3 +1607,7 @@ QHI_plotdata <- QHI_plotdata %>%
          # differnet methods, maybe nor great pratice, but it works...
          year = substring(plot_unique,6,9))
          
+
+QHI_spec_plot <- left_join(QHI_year, QHI_plotdata, value = "plot_unique") 
+  #replace(is.na(.), 0)
+  
