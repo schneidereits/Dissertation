@@ -1,4 +1,4 @@
-"","plot_unique","richness","shannon","simposon","evenness","bareground","dead","reproductive_tissue","total_cover","shrub","graminoid","gram_shrub_ratio"
+"","plot_unique","richness","shannon","simpson","evenness","bareground","dead","reproductive_tissue","total_cover","shrub","graminoid","gram_shrub_ratio"
 "1","HE_1_2018",15,1.85644191905086,0.755910289621695,0.642284825119563,1,19,5,181,15,78,5.2
 "2","HE_1_2019",17,1.94774579547753,0.751557493770025,0.650173519400258,0,21,5,192,27,77,2.85185185185185
 "3","HE_2_2018",21,2.24803597635633,0.827581853379345,0.707362460286018,2,14,2,201,24,61,2.54166666666667

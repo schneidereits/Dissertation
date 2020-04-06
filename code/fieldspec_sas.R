@@ -1608,6 +1608,75 @@ QHI_plotdata <- read_csv("data/QHI_biodiversity/QHI_plotdata_2018_2019_sas.csv",
          year = substring(plot_unique,6,9))
          
 
-QHI_spec_plot <- left_join(QHI_year, QHI_plotdata, value = "plot_unique") 
-  #replace(is.na(.), 0)
+QHI_spec_plot <- left_join(QHI_year, QHI_plotdata, value = "plot_unique") %>%
+  filter(!plot == "PS2")
   
+
+# H2 plot PCA ----
+
+# only 2019
+
+pca_H2 <- QHI_spec_plot %>%
+  filter(year == 2019)
+
+# ncp = 10 (10 variables)
+res.pca_H2 <- PCA(pca_H2[,10:19], scale.unit = TRUE, ncp = 10, graph = TRUE)
+
+# eigen values
+
+eig.val <- get_eigenvalue(res.pca_H2)
+eig.val
+
+# pca barplot
+fviz_eig(res.pca_H2, addlabels = TRUE, ylim = c(0, 50))
+
+# saving results
+var <- get_pca_var(res.pca_H2)
+var
+
+# Coordinates
+head(var$coord)
+# Cos2: quality on the factore map
+head(var$cos2)
+# Contributions to the principal components
+head(var$contrib)
+
+# plotting variables
+fviz_pca_var(res.pca_H2, col.var = "black")
+
+# to visulize correlation on of varibals in each dimention
+library("corrplot")
+
+corrplot(var$cos2, is.corr=FALSE)
+
+# Total cos2 of variables on Dim.1 and Dim.2
+fviz_cos2(res.pca_H2, choice = "var", axes = 1:2)
+
+# Color by cos2 values: quality on the factor map
+fviz_pca_var(res.pca_H2, col.var = "cos2",
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), 
+             repel = TRUE)
+
+# contributions of variables 
+corrplot(var$contrib, is.corr=FALSE)    
+
+fviz_pca_var(res.pca_H2, col.var = "contrib",
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"))
+
+# grouped by elipsise
+
+t <- QHI_spec_plot %>%
+  filter(year == 2019)
+
+(p_pca <- fviz_pca_biplot(res.pca_H2,
+                       geom.ind = "point", # show points only (nbut not "text")
+                       col.ind = t$veg_type, # color by groups
+                       palette = c("#ffa544", "#2b299b"),
+                       addEllipses = TRUE, # Concentration ellipses
+                       # ellipse.type = "confidence",
+                       ellipse.level = 0.95, # confidence level specification
+                       mean.point = TRUE, # braycenter mean point
+                       legend.title = "Groups",
+                       axes.linetype = "dashed",
+                       xlab = "PC1", ylab = "PC2", 
+                       ggtheme = theme_spectra()))
