@@ -238,7 +238,7 @@ unique(pointfr_2018_2019$TISSUE)
 
 reproducitve_tissue_IDs <-  pointfr_2018_2019 %>% filter(Height..cm. > 1) %>%
   filter(TISSUE == "Flower" | 
-           STATUS == "Seed pod") %>%
+           TISSUE == "Seed pod") %>%
   # remove duplicate xy cordinates (none)
   mutate(duplicated = duplicated(uniqueID)) %>%
   filter(!duplicated == "TRUE")
@@ -279,14 +279,59 @@ total_cover <- ddply(total_cover,.(plot_unique), summarise,
                     total_cover = sum(cover))
 
 
-# desiduas vs evergreen cover ----
+# gramanoid vs shrub cover ----
 
 
+unique(sort(pointfr_2018_2019$SPP))
 
+# shrub ----
 
-# gramanoid cover ----
+# grouping flower and seed pod together as these are likely to contribure to spectral heteogenetiy 
 
+shrub_IDs <-  pointfr_2018_2019 %>% filter(Height..cm. > 1) %>%
+  filter(SPP == "Salix arctica" | SPP == "Salix phlebophylla" | 
+           SPP == "Salix pulchra" | SPP == "Salix reticulata") %>%
+  # remove duplicate xy cordinates (none)
+  mutate(duplicated = duplicated(uniqueID)) %>%
+  filter(!duplicated == "TRUE")
 
+# add standardized plot_unique
+shrub_IDs$plot_unique <- paste(shrub_IDs$SUBSITE,
+                               shrub_IDs$PLOT,
+                               shrub_IDs$YEAR,sep="_")
+
+shrub <- shrub_IDs %>%
+  dplyr::count(plot_unique)
+
+# add in baseR as colonm was not recognized as object in dpylr
+colnames(shrub)[2] <- "shrub"
+
+# gramanoid cover
+
+unique(sort(pointfr_2018_2019$SPP))
+
+graminoid_IDs <-  pointfr_2018_2019 %>% filter(Height..cm. > 1) %>%
+  filter(SPP == "Alopecurus alpinus" | SPP == "Arctagrostis latifolia" | 
+           SPP == "Eriophorum angustifolium" | SPP == "Eriophorum vaginatum" |
+           SPP == "Festuca baffinensis" | SPP == "Poa arctica" |
+           SPP == "Poa arctica " | SPP == "XXXkobresia" |
+           SPP == "XXXotherforb" | SPP == "XXXothergram" |
+           SPP == "XXXunkgram") %>%
+  # remove duplicate xy cordinates (none)
+  mutate(duplicated = duplicated(uniqueID)) %>%
+  filter(!duplicated == "TRUE")
+  
+
+# add standardized plot_unique
+graminoid_IDs$plot_unique <- paste(graminoid_IDs$SUBSITE,
+                                   graminoid_IDs$PLOT,
+                                   graminoid_IDs$YEAR,sep="_")
+
+graminoid <- graminoid_IDs %>%
+  dplyr::count(plot_unique)
+
+# add in baseR as colonm was not recognized as object in dpylr
+colnames(graminoid)[2] <- "graminoid"
 
 # binding plot level environmental data ----
 
@@ -298,73 +343,9 @@ QHI_plotdata <- left_join(richness, shannon) %>%
   left_join(dead) %>%
   left_join(reproducitve_tissue) %>%
   left_join(total_cover) %>%
-  replace(is.na(.), 0)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Extract only points that have dead vegetation at top of canopy
-pointfr_2018_2019_dead <- pointfr_2018_2019[pointfr_2018_2019$uniqueID %in% dead_IDs,]  
-
-Out=NULL  # Set up loop
-for(i in unique(pointfr_2018_2019_BGs$uniqueID)){  # For each point
-  a <- subset(pointfr_2018_2019_BGs, uniqueID==i)  # create dataframe of all entries for that point
-  b <- a[a$SPP == "XXXlitter" | a$SPP == "XXXlitter " | a$SPP == "XXXbareground" | 
-           a$SPP == "XXXbareground " | a$SPP == "XXXrock" | a$SPP == "XXXrock " | 
-           a$SPP == "XXXfeces" | a$SPP == "XXXfeces " | a$SPP == "XXXstandingwater" | 
-           a$SPP == "XXXstandingwater " | a$SPP == "XXXspider",]  # Identify how many entries are not vegetation
-  c <- nrow(a) - nrow(b)  # Finnd out if any entries are vegetation (i.e. total rows - non-veg rows)
-  Out <- rbind(Out, c(i, c))  # Extract point name and number vegetation entries
-}
-
-BGs <- as.data.frame(Out)  # Convert into data frame
-BGs <- subset(BGs,V2=="0")  # Extract points for which there are only non-veg data (i.e.i.e. total rows - non-veg rows = 0)
-BGs <- BGs[,1]  # Extract only first column (unique points)
-
-bareground <- pointfr_2018_2019_BGs <- pointfr_2018_2019[pointfr_2018_2019$uniqueID %in% BGs,]  # Create dataframe of bare ground points 
-bareground <- ddply(bareground,.(YEAR, PLOT, SUBSITE), summarise,
-                    Bareground = sum(Abundance))  # Count number of bare ground points per plot
-
-# Create dummy dataframe with all plots because if plots have no bare ground they wont be included
-bareground_full <- ddply(pointfr_2018_2019,.(YEAR, SUBSITE, PLOT), summarise,
-                         Bareground = 0)  
-
-# Replace dummy bareground with real baregound
-bareground_full$Bareground <- bareground$Bareground[match(paste(bareground_full$YEAR,
-                                                                bareground_full$SUBSITE,
-                                                                bareground_full$PLOT),
-                                                          paste(bareground$YEAR,
-                                                                bareground$SUBSITE,
-                                                                bareground$PLOT))] 
-bareground <- bareground_full  # Rename to original
-bareground[is.na(bareground$Bareground),]$Bareground <- 0  # Replace NAs from match with zeros
-
-
-
-
-
-
-
-# SPP type compositon ratios
-# desiduas vs evergreen
-# serge & grass vs shrub
-# gramanoid
-
-
-
-
-
+  left_join(shrub) %>%
+  left_join(graminoid) %>%
+  replace(is.na(.), 0) %>%
+  mutate(gram_shrub_ratio = graminoid/shrub)
 
 
