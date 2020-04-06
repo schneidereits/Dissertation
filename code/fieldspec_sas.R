@@ -290,19 +290,40 @@ filter(id %in% c("249", "250")) %>%
 spec_2018 <- read_csv("data/spec_bio.csv")
 
 spec_2018 <- spec_2018 %>%
-  select(site, plot, Reflectance_mean, Reflectance_sd, Reflectance_cv) %>%
+  select(site, plot, Reflectance_mean, Reflectance_sd, Reflectance_cv, Wavelength) %>%
   mutate(year = "2018",
-         veg_type = site) %>%
-  rename(spec_mean = Reflectance_mean,
-         spec_SD = Reflectance_sd,
-         CV = Reflectance_cv) %>%
+         veg_type = site,
+         # multiple to match reflectance of QHI 
+         Reflectance_mean = Reflectance_mean*100) %>%
+ # rename(spec_mean = Reflectance_mean,
+     #    spec_SD = Reflectance_sd,
+      #   CV = Reflectance_cv) %>%
   # to correspond with QHI plot formate
-  unite("plot", c(site, plot))
+  unite("plot", c(site, plot), sep = "") %>%
+  ungroup() %>%
+  group_by(year, veg_type, plot) %>%
+  # SUMARIZE BY PLOT? DOES NOT CORRESPOND WITH QHI FORMATE WHICH IS AT MEASURMENT LEVEL
+  # had to add na.rm=TRUE, although there were no NAs in the data 
+  summarise(spec_mean = mean(Reflectance_mean, na.rm=TRUE),
+            spec_SD = mean(Reflectance_sd, na.rm=TRUE),
+            CV = mean(Reflectance_cv, na.rm=TRUE))
+ 
+
+histogram(spec_2018$spec_mean)
+histogram(QHI_small$spec_mean)
 
 # binding 2018 & 2019# NOTE:
 QHI_year <- bind_rows(QHI_small, spec_2018)
 
 
+
+# violin of mean by year
+ggplot(QHI_year, aes(x=year, y=spec_mean, fill=veg_type)) + 
+  geom_violin(trim=FALSE, alpha = .5, aes(fill = veg_type)) +
+  geom_point(position = position_jitter(0.05)) +
+  geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
+  scale_fill_manual(values = c("#ffa544", "#2b299b", "gray65")) +
+  theme_cowplot()
 
 
 #  band selection ----
@@ -420,8 +441,8 @@ lowD <- collison %>%
 facet_wrap(.~id) 
 
 
-# violin of mean by vegetation type
-ggplot(QHI_year, aes(x=year, y=spec_mean, fill=veg_type)) + 
+# violin of mean by year
+ggplot(QHI_small, aes(x=veg_type, y=spec_mean, fill=veg_type)) + 
   geom_violin(trim=FALSE, alpha = .5, aes(fill = veg_type)) +
   geom_point(position = position_jitter(0.05)) +
   geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
@@ -758,7 +779,7 @@ collison_wavelength <- collison %>%
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = subset(collison_wavelength, region %in% c("NIR")),
                aes(x=veg_type, y=spec_mean, colour=plot),
-               position = position_jitter(width = .05), size = 1) +
+               position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(collison_wavelength, region %in% c("NIR")),
                  aes(x=veg_type, y=spec_mean),
                  width=0.2, fill="white", alpha = 0.3) +
@@ -776,7 +797,7 @@ collison_wavelength <- collison %>%
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = subset(collison_wavelength, region %in% c("NIR")),
                aes(x=veg_type, y=CV, colour=plot),
-               position = position_jitter(width = .05), size = 1) +
+               position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(collison_wavelength, region %in% c("NIR")),
                  aes(x=veg_type, y=CV),
                  width=0.2, fill="white", alpha = 0.3) +
@@ -794,7 +815,7 @@ collison_wavelength <- collison %>%
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = subset(collison_wavelength, region %in% c("IR")),
                aes(x=veg_type, y=spec_mean, colour=plot),
-               position = position_jitter(width = .05), size = 1) +
+               position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(collison_wavelength, region %in% c("IR")),
                  aes(x=veg_type, y=spec_mean),
                  width=0.2, fill="white", alpha = 0.3) +
@@ -812,7 +833,7 @@ collison_wavelength <- collison %>%
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = subset(collison_wavelength, region %in% c("IR")),
                aes(x=veg_type, y=CV, colour=plot),
-               position = position_jitter(width = .05), size = 1) +
+               position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(collison_wavelength, region %in% c("IR")),
                  aes(x=veg_type, y=CV),
                  width=0.2, fill="white", alpha = 0.3) +
@@ -1255,7 +1276,7 @@ res.pca_QHI_year <- PCA(QHI_year[,c(5,7)], scale.unit = TRUE, ncp = 5, graph = T
 # pca 
 (p_pca <- fviz_pca_ind(res.pca_QHI_year,
                        geom.ind = "point", # show points only (nbut not "text")
-                       col.ind = QHI_year$veg_type, # color by groups
+                       col.ind = QHI_year$year, # color by groups
                        palette = c("#ffa544", "#2b299b", "gray65"),
                        addEllipses = TRUE, # Concentration ellipses
                        # ellipse.type = "confidence",
@@ -1560,3 +1581,20 @@ fviz_pca_var(res.pca_QHI_PS2, col.var = "contrib",
              # ellipse.type = "confidence",
              legend.title = "Groups"))
 
+
+# H2 Plot data ----
+
+# data import
+
+QHI_plotdata <- read_csv("data/QHI_biodiversity/QHI_plotdata_2018_2019_sas.csv")
+
+# adding sperate columns for vegtype, plot, and year
+QHI_plotdata <- QHI_plotdata %>%
+  mutate(veg_type = case_when(grepl("HE|KO", plot_unique, ignore.case=TRUE) ~ 
+                                stringr::str_extract(plot_unique, "HE|KO")),
+         plot = case_when(grepl("_", plot_unique)   ~ 
+                            stringr::str_extract(plot_unique, "_\\d*")),
+         plot = str_remove_all(plot, "_"),
+         # differnet methods, maybe nor great pratice, but it works...
+         year = substring(plot_unique,6,9))
+         
