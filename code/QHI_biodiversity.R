@@ -108,8 +108,8 @@ cover_2018_2019 <- QHI_cover_1999_2019_sas %>%
 
 unique(pointfr_2019$SPP)
 
-
-t_IDs <-  pointfr_2018_2019 %>% 
+bareground <-  pointfr_2018_2019 %>% 
+  unite(plot_unique, c(SUBSITE, PLOT, YEAR), sep="_") %>%
   # create true/false colunm for soil background
   mutate(bareground = SPP == "XXXlitter" | SPP == "XXXlitter " | 
            SPP == "XXXbareground" | SPP == "XXXbareground " |
@@ -118,93 +118,30 @@ t_IDs <-  pointfr_2018_2019 %>%
            SPP == "XXXspider" | SPP == "XXXstandingwater ") %>%
   group_by(uniqueID) %>%
   # count both soil background and presence of vegitation
-   dplyr::count(bareground ) 
+   dplyr::count(bareground) 
 
-# add unique plot 
-t_IDs$plot_unique <- paste(t_IDs$SUBSITE,t_IDs$PLOT,t_IDs$YEAR,sep="_")
  
 # filter distinct values 
-t_distinct <- count(t_IDs$uniqueID) %>% # count number of rows per id 
+bareground_IDs <- count(t_IDs$uniqueID) %>% # count number of rows per id 
   filter(freq == 1)                     # fiter only unique rows
 
-colnames(t_distinct)[1] <- "uniqueID"   # rename variable
+colnames(bareground_IDs)[1] <- "uniqueID"   # rename variable
 
 
-t <- t_IDs %>% 
-  filter(uniqueID %in% t_distinct$uniqueID, # filter out only unique rows
+bareground <- bareground %>% 
+  filter(uniqueID %in% bareground_IDs$uniqueID, # filter out only unique rows
          bareground == TRUE)                # filter plots that only have soil
-  
 
-
-
-distinc
-
-
-# add standardized plot_unique
-shrub_IDs$plot_unique <- paste(shrub_IDs$SUBSITE,
-                               shrub_IDs$PLOT,
-                               shrub_IDs$YEAR,sep="_")
-
-shrub <- shrub_IDs %>%
+bareground <- pointfr_2018_2019 %>%
+  filter(uniqueID %in% bareground$uniqueID) %>%
+  unite(plot_unique, c(SUBSITE, PLOT, YEAR), sep="_") %>%
   dplyr::count(plot_unique)
-
-# add in baseR as colonm was not recognized as object in dpylr
-colnames(shrub)[2] <- "shrub"
-
-
-pointfr_2018_2019$uniqueID <- paste(pointfr_2018_2019$YEAR, pointfr_2018_2019$SUBSITE, 
-                                    pointfr_2018_2019$PLOT, pointfr_2018_2019$X, pointfr_2018_2019$Y, sep="")  # Assign unique ID to every point
-bareground_IDs <- pointfr_2018_2019[pointfr_2018_2019$SPP=="XXXlitter" | pointfr_2018_2019$SPP=="XXXlitter " | 
-                              pointfr_2018_2019$SPP=="XXXbareground" | pointfr_2018_2019$SPP=="XXXbareground " | 
-                              pointfr_2018_2019$SPP=="XXXrock" | pointfr_2018_2019$SPP =="XXXrock " | 
-                              pointfr_2018_2019$SPP =="XXXfeces" | pointfr_2018_2019$SPP =="XXXfeces " | 
-                              pointfr_2018_2019$SPP =="XXXstandingwater" | pointfr_2018_2019$SPP =="XXXstandingwater " | 
-                              pointfr_2018_2019$SPP =="XXXspider", "uniqueID"]  # Identify points with non-vegetation indicators
-pointfr_2018_2019_BGs <- pointfr_2018_2019[pointfr_2018_2019$uniqueID %in% bareground_IDs,]  # Extract only points that have non-veg indicators
-
-Out=NULL  # Set up loop
-for(i in unique(pointfr_2018_2019_BGs$uniqueID)){  # For each point
-  a <- subset(pointfr_2018_2019_BGs, uniqueID==i)  # create dataframe of all entries for that point
-  b <- a[a$SPP == "XXXlitter" | a$SPP == "XXXlitter " | a$SPP == "XXXbareground" | 
-           a$SPP == "XXXbareground " | a$SPP == "XXXrock" | a$SPP == "XXXrock " | 
-           a$SPP == "XXXfeces" | a$SPP == "XXXfeces " | a$SPP == "XXXstandingwater" | 
-           a$SPP == "XXXstandingwater " | a$SPP == "XXXspider",]  # Identify how many entries are not vegetation
-  c <- nrow(a) - nrow(b)  # Finnd out if any entries are vegetation (i.e. total rows - non-veg rows)
-  Out <- rbind(Out, c(i, c))  # Extract point name and number vegetation entries
-}
-
-BGs <- as.data.frame(Out)  # Convert into data frame
-BGs <- subset(BGs,V2=="0")  # Extract points for which there are only non-veg data (i.e.i.e. total rows - non-veg rows = 0)
-BGs <- BGs[,1]  # Extract only first column (unique points)
-
-Bareground <- pointfr_2018_2019_BGs <- pointfr_2018_2019[pointfr_2018_2019$uniqueID %in% BGs,]  # Create dataframe of bare ground points 
-Bareground <- ddply(Bareground,.(YEAR, PLOT, SUBSITE), summarise,
-                    bareground = sum(Abundance))  # Count number of bare ground points per plot
-
-# Create dummy dataframe with all plots because if plots have no bare ground they wont be included
-bareground_full <- ddply(pointfr_2018_2019,.(YEAR, SUBSITE, PLOT), summarise,
-                         bareground = 0)  
-
-# Replace dummy bareground with real baregound
-bareground_full$bareground <- Bareground$bareground[match(paste(bareground_full$YEAR,
-                                                                bareground_full$SUBSITE,
-                                                                bareground_full$PLOT),
-                                                          paste(Bareground$YEAR,
-                                                                Bareground$SUBSITE,
-                                                                Bareground$PLOT))] 
-Bareground <- bareground_full  # Rename to original
-Bareground[is.na(Bareground$bareground),]$bareground <- 0  # Replace NAs from match with zeros
-
-# adding plot_unique colunm to later bind with other dfs
-Bareground$plot_unique <- paste(bareground$SUBSITE,bareground$PLOT,bareground$YEAR,sep="_")
-Bareground <- Bareground %>% select(plot_unique, bareground) 
+  
 
 # biodiverstiy ----
 # data filtering adapted gergana daskalova spectra_hub/02-scale-biodiv-GD.R
 
 unique(sort(cover_2018_2019$Species))
-
-unite("year2", c(n2, year)) 
 
 biodiv <- cover_2018_2019 %>% dplyr::select(sub_name, PLOT, Species, cover, year) %>%
   unite(plot_unique, c(sub_name, PLOT, year), sep="_") %>%
@@ -219,17 +156,8 @@ unique(sort(biodiv$Species))
 biodiv_long <- spread(biodiv, Species, cover)
 biodiv_long[is.na(biodiv_long)] <- 0
 
-# create new unique plot colunm
-biodiv_long$plot_unique <- paste(biodiv_long$sub_name,biodiv_long$PLOT,biodiv_long$year,sep="_")
-# remove 
-#biodiv_long <- biodiv_long %>% select(-sub_name, -PLOT, -year)
-
 # remove QHI: form plot unique
 biodiv_long <- biodiv_long %>% mutate(plot_unique = str_remove_all(plot_unique, "QHI:"))
-
-# rearrange colunms
-biodiv_long <- biodiv_long[,c(1:3, 62, 4:61)]
-
 
 
 # diversity indicies ----
@@ -261,14 +189,12 @@ str(pointfr_2018_2019)
 
 # filter only top of canopy pointfr hits (ones that are seen by spectrometer)
 dead_IDs <-  pointfr_2018_2019 %>% filter(Height..cm. > 1) %>%
+  unite(plot_unique, c(SUBSITE, PLOT, YEAR), sep="_") %>%
   filter(STATUS == "Standing dead" | 
            STATUS == "Dead") %>%
   # remove duplicate xy cordinates (only one)
   mutate(duplicated = duplicated(uniqueID)) %>%
   filter(!duplicated == "TRUE")
-
-# add standardized plot_unique
-dead_IDs$plot_unique <- paste(dead_IDs$SUBSITE,dead_IDs$PLOT,dead_IDs$YEAR,sep="_")
 
 dead <- dead_IDs %>%
   dplyr::count(plot_unique)
