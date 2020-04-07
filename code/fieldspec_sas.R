@@ -1691,7 +1691,79 @@ QHI_plotdata <- read_csv("data/QHI_biodiversity/QHI_plotdata_2018_2019_sas.csv",
 
 QHI_spec_plot <- left_join(QHI_2018_2019, QHI_plotdata, value = "plot_unique") %>%
   filter(!plot == "PS2")
-  
+
+# H2 model ----
+
+# spectral mean 
+(hist <- ggplot(QHI_spec_plot, aes(x = spec_mean)) +
+    geom_histogram() +
+    theme_classic())
+
+# linear model for H2
+m_H2a <- glm(data = QHI_spec_plot, spec_mean ~ veg_type + richness + evenness + bareground + (1|Year))
+
+m_H2a <- lmer(data = QHI_spec_plot, spec_mean ~ veg_type + richness + evenness + bareground + (1|plot) + (1|year))
+
+
+summary(m_H2a)
+
+plot(m_H2a)
+qqnorm(resid(m_H2a))
+qqline(resid(m_H2a)) 
+
+# Visualises random effects 
+(re.effects <- plot_model(m_H2a, type = "re", show.values = TRUE))
+# visulise fixed effect
+(fe.effects <- plot_model(m_H2a, show.values = TRUE))
+
+
+ggplot(collison_wavelength, aes(x = wavelength, y = spec_mean, group=veg_type, color = veg_type)) + 
+  geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
+  stat_smooth(method = "lm", aes(fill = veg_type, color = veg_type), se=TRUE )+
+  theme_spectra() +
+  labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n")
+
+
+# CV
+
+(hist <- ggplot(QHI_spec_plot, aes(x = CV)) +
+    geom_histogram() +
+    theme_classic())
+
+m_H2b <- lmer(data = QHI_spec_plot, CV ~ veg_type + richness + evenness + bareground + (1|plot) + (1|year))
+
+summary(m_H2b)
+
+plot(m_H2b)
+qqnorm(resid(m_H2b))
+qqline(resid(m_H2b)) 
+
+# Visualises random effects 
+(re.effects <- plot_model(m_H2b, type = "re", show.values = TRUE))
+# visulise fixed effect
+(fe.effects <- plot_model(m_H2b, show.values = TRUE))
+
+ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
+  geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
+  stat_smooth(method = "lm", aes(fill = veg_type, color = veg_type), se=TRUE )+
+  theme_spectra() +
+  labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n")
+
+
+
+
+collison_small_VT <- collison %>%
+  group_by(veg_type,wavelength) %>%
+  summarise(spec_mean = mean(reflectance),
+            CV = mean(sd(reflectance)/mean(reflectance)))
+
+ggplot(collison, aes(x = wavelength, y = reflectance, group = veg_type, color = veg_type)) + 
+  stat_smooth(method = "lm", aes(fill = veg_type, color = veg_type), se=TRUE ) +
+  geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
+  guides(colour = guide_legend(override.aes = list(size=5))) +
+  labs(x = "Wavelength (mm)", y = "Reflectance") +
+  theme_spectra() +
+  theme(legend.position = "bottom")
 
 # H2 plot PCA ----
 
