@@ -256,7 +256,7 @@ QHI <- QHI %>%
 QHI %>% filter(reflectance>100) %>%
   count(id)
 
-filter(wavelength %in% ISI_band_selection$wavelength) %>%
+#filter(wavelength %in% ISI_band_selection$wavelength) %>%
 
 # remove measuments with reflectance values over 100
 QHI <- QHI %>%
@@ -1693,5 +1693,80 @@ t <- QHI_spec_plot %>%
                        axes.linetype = "dashed",
                        xlab = "PC1", ylab = "PC2"))
 
+# pca 2018 & 2019
 
-# note that there are hundereds of point, but that they perfectly overlay, due to only cv & spec
+pca_H2_2018_2019 <- QHI_spec_plot 
+
+head(pca_H2)
+
+# ncp = 10 (10 variables)
+res.pca_H2_2018_2019 <- PCA(pca_H2_2018_2019[,c(5, 7, 9, 12:16, 19)], scale.unit = TRUE, ncp = 10, graph = TRUE)
+
+# eigen values
+
+eig.val <- get_eigenvalue(res.pca_H2_2018_2019)
+eig.val
+
+# pca barplot
+fviz_eig(res.pca_H2_2018_2019, addlabels = TRUE, ylim = c(0, 50))
+
+# saving results
+var <- get_pca_var(res.pca_H2_2018_2019)
+var
+
+# Coordinates
+head(var$coord)
+# Cos2: quality on the factore map
+head(var$cos2)
+# Contributions to the principal components
+head(var$contrib)
+
+# plotting variables
+fviz_pca_var(res.pca_H2_2018_2019, col.var = "black")
+
+# to visulize correlation on of varibals in each dimention
+corrplot(var$cos2, is.corr=FALSE)
+
+# Total cos2 of variables on Dim.1 and Dim.2
+fviz_cos2(res.pca_H2_2018_2019, choice = "var", axes = 1:2)
+
+# Color by cos2 values: quality on the factor map
+fviz_pca_var(res.pca_H2_2018_2019, col.var = "cos2",
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), 
+             repel = TRUE)
+
+# contributions of variables 
+corrplot(var$contrib, is.corr=FALSE)    
+
+fviz_pca_var(res.pca_H2_2018_2019, col.var = "contrib",
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"))
+
+# grouped by elipsise 
+
+(p_pca <- fviz_pca_biplot(res.pca_H2_2018_2019,
+                          geom.ind = "point", # show points only (nbut not "text")
+                          fill.ind = QHI_spec_plot$year, # color by groups
+                          pointshape = 21, 
+                        #  palette = c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FFB90F", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF"),
+                          addEllipses = TRUE, # Concentration ellipses
+                          # ellipse.type = "confidence",
+                          repel = TRUE,
+                          ellipse.level = 0.95, # confidence level specification
+                          mean.point = TRUE, # braycenter mean point
+                          # to color arrow by variable type
+                          col.var = factor(c("spectral", "spectral", "diversity", "diversity",
+                                             "environmenal", "environmenal", "environmenal", 
+                                             "environmenal", "environmenal")),
+                          gradient.cols = c("#00AFBB", "#00AFBB", "#FC4E07", "#FC4E07",
+                                            "#E7B800",  "#E7B800",  "#E7B800",  "#E7B800",  "#E7B800"),
+                          # col.var = "cos2",
+                          # gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+                          # alternate color gradient gradient.cols = c("blue", "yellow", "red")
+                          legend.title = list(fill = "Sites", color = "cos2"),
+                          axes.linetype = "dashed",
+                          xlab = "PC1", ylab = "PC2"))
+
+
+
+
+
