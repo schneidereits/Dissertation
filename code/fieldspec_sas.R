@@ -313,11 +313,11 @@ spec_2018 <- spec_2018 %>%
 histogram(spec_2018$spec_mean)
 histogram(QHI_small$spec_mean)
 
-# binding 2018 & 2019# NOTE:
-QHI_year <- bind_rows(QHI_small, spec_2018)
+# binding 2018 & 2019
+QHI_2018_2019 <- bind_rows(QHI_small, spec_2018)
 
 # adding a unique plot id 
-QHI_year <- QHI_year %>%
+QHI_2018_2019 <- QHI_2018_2019 %>%
   ungroup() %>%
   # temporary colunm with only plot number 
   mutate(plot2 = str_remove_all(plot, "HE|KO"),
@@ -327,7 +327,7 @@ QHI_year <- QHI_year %>%
 
 
 # violin of mean by year
-ggplot(QHI_year, aes(x=year, y=spec_mean, fill=veg_type)) + 
+ggplot(QHI_2018_2019, aes(x=year, y=spec_mean, fill=veg_type)) + 
   geom_violin(trim=FALSE, alpha = .5, aes(fill = veg_type)) +
   geom_point(position = position_jitter(0.05)) +
   geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
@@ -364,7 +364,30 @@ spec_2018 <- spectra_040818 %>%
          veg_type = case_when(site == "Herschel" ~ "HE",
                               site == "komukuk" ~ "KO")) %>%
          # add id by groups
-         mutate(id = group_indices(., veg_type, plot, measurement))
+         mutate(id = as.character(group_indices(., veg_type, plot, measurement) + 385)) %>% # 384 IDs for 2019 spectral data
+  unite(plot, c(veg_type, plot), sep = "", remove = FALSE)
+  
+
+
+# summarized by measurment spec 2018 data 
+spec_2018_small <- spec_2018 %>%
+  group_by(year, veg_type, plot, id) %>%
+  summarise(spec_mean = mean(Reflectance),
+            spec_SD = sd(Reflectance),
+            CV = mean(sd(Reflectance)/mean(Reflectance)))
+
+# binding 2018 & 2019 spec data
+
+
+QHI_2018_2019 <- bind_rows(QHI_small, spec_2018_small)
+
+# adding a unique plot id 
+QHI_2018_2019 <- QHI_2018_2019 %>%
+  ungroup() %>%
+  # temporary colunm with only plot number 
+  mutate(plot2 = str_remove_all(plot, "HE|KO"),
+         plot_unique = paste(veg_type,plot2,year,sep="_")) %>%
+  select(-plot2)
 
 
 ggplot(spec_2018, aes(x = Wavelength, y = Reflectance, group = id, color = veg_type)) + 
@@ -378,15 +401,19 @@ ggplot(spec_2018, aes(x = Wavelength, y = Reflectance, group = id, color = veg_t
 
 
 
+ggplot(spec_2018_small, aes(x=veg_type, y=spec_mean, fill=veg_type)) + 
+  geom_violin(trim=FALSE, alpha = .5) +
+  geom_point(position = position_jitter(0.05)) +
+  geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
+  scale_fill_manual(values = c("#ffa544", "#2b299b")) +
+  theme_cowplot()
 
-
-spec_2018_small <- spec_2018 %>%
-  group_by(year, veg_type, plot, id) %>%
-  summarise(spec_mean = mean(Reflectance),
-            spec_SD = sd(Reflectance),
-            CV = mean(sd(Reflectance)/mean(Reflectance)))
-
-
+ggplot(spec_2018_small, aes(x=veg_type, y=CV, fill=veg_type)) + 
+  geom_violin(trim=FALSE, alpha = .5) +
+  geom_point(position = position_jitter(0.05)) +
+  geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
+  scale_fill_manual(values = c("#ffa544", "#2b299b")) +
+  theme_cowplot()
 
 #  band selection ----
 
@@ -1332,13 +1359,13 @@ res.pca_lowD <- PCA(pca_lowD[,4:5], scale.unit = TRUE, ncp = 5, graph = TRUE)
 
 
 # multi year PCA
-res.pca_QHI_year <- PCA(QHI_year[,c(5,7)], scale.unit = TRUE, ncp = 5, graph = TRUE)
+res.pca_QHI_2018_2019 <- PCA(QHI_2018_2019[,c(5,7)], scale.unit = TRUE, ncp = 5, graph = TRUE)
 
 
 # pca 
-(p_pca <- fviz_pca_ind(res.pca_QHI_year,
+(p_pca <- fviz_pca_ind(res.pca_QHI_2018_2019,
                        geom.ind = "point", # show points only (nbut not "text")
-                       col.ind = QHI_year$year, # color by groups
+                       col.ind = QHI_2018_2019$year, # color by groups
                        palette = c("#ffa544", "#2b299b", "gray65"),
                        addEllipses = TRUE, # Concentration ellipses
                        # ellipse.type = "confidence",
@@ -1662,7 +1689,7 @@ QHI_plotdata <- read_csv("data/QHI_biodiversity/QHI_plotdata_2018_2019_sas.csv",
          year = substring(plot_unique,6,9))
          
 
-QHI_spec_plot <- left_join(QHI_year, QHI_plotdata, value = "plot_unique") %>%
+QHI_spec_plot <- left_join(QHI_2018_2019, QHI_plotdata, value = "plot_unique") %>%
   filter(!plot == "PS2")
   
 
@@ -1795,11 +1822,61 @@ corrplot(var$contrib, is.corr=FALSE)
 fviz_pca_var(res.pca_H2_2018_2019, col.var = "contrib",
              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"))
 
-# grouped by elipsise 
-
+# biplot grouped by year 
 (p_pca <- fviz_pca_biplot(res.pca_H2_2018_2019,
                           geom.ind = "point", # show points only (nbut not "text")
                           fill.ind = QHI_spec_plot$year, # color by groups
+                          pointshape = 21, 
+                          #  palette = c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FFB90F", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF"),
+                          addEllipses = TRUE, # Concentration ellipses
+                          # ellipse.type = "confidence",
+                          repel = TRUE,
+                          ellipse.level = 0.95, # confidence level specification
+                          mean.point = TRUE, # braycenter mean point
+                          # to color arrow by variable type
+                          col.var = factor(c("spectral", "spectral", "diversity", "diversity",
+                                             "environmenal", "environmenal", "environmenal", 
+                                             "environmenal", "environmenal")),
+                          gradient.cols = c("#00AFBB", "#00AFBB", "#FC4E07", "#FC4E07",
+                                            "#E7B800",  "#E7B800",  "#E7B800",  "#E7B800",  "#E7B800"),
+                          # col.var = "cos2",
+                          # gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+                          # alternate color gradient gradient.cols = c("blue", "yellow", "red")
+                          legend.title = list(fill = "Sites", color = "cos2"),
+                          axes.linetype = "dashed",
+                          xlab = "PC1", ylab = "PC2"))
+
+# biplot grouped by veg_type 
+(p_pca <- fviz_pca_biplot(res.pca_H2_2018_2019,
+                          geom.ind = "point", # show points only (nbut not "text")
+                          fill.ind = QHI_spec_plot$veg_type, # color by groups
+                          pointshape = 21, 
+                          #  palette = c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FFB90F", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF"),
+                          addEllipses = TRUE, # Concentration ellipses
+                          # ellipse.type = "confidence",
+                          repel = TRUE,
+                          ellipse.level = 0.95, # confidence level specification
+                          mean.point = TRUE, # braycenter mean point
+                          # to color arrow by variable type
+                          col.var = factor(c("spectral", "spectral", "diversity", "diversity",
+                                             "environmenal", "environmenal", "environmenal", 
+                                             "environmenal", "environmenal")),
+                          gradient.cols = c("#00AFBB", "#00AFBB", "#FC4E07", "#FC4E07",
+                                            "#E7B800",  "#E7B800",  "#E7B800",  "#E7B800",  "#E7B800"),
+                          # col.var = "cos2",
+                          # gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+                          # alternate color gradient gradient.cols = c("blue", "yellow", "red")
+                          legend.title = list(fill = "Sites", color = "cos2"),
+                          axes.linetype = "dashed",
+                          xlab = "PC1", ylab = "PC2"))
+
+# pca by veg_type and year
+t <- QHI_spec_plot %>%
+  unite(site, c(veg_type,year))
+
+(p_pca <- fviz_pca_biplot(res.pca_H2_2018_2019,
+                          geom.ind = "point", # show points only (nbut not "text")
+                          fill.ind = t$site, # color by groups
                           pointshape = 21, 
                         #  palette = c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FFB90F", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF"),
                           addEllipses = TRUE, # Concentration ellipses
