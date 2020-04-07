@@ -55,6 +55,7 @@ sort_QHI <- QHI_cover %>%
             cover = first(cover))
   
 
+
 ggplot(sort_QHI, aes(x=PLOT, y= cover, color= year2)) +
        geom_point() +
   geom_line() +
@@ -106,6 +107,49 @@ cover_2018_2019 <- QHI_cover_1999_2019_sas %>%
 # Written by Isla Myers-Smith, Anne Bjorkman, Haydn Thomas, Sandra Angers-Blondin and Gergana Daskalova
 
 unique(pointfr_2019$SPP)
+
+
+t_IDs <-  pointfr_2018_2019 %>% 
+  # create true/false colunm for soil background
+  mutate(bareground = SPP == "XXXlitter" | SPP == "XXXlitter " | 
+           SPP == "XXXbareground" | SPP == "XXXbareground " |
+           SPP == "XXXrock" | SPP == "XXXrock " |
+           SPP == "XXXstandingwater" | SPP == "XXXstandingwater "|
+           SPP == "XXXspider" | SPP == "XXXstandingwater ") %>%
+  group_by(uniqueID) %>%
+  # count both soil background and presence of vegitation
+   dplyr::count(bareground ) 
+
+# add unique plot 
+t_IDs$plot_unique <- paste(t_IDs$SUBSITE,t_IDs$PLOT,t_IDs$YEAR,sep="_")
+ 
+# filter distinct values 
+t_distinct <- count(t_IDs$uniqueID) %>% # count number of rows per id 
+  filter(freq == 1)                     # fiter only unique rows
+
+colnames(t_distinct)[1] <- "uniqueID"   # rename variable
+
+
+t <- t_IDs %>% 
+  filter(uniqueID %in% t_distinct$uniqueID, # filter out only unique rows
+         bareground == TRUE)                # filter plots that only have soil
+  
+
+
+
+distinc
+
+
+# add standardized plot_unique
+shrub_IDs$plot_unique <- paste(shrub_IDs$SUBSITE,
+                               shrub_IDs$PLOT,
+                               shrub_IDs$YEAR,sep="_")
+
+shrub <- shrub_IDs %>%
+  dplyr::count(plot_unique)
+
+# add in baseR as colonm was not recognized as object in dpylr
+colnames(shrub)[2] <- "shrub"
 
 
 pointfr_2018_2019$uniqueID <- paste(pointfr_2018_2019$YEAR, pointfr_2018_2019$SUBSITE, 
@@ -160,7 +204,10 @@ Bareground <- Bareground %>% select(plot_unique, bareground)
 
 unique(sort(cover_2018_2019$Species))
 
+unite("year2", c(n2, year)) 
+
 biodiv <- cover_2018_2019 %>% dplyr::select(sub_name, PLOT, Species, cover, year) %>%
+  unite(plot_unique, c(sub_name, PLOT, year), sep="_") %>%
   filter(!Species %in% c("XXXbareground", "XXXfeces",
                          "XXXlitter", "XXXstandingwater", "XXXrock")) %>%
   # standardizing moss
@@ -196,7 +243,7 @@ shannon <- ddply(biodiv_long,~plot_unique,function(x) {
   })
 
 simpson <- ddply(biodiv_long,~plot_unique,function(x) {
-  data.frame(simposon=diversity(x[-c(1:4)], index="simpson"))
+  data.frame(simpson=diversity(x[-c(1:4)], index="simpson"))
   })
 
 evenness <- ddply(biodiv_long,~plot_unique,function(x) {
