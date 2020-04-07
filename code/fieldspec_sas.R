@@ -248,6 +248,7 @@ QHI <- QHI %>%
   drop_na(wavelength) %>%
   drop_na(reference) %>%
   drop_na(target)  %>%
+  # filter range of device measurment accuracy
   filter(between(wavelength, 400, 985),
          # filtering out device based measurment errors
          !id %in% c(148:171, 196, 210:211, 250:259))
@@ -277,12 +278,12 @@ PS2 <- QHI %>%
 
 ##### correction factros for 250-259 reflectance. but to small. need > 3. also dont know how to apply to refletance 
 #HE1_corr <- full_QHI %>%
-filter(id %in% c("249", "250")) %>%
-  group_by(wavelength) %>%
-  mutate(reference = parse_number(as.character(reference))/100,
-         reflectance = parse_number(as.character(reflectance))/100,
-         correction_factor = (reference[id == "250"] / reference[id == "249"]),
-         reflectance = reflectance/correction_factor)
+#filter(id %in% c("249", "250")) %>%
+#  group_by(wavelength) %>%
+#  mutate(reference = parse_number(as.character(reference))/100,
+#         reflectance = parse_number(as.character(reflectance))/100,
+#         correction_factor = (reference[id == "250"] / reference[id == "249"]),
+#         reflectance = reflectance/correction_factor)
 
 
 # spectral data 2018 #NOTE: THAT THESE ARE GROUPED BY PLOT
@@ -332,6 +333,59 @@ ggplot(QHI_year, aes(x=year, y=spec_mean, fill=veg_type)) +
   geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
   scale_fill_manual(values = c("#ffa544", "#2b299b", "gray65")) +
   theme_cowplot()
+
+
+
+# testing 2018 spectral raw
+
+spectra_040818 <- read_csv("~/Downloads/spectra_040818.csv",
+                         col_types = cols(X1 = col_skip()))
+head(spectra_040818)
+unique(spectra_040818$type)
+unique(spectra_040818$site)
+unique(spectra_040818$plot)
+unique(spectra_040818$method)
+unique(spectra_040818$measurement)
+
+spectra_040818 %>% count(type) # looks like target is what im after
+
+spec_2018 <- spectra_040818 %>%
+  # filter range of device measurment accuracy
+  filter(between(Wavelength, 400, 985),
+         site == "Herschel" |  site == "komukuk",
+         type == "target",
+         method == "point",
+         !plot== "H20",
+         # no NAs in data, but if not filtered unique(spec_2018$measurement) aswell as plot indicate there are NAs...
+         !measurement == "NA") %>%
+  mutate(Reflectance = Reflectance*100,
+         plot = str_remove_all(plot, "LT"),
+         year = "2018",
+         veg_type = case_when(site == "Herschel" ~ "HE",
+                              site == "komukuk" ~ "KO")) %>%
+         # add id by groups
+         mutate(id = group_indices(., veg_type, plot, measurement))
+
+
+ggplot(spec_2018, aes(x = Wavelength, y = Reflectance, group = id, color = veg_type)) + 
+    geom_line(alpha = 0.3) + 
+    theme_spectra() +
+    labs(x = "\nWavelength (mm)", y = "Reflectance\n")+ 
+    theme(legend.position = "right") +
+    # scale_color_viridis_d(option = "C") +
+    scale_color_manual(values = c("#ffa544", "#2b299b")) +
+    guides(colour = guide_legend(override.aes = list(size=5)))
+
+
+
+
+
+spec_2018_small <- spec_2018 %>%
+  group_by(year, veg_type, plot, id) %>%
+  summarise(spec_mean = mean(Reflectance),
+            spec_SD = sd(Reflectance),
+            CV = mean(sd(Reflectance)/mean(Reflectance)))
+
 
 
 #  band selection ----
@@ -1765,8 +1819,6 @@ fviz_pca_var(res.pca_H2_2018_2019, col.var = "contrib",
                           legend.title = list(fill = "Sites", color = "cos2"),
                           axes.linetype = "dashed",
                           xlab = "PC1", ylab = "PC2"))
-
-
 
 
 
