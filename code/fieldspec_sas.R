@@ -495,6 +495,8 @@ lowD <- collison %>%
   geom_line() +
   theme_cowplot())
 
+
+
 #ggsave(p_SZU, path = "figures", filename = "SZU.png", height = 10, width = 12)
 
 
@@ -993,8 +995,8 @@ library(dotwhisker) # to visulaise effect whiskerplots
 collison_small <- collison %>%
   group_by(veg_type, plot, id) %>%
   summarise(spec_mean = mean(reflectance),
-            CV = mean(sd(reflectance)/mean(reflectance))) #%>%
-  mutate(spec_mean = scale(spec_mean, center = TRUE, scale = TRUE))
+            CV = mean(sd(reflectance)/mean(reflectance)))
+
 
 
 (hist <- ggplot(collison_small, aes(x = spec_mean)) +
@@ -1002,9 +1004,8 @@ collison_small <- collison %>%
    theme_classic())
 
 # linear model for H1
-m_H1a <- glm(data = collison_small, spec_mean ~ veg_type + plot)
 
-m_H1a <- lmer(data = collison_small, spec_mean ~ veg_type + (1|plot))
+m_H1a <- lmer(data = QHI_spec_plot, spec_mean ~ veg_type + (1|plot) + (1|year))
 
 
 summary(m_H1a)
@@ -1032,7 +1033,7 @@ ggplot(collison_wavelength, aes(x = wavelength, y = spec_mean, group=veg_type, c
     geom_histogram() +
     theme_classic())
 
-m_H1b <- lmer(data = collison_small, CV ~ veg_type + (1|plot))
+m_H1b <- lmer(data = QHI_spec_plot, CV ~ veg_type + (1|plot) + (1|year))
 
 summary(m_H1b)
 
@@ -1076,8 +1077,6 @@ ggplot(collison, aes(x = wavelength, y = reflectance, group = veg_type, color = 
     theme_classic())
 
 # linear model with band selection
-
-m_H3a <- glm(data = lowD, spec_mean ~ veg_type + plot)
 
 m_H3a <- lmer(data = lowD, spec_mean ~ veg_type + (1|plot))
 
@@ -1681,13 +1680,13 @@ QHI_plotdata <- read_csv("data/QHI_biodiversity/QHI_plotdata_2018_2019_sas.csv",
 
 # (redundant) adding sperate columns for vegtype, plot, and year
 #QHI_plotdata <- QHI_plotdata %>%
-  mutate(veg_type = case_when(grepl("HE|KO", plot_unique, ignore.case=TRUE) ~ 
-                                stringr::str_extract(plot_unique, "HE|KO")),
-         plot = case_when(grepl("_", plot_unique)   ~ 
-                            stringr::str_extract(plot_unique, "_\\d*")),
-         plot = str_remove_all(plot, "_"),
-         # differnet methods, maybe nor great pratice, but it works...
-         year = substring(plot_unique,6,9))
+#  mutate(veg_type = case_when(grepl("HE|KO", plot_unique, ignore.case=TRUE) ~ 
+#                                stringr::str_extract(plot_unique, "HE|KO")),
+#         plot = case_when(grepl("_", plot_unique)   ~ 
+#                            stringr::str_extract(plot_unique, "_\\d*")),
+#         plot = str_remove_all(plot, "_"),
+#         # differnet methods, maybe nor great pratice, but it works...
+#         year = substring(plot_unique,6,9))
          
 
 QHI_spec_plot <- left_join(QHI_2018_2019, QHI_plotdata, value = "plot_unique") %>%
@@ -1704,23 +1703,23 @@ corrplot(correlation, method="circle", type="upper", #order="hclust",
 
 
 # ugly alternative 
-install.packages("PerformanceAnalytics")
+#install.packages("PerformanceAnalytics")
 library("PerformanceAnalytics")
 
 chart.Correlation(correlation, histogram=TRUE, pch=19)
 
 
 # spectral mean 
-(hist <- ggplot(QHI_spec_plot, aes(x = spec_mean)) +
+(hist <- ggplot(QHI_spec_plot_2019, aes(x = spec_mean)) +
     geom_histogram() +
     theme_classic())
 
 
 # linear model for H2
-m_H2a <- glm(data = QHI_spec_plot, spec_mean ~ veg_type + richness + evenness + bareground + (1|year))
 
-m_H2a <- lmer(data = QHI_spec_plot, spec_mean ~ veg_type + richness + evenness + bareground + (1|plot) + (1|year))
+QHI_spec_plot_2019 <- QHI_spec_plot %>% filter(year == 2019)
 
+m_H2a <- lmer(data = QHI_spec_plot_2019, spec_mean ~ veg_type + richness + evenness + bareground + (1|plot))
 
 
 summary(m_H2a)
@@ -1734,21 +1733,13 @@ qqline(resid(m_H2a))
 # visulise fixed effect
 (fe.effects <- plot_model(m_H2a, show.values = TRUE))
 
-
-ggplot(collison_wavelength, aes(x = wavelength, y = spec_mean, group=veg_type, color = veg_type)) + 
-  geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
-  stat_smooth(method = "lm", aes(fill = veg_type, color = veg_type), se=TRUE )+
-  theme_spectra() +
-  labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n")
-
-
 # CV
 
-(hist <- ggplot(QHI_spec_plot, aes(x = CV)) +
+(hist <- ggplot(QHI_spec_plot_2019, aes(x = CV)) +
     geom_histogram() +
     theme_classic())
 
-m_H2b <- lmer(data = QHI_spec_plot, CV ~ veg_type + richness + evenness + bareground + (1|plot) + (1|year))
+m_H2b <- lmer(data = QHI_spec_plot_2019, CV ~ veg_type + richness + evenness + bareground + (1|plot))
 
 summary(m_H2b)
 
@@ -1760,28 +1751,6 @@ qqline(resid(m_H2b))
 (re.effects <- plot_model(m_H2b, type = "re", show.values = TRUE))
 # visulise fixed effect
 (fe.effects <- plot_model(m_H2b, show.values = TRUE))
-
-ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
-  geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
-  stat_smooth(method = "lm", aes(fill = veg_type, color = veg_type), se=TRUE )+
-  theme_spectra() +
-  labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n")
-
-
-
-
-collison_small_VT <- collison %>%
-  group_by(veg_type,wavelength) %>%
-  summarise(spec_mean = mean(reflectance),
-            CV = mean(sd(reflectance)/mean(reflectance)))
-
-ggplot(collison, aes(x = wavelength, y = reflectance, group = veg_type, color = veg_type)) + 
-  stat_smooth(method = "lm", aes(fill = veg_type, color = veg_type), se=TRUE ) +
-  geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
-  guides(colour = guide_legend(override.aes = list(size=5))) +
-  labs(x = "Wavelength (mm)", y = "Reflectance") +
-  theme_spectra() +
-  theme(legend.position = "bottom")
 
 # H2 plot PCA ----
 
@@ -1875,7 +1844,7 @@ pca_H2_2018_2019 <- QHI_spec_plot
 head(pca_H2)
 
 # ncp = 10 (10 variables)
-res.pca_H2_2018_2019 <- PCA(pca_H2_2018_2019[,c(5, 7, 9, 12:16, 19)], scale.unit = TRUE, ncp = 10, graph = TRUE)
+res.pca_H2_2018_2019 <- PCA(pca_H2_2018_2019[,c(5, 7, 9, 12:16, 19)], scale.unit = TRUE, ncp = 9, graph = TRUE)
 
 # eigen values
 
@@ -1912,6 +1881,7 @@ fviz_pca_var(res.pca_H2_2018_2019, col.var = "cos2",
 
 # contributions of variables 
 corrplot(var$contrib, is.corr=FALSE)    
+
 
 fviz_pca_var(res.pca_H2_2018_2019, col.var = "contrib",
              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"))
