@@ -1837,24 +1837,28 @@ t <- QHI_spec_plot %>%
                        geom.ind = "point", # show points only (nbut not "text")
                        fill.ind = t$plot_unique, # color by groups
                        pointshape = 21, 
-                       palette = c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FFB90F", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF"),
+                       col.ind = "black",
+                      # palette = c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FFB90F", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF"),
                        addEllipses = TRUE, # Concentration ellipses
                        # ellipse.type = "confidence",
                        repel = TRUE,
                        ellipse.level = 0.95, # confidence level specification
                        mean.point = TRUE, # braycenter mean point
                        # to color arrow by variable type
-                        col.var = factor(c("spectral", "spectral", "diversity", "diversity",
-                                  "environmenal", "environmenal", "environmenal", 
-                                   "environmenal", "environmenal")),
-                       gradient.cols = c("#00AFBB", "#00AFBB", "#FC4E07", "#FC4E07",
-                                         "#E7B800",  "#E7B800",  "#E7B800",  "#E7B800",  "#E7B800"),
+                       col.var = factor(c("spectral", "spectral", "diversity", "diversity",
+                                "environmenal", "environmenal", "environmenal", 
+                                "environmenal", "environmenal")),
+                      # gradient.cols = c("#00AFBB", "#00AFBB", "#FC4E07", "#FC4E07",
+                       #                  "#E7B800",  "#E7B800",  "#E7B800",  "#E7B800",  "#E7B800"),
                       # col.var = "cos2",
                       # gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
                       # alternate color gradient gradient.cols = c("blue", "yellow", "red")
                        legend.title = list(fill = "Sites", color = "cos2"),
                        axes.linetype = "dashed",
-                       xlab = "PC1", ylab = "PC2"))
+                       xlab = "PC1", ylab = "PC2")) +
+  ggpubr::fill_palette(c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FFB90F", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF"))+      # Indiviual fill color
+  ggpubr::color_palette("Dark2")      # Variable colors
+
 
 # pca 2018 & 2019
 
@@ -1926,7 +1930,10 @@ fviz_pca_var(res.pca_H2_2018_2019, col.var = "contrib",
                           # alternate color gradient gradient.cols = c("blue", "yellow", "red")
                           legend.title = list(fill = "Sites", color = "cos2"),
                           axes.linetype = "dashed",
-                          xlab = "PC1", ylab = "PC2"))
+                          xlab = "PC1", ylab = "PC2")) +
+  ggpubr::color_palette("Dark2")      # Variable colors
+  #ggpubr::fill_palette(c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FFB90F", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF"))+      # Indiviual fill color
+  
 
 # biplot grouped by veg_type 
 (p_pca <- fviz_pca_biplot(res.pca_H2_2018_2019,
@@ -1950,7 +1957,8 @@ fviz_pca_var(res.pca_H2_2018_2019, col.var = "contrib",
                           # alternate color gradient gradient.cols = c("blue", "yellow", "red")
                           legend.title = list(fill = "Sites", color = "cos2"),
                           axes.linetype = "dashed",
-                          xlab = "PC1", ylab = "PC2"))
+                          xlab = "PC1", ylab = "PC2")) +
+  ggpubr::color_palette("Dark2")      # Variable colors
 
 # pca by veg_type and year
 t <- QHI_spec_plot %>%
@@ -1977,7 +1985,10 @@ t <- QHI_spec_plot %>%
                           # alternate color gradient gradient.cols = c("blue", "yellow", "red")
                           legend.title = list(fill = "Sites", color = "cos2"),
                           axes.linetype = "dashed",
-                          xlab = "PC1", ylab = "PC2"))
+                          xlab = "PC1", ylab = "PC2")) +
+  ggpubr::color_palette("Dark2")  +    # Variable colors
+  ggpubr::fill_palette(c("#FF4500", "#FF8C00", "#D15FEE", "#63B8FF"))     # Indiviual fill color
+
 
 
 
