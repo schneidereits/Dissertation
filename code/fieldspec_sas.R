@@ -17,6 +17,7 @@ library(grid) # for pannel plot
 library(FactoMineR) # for pca
 library(factoextra) # for pca visulizaiton
 library(ggpmisc) # for ISI minima visulizaiton
+library(RColorBrewer)
 
 
 source("https://gist.githubusercontent.com/benmarwick/2a1bb0133ff568cbe28d/raw/fb53bd97121f7f9ce947837ef1a4c65a73bffb3f/geom_flat_violin.R")
@@ -1693,6 +1694,15 @@ QHI_spec_plot <- left_join(QHI_2018_2019, QHI_plotdata, value = "plot_unique") %
   filter(!plot == "PS2")
 
 # H2 model ----
+
+# correlation plot
+
+correlation <- cor(QHI_spec_plot[,c(5, 7, 9, 12:16, 19)])
+
+corrplot(correlation, method="circle", type="upper", #order="hclust",
+         tl.srt=45, tl.col="black", col=brewer.pal(n=10, name="RdYlBu"))
+
+
 
 # spectral mean 
 (hist <- ggplot(QHI_spec_plot, aes(x = spec_mean)) +
