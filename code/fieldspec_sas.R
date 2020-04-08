@@ -1703,16 +1703,25 @@ corrplot(correlation, method="circle", type="upper", #order="hclust",
          tl.srt=45, tl.col="black", col=brewer.pal(n=10, name="RdYlBu"))
 
 
+# ugly alternative 
+install.packages("PerformanceAnalytics")
+library("PerformanceAnalytics")
+
+chart.Correlation(correlation, histogram=TRUE, pch=19)
+
 
 # spectral mean 
 (hist <- ggplot(QHI_spec_plot, aes(x = spec_mean)) +
     geom_histogram() +
     theme_classic())
 
+
+
 # linear model for H2
-m_H2a <- glm(data = QHI_spec_plot, spec_mean ~ veg_type + richness + evenness + bareground + (1|Year))
+m_H2a <- glm(data = QHI_spec_plot, spec_mean ~ veg_type + richness + evenness + bareground + (1|year))
 
 m_H2a <- lmer(data = QHI_spec_plot, spec_mean ~ veg_type + richness + evenness + bareground + (1|plot) + (1|year))
+
 
 
 summary(m_H2a)
