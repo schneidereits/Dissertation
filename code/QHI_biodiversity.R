@@ -135,7 +135,9 @@ bareground <- bareground %>%
 bareground <- pointfr_2018_2019 %>%
   filter(uniqueID %in% bareground$uniqueID) %>%
   unite(plot_unique, c(SUBSITE, PLOT, YEAR), sep="_") %>%
-  dplyr::count(plot_unique)
+  dplyr::count(plot_unique) 
+
+colnames(bareground)[2] <- "bareground"
   
 
 # biodiverstiy ----
@@ -312,7 +314,7 @@ colnames(graminoid)[2] <- "graminoid"
 QHI_plotdata <- left_join(richness, shannon) %>% 
   left_join(simpson) %>%
   left_join(evenness) %>%
-  left_join(Bareground) %>%
+  left_join(bareground) %>%
   left_join(dead) %>%
   left_join(reproducitve_tissue) %>%
   left_join(total_cover) %>%
