@@ -1716,7 +1716,6 @@ chart.Correlation(correlation, histogram=TRUE, pch=19)
     theme_classic())
 
 
-
 # linear model for H2
 m_H2a <- glm(data = QHI_spec_plot, spec_mean ~ veg_type + richness + evenness + bareground + (1|year))
 
@@ -1998,6 +1997,39 @@ t <- QHI_spec_plot %>%
   ggpubr::color_palette("Dark2")  +    # Variable colors
   ggpubr::fill_palette(c("#FF4500", "#FF8C00", "#D15FEE", "#63B8FF"))     # Indiviual fill color
 
+# H4 spatial autocorrelation ----
+
+# spatial variogram
+
+QHI_spatial <- collison_small %>% 
+ ungroup() %>%
+  mutate(x = as.numeric(group_indices(., plot)),
+         y = as.numeric(group_indices(., plot)),
+         # add spatial distance between HE and KO plots
+         x = case_when(veg_type == "HE" ~ x,
+                       veg_type == "KO" ~ x + 500),
+         y = case_when(veg_type == "HE" ~ y,
+                       veg_type == "KO" ~ y + 500)) %>%
+  # select only relavent colunms for variogram?
+  select(spec_mean, x, y)
+
+histogram(QHI_spatial$spec_mean)
+histogram(QHI_spatial$spec_mean )
+histogram
+library(sp)
+library(gstat)
+
+?coordinates
+
+coordinates(QHI_spatial) = ~x+y
 
 
+# variogram model
+v0 = variogram(spec_mean~1, QHI_spatial)
+
+# fit under 4 different models
+fit.variogram(v0, vgm(c("Exp", "Mat", "Sph", "Ste")), fit.kappa = TRUE) # Mat is selected to be the best 
+
+plot(variogramLine(vgm(1, "Mat", 1, kappa = 5), 20), type = 'l')  # accourding to model kappa=5 
+abline(v=11, col="black", lty=2 )
 
