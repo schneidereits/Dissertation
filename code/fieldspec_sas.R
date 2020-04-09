@@ -1760,59 +1760,28 @@ qqline(resid(m_H2a))
 (fe.effects <- plot_model(m_H2a, show.values = TRUE))
 
 
-# Extract the prediction richness
-pred.mm <- ggpredict(m_H2a, terms = c("richness"))  # this gives overall predictions for the model
-
-# Plot the predictions 
-
-(ggplot(pred.mm) + 
-    geom_line(aes(x = x, y = predicted)) +          # slope
-    geom_ribbon(aes(x = x, ymin = predicted - std.error, ymax = predicted + std.error), 
-                fill = "lightgrey", alpha = 0.5) +  # error band
-    geom_line(aes(x = x, y = predicted + 25.5348)) +          # slope
-    geom_ribbon(aes(x = x, ymin = predicted + 25.5348 - std.error, ymax = predicted + 25.5348 + std.error), 
-                fill = "lightgrey", alpha = 0.5) +
-    geom_point(data = QHI_spec_plot_2019,                      # adding the raw data (scaled values)
-               aes(x = richness, y = spec_mean, colour = veg_type)) + 
-    
-    theme_spectra()
-)
-
-
-
-
-
-# Extract the prediction data frame bareground
-pred.mm <- ggpredict(m_H2a, terms = c("bareground"))  # this gives overall predictions for the model
-
-# Plot the predictions 
-
-(ggplot(pred.mm) + 
-    geom_line(aes(x = x, y = predicted)) +          # slope
-    geom_ribbon(aes(x = x, ymin = predicted - std.error, ymax = predicted + std.error), 
-                fill = "lightgrey", alpha = 0.5) +  # error band
-    geom_line(aes(x = x, y = predicted + 25.5348)) +          # slope
-    geom_ribbon(aes(x = x, ymin = predicted + 25.5348 - std.error, ymax = predicted + 25.5348 + std.error), 
-                fill = "lightgrey", alpha = 0.5) +
-    geom_point(data = QHI_spec_plot_2019,                      # adding the raw data (scaled values)
-               aes(x = bareground, y = spec_mean, colour = veg_type)) + 
-    
-    theme_spectra()
-)
-
-
-ggpredict(m_H2a, terms = c("richness", "veg_type"), type = "re") %>% 
+ggpredict(m_H2a, terms = c("veg_type"), type = "fe") %>% 
   plot(rawdata = TRUE) +
+  scale_color_manual(values = c("#ffa544", "#2b299b")) +
   theme_spectra()
 
-ggpredict(m_H2a, terms = c("evenness", "veg_type"), type = "re") %>% 
+ggpredict(m_H2a, terms = c("richness", "veg_type"), type = "fe") %>% 
   plot(rawdata = TRUE) +
+  scale_color_manual(values = c("#ffa544", "#2b299b")) +
   theme_spectra()
 
-ggpredict(m_H2a, terms = c("bareground", "veg_type"), type = "re") %>% 
+ggpredict(m_H2a, terms = c("evenness", "veg_type"), type = "fe") %>% 
   plot(rawdata = TRUE) +
+  scale_color_manual(values = c("#ffa544", "#2b299b")) +
+  theme_spectra() 
+
+
+ggpredict(m_H2a, terms = c("bareground", "veg_type"), type = "fe" ) %>% 
+  plot(rawdata = TRUE) +
+  scale_color_manual(values = c("#ffa544", "#2b299b")) +
   theme_spectra()
 
+ggpre
 
 # CV
 
@@ -1832,6 +1801,27 @@ qqline(resid(m_H2b))
 (re.effects <- plot_model(m_H2b, type = "re", show.values = TRUE))
 # visulise fixed effect
 (fe.effects <- plot_model(m_H2b, show.values = TRUE))
+
+
+ggpredict(m_H2b, terms = c("veg_type"), type = "fe") %>% 
+  plot(rawdata = TRUE) +
+  scale_color_manual(values = c("#ffa544", "#2b299b")) +
+  theme_spectra()
+
+ggpredict(m_H2b, terms = c("richness", "veg_type"), type = "fe") %>% 
+  plot(rawdata = TRUE) +
+  scale_color_manual(values = c("#ffa544", "#2b299b")) +
+  theme_spectra()
+
+ggpredict(m_H2b, terms = c("evenness", "veg_type"), type = "fe") %>% 
+  plot(rawdata = TRUE) +
+  scale_color_manual(values = c("#ffa544", "#2b299b")) +
+  theme_spectra()
+
+ggpredict(m_H2b, terms = c("bareground", "veg_type"), type = "fe") %>% 
+  plot(rawdata = TRUE) +
+  scale_color_manual(values = c("#ffa544", "#2b299b")) +
+  theme_spectra()
 
 # H2 plot PCA ----
 
