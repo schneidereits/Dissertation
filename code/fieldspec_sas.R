@@ -1378,6 +1378,30 @@ res.pca_QHI_2018_2019 <- PCA(QHI_2018_2019[,c(5,7)], scale.unit = TRUE, ncp = 5,
 
 #ggsave(p_pca, path = "figures", filename = "QHI_lowD_biplot.png", height = 10, width = 12)
 
+# multiyear pca by year and vegtype
+
+t <- QHI_2018_2019 %>%
+  unite(veg_year, c(veg_type, year))
+
+(p_pca <- fviz_pca_ind(res.pca_QHI_2018_2019,
+                       geom.ind = "point", # show points only (nbut not "text")
+                       fill.ind = t$veg_year, # color by groups
+                       color.ind = "black",
+                       pointshape = 21,
+                       col.ind = "black",
+                       palette = c( "tomato", "#ffa544", "purple", "#2b299b", "gray65"),
+                       addEllipses = TRUE, # Concentration ellipses
+                       # ellipse.type = "confidence",
+                       ellipse.level = 0.95, # confidence level specification
+                       mean.point = TRUE, # braycenter mean point
+                       legend.title = "Groups",
+                       axes.linetype = "dashed",
+                       xlab = "PC1", ylab = "PC2", 
+                       ggtheme = theme_spectra()))
+
+#ggsave(p_pca, path = "figures", filename = "QHI_lowD_biplot.png", height = 10, width = 12)
+
+
 # PS2 ----
 
 # PS2 24-144 (PS2) ------
@@ -1982,6 +2006,7 @@ QHI_spatial <- collison_small %>%
                        veg_type == "KO" ~ y + 500)) %>%
   # select only relavent colunms for variogram?
   select(spec_mean, x, y)
+  
 
 histogram(QHI_spatial$spec_mean)
 histogram(QHI_spatial$spec_mean )
@@ -1995,11 +2020,19 @@ coordinates(QHI_spatial) = ~x+y
 
 
 # variogram model
-v0 = variogram(spec_mean~1, QHI_spatial)
+(v0 = variogram(spec_mean~1, QHI_spatial))
 
 # fit under 4 different models
-fit.variogram(v0, vgm(c("Exp", "Mat", "Sph", "Ste")), fit.kappa = TRUE) # Mat is selected to be the best 
+(v.fit0 = fit.variogram(v0, vgm(c("Exp", "Mat", "Sph", "Ste")), fit.kappa = TRUE)) # Mat is selected to be the best 
 
-plot(variogramLine(vgm(1, "Mat", 1, kappa = 5), 20), type = 'l')  # accourding to model kappa=5 
-abline(v=11, col="black", lty=2 )
+preds = variogramLine(v.fit0, maxdist = 15)
+head(preds)
+
+ggplot(v0, aes(x = dist, y = gamma)) +
+  geom_line(data = preds) +
+  geom_vline(xintercept = 7, linetype="dotted") +
+  xlim(0,15) +
+  ylim(0,70) +
+  coord_cartesian(xlim = c(0.7, 15), ylim = c(2.5, 63)) +
+  theme_spectra()
 
