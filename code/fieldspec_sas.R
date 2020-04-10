@@ -70,10 +70,12 @@ theme_rgb_CV <- list(annotate("rect", xmin = 400, xmax = 500, ymin = 0, ymax = 0
                      annotate("rect", xmin = 680, xmax = 800, ymin = 0, ymax = 0.5, 
                           alpha = .15, fill = "tomato"),
                      annotate("rect", xmin = 800, xmax = 985, ymin = 0, ymax = 0.5, 
-                         alpha = .15, fill = "darkgrey"))
+                         alpha = .15, fill = "darkgrey"),
+                     scale_y_continuous(expand = expand_scale(mult = c(0, .1))),
+                     scale_x_continuous(expand = expand_scale(mult = c(0, .1))))
   
-scale_color_QHI <- list(scale_color_manual(values = c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FFB90F", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF", "#A8A8A8")))
-scale_color_collison <- list(scale_color_manual(values = c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FFB90F", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF")))
+scale_color_QHI <- list(scale_color_manual(values = c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FF4500", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF", "#A8A8A8")))
+scale_color_collison <- list(scale_color_manual(values = c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FF4500", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF")))
 
 # ploting spectral signatures 
 spec_plot <- function(x){
@@ -287,57 +289,8 @@ PS2 <- QHI %>%
 #         reflectance = reflectance/correction_factor)
 
 
-# spectral data 2018 #NOTE: THAT THESE ARE GROUPED BY PLOT
 
-spec_2018 <- read_csv("data/spec_bio.csv")
-
-spec_2018 <- spec_2018 %>%
-  select(site, plot, Reflectance_mean, Reflectance_sd, Reflectance_cv, Wavelength) %>%
-  mutate(year = "2018",
-         veg_type = site,
-         # multiple to match reflectance of QHI 
-         Reflectance_mean = Reflectance_mean*100) %>%
- # rename(spec_mean = Reflectance_mean,
-     #    spec_SD = Reflectance_sd,
-      #   CV = Reflectance_cv) %>%
-  # to correspond with QHI plot formate
-  unite("plot", c(site, plot), sep = "") %>%
-  ungroup() %>%
-  group_by(year, veg_type, plot) %>%
-  # SUMARIZE BY PLOT? DOES NOT CORRESPOND WITH QHI FORMATE WHICH IS AT MEASURMENT LEVEL
-  # had to add na.rm=TRUE, although there were no NAs in the data 
-  summarise(spec_mean = mean(Reflectance_mean, na.rm=TRUE),
-            spec_SD = mean(Reflectance_sd, na.rm=TRUE),
-            CV = mean(Reflectance_cv, na.rm=TRUE))
- 
-
-histogram(spec_2018$spec_mean)
-histogram(QHI_small$spec_mean)
-
-# binding 2018 & 2019
-QHI_2018_2019 <- bind_rows(QHI_small, spec_2018)
-
-# adding a unique plot id 
-QHI_2018_2019 <- QHI_2018_2019 %>%
-  ungroup() %>%
-  # temporary colunm with only plot number 
-  mutate(plot2 = str_remove_all(plot, "HE|KO"),
-         plot_unique = paste(veg_type,plot2,year,sep="_")) %>%
-  select(-plot2)
-
-
-
-# violin of mean by year
-ggplot(QHI_2018_2019, aes(x=year, y=spec_mean, fill=veg_type)) + 
-  geom_violin(trim=FALSE, alpha = .5, aes(fill = veg_type)) +
-  geom_point(position = position_jitter(0.05)) +
-  geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
-  scale_fill_manual(values = c("#ffa544", "#2b299b", "gray65")) +
-  theme_cowplot()
-
-
-
-# testing 2018 spectral raw
+# adding 2018 spectral data
 
 spectra_040818 <- read_csv("~/Downloads/spectra_040818.csv",
                          col_types = cols(X1 = col_skip()))
@@ -368,7 +321,6 @@ spec_2018 <- spectra_040818 %>%
          mutate(id = as.character(group_indices(., veg_type, plot, measurement) + 385)) %>% # 384 IDs for 2019 spectral data
   unite(plot, c(veg_type, plot), sep = "", remove = FALSE)
   
-
 
 # summarized by measurment spec 2018 data 
 spec_2018_small <- spec_2018 %>%
@@ -495,8 +447,6 @@ lowD <- collison %>%
   geom_line() +
   theme_cowplot())
 
-
-
 #ggsave(p_SZU, path = "figures", filename = "SZU.png", height = 10, width = 12)
 
 
@@ -533,7 +483,7 @@ lowD <- collison %>%
 facet_wrap(.~id) 
 
 
-# violin of mean by year
+# violin of mean by vegtype
 ggplot(QHI_small, aes(x=veg_type, y=spec_mean, fill=veg_type)) + 
   geom_violin(trim=FALSE, alpha = .5, aes(fill = veg_type)) +
   geom_point(position = position_jitter(0.05)) +
@@ -547,7 +497,7 @@ ggplot(QHI_small, aes(x=veg_type, y=spec_mean, fill=veg_type)) +
     geom_flat_violin(position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = QHI_small, aes(x=veg_type, y=spec_mean, colour=plot),
                position = position_jitter(width = .05), size = 2) +
-    geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
+    geom_boxplot(width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_fill_manual(values = c("#ffa544", "#2b299b", "gray65")) +
     scale_color_QHI +
     theme_cowplot())
@@ -569,11 +519,11 @@ ggplot(QHI_small, aes(x=veg_type, y=CV, fill=veg_type)) +
     geom_point(data = QHI_small, aes(x=veg_type, y=CV, colour=plot),
                position = position_jitter(width = .15), size = 2) +
     geom_boxplot(data = QHI_small, aes(x=veg_type, y=CV),
-                 width=0.2, fill="white", alpha = 0.3) +
+                 width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_fill_manual(values = c("#ffa544", "#2b299b", "gray65")) +
     scale_color_QHI +
     theme_cowplot())
-# ggsave(p_QHI, path = "figures", filename = "cloud_CV.png", height = 8, width = 10)
+ #ggsave(p_QHI, path = "figures", filename = "cloud_CV.png", height = 8, width = 10)
 
 
 # group by wavelength 
@@ -674,7 +624,7 @@ ggplot(collison_small, aes(x=veg_type, y=spec_mean, fill=veg_type)) +
     geom_flat_violin(position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = collison_small, aes(x=veg_type, y=spec_mean, colour=plot),
                position = position_jitter(width = .05), size = 2) +
-    geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
+    geom_boxplot(width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
     scale_color_collison +
     theme_cowplot())
@@ -696,17 +646,16 @@ ggplot(collison_small, aes(x=veg_type, y=CV, fill=veg_type)) +
     geom_point(data = collison_small, aes(x=veg_type, y=CV, colour=plot),
                position = position_jitter(width = .05), size = 2) +
     geom_boxplot(data = collison_small, aes(x=veg_type, y=CV),
-                 width=0.2, fill="white", alpha = 0.3) +
+                 width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
     scale_color_collison +
     theme_cowplot())
-# ggsave(p_collison, path = "figures", filename = "cloud_CV_collison.png", height = 8, width = 10)
+ #ggsave(p_collison, path = "figures", filename = "cloud_CV_collison.png", height = 8, width = 10)
 
 # plots mean reflectance 
 (p_col_mean <- ggplot(collison_wavelength, aes(x = wavelength, y = spec_mean, group = plot, color = plot)) + 
     geom_line(alpha = 0.7, size=1.) + 
     guides(colour = guide_legend(override.aes = list(size=5))) +
-    scale_color_brewer(palette = "Paired") +
     labs(x = "Wavelength (mm)", y = "Reflectance") +
     theme_spectra() +
     theme(legend.position = "bottom") +
@@ -726,7 +675,6 @@ ggplot(collison_wavelength, aes(x = wavelength, y = spec_mean, group=veg_type, c
 (p_col_CV <- ggplot(collison_wavelength, aes(x = wavelength, y = CV, group = plot, color = plot)) + 
     geom_line(alpha = 0.7, size=1.) + 
     guides(colour = guide_legend(override.aes = list(size=5))) +
-    scale_color_brewer(palette = "Paired") +
     labs(x = "Wavelength (mm)", y = "CV") +
     theme_spectra() +
     theme(legend.position = "bottom") +
@@ -745,34 +693,23 @@ ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = 
 #  collison facet plot ----
 #  spectral mean and CV violin plots by region ----
 
-collison_wavelength <- collison %>%
-  group_by(veg_type, plot, wavelength) %>%
-  summarise(spec_mean = mean(reflectance),
-            CV = mean(sd(reflectance)/mean(reflectance))) %>%
-  mutate(region = case_when(between(wavelength, 400, 500) ~ "blue",
-                            between(wavelength, 500, 600) ~ "green",
-                            between(wavelength, 600, 680) ~ "red",
-                            between(wavelength, 680, 800) ~ "NIR",
-                            between(wavelength, 800, 1000) ~ "IR"))
-
 # blue mean
 (p_blue_mean <- ggplot() +
-    geom_flat_violin(data = subset(collison_wavelength, region %in% c("blue")), 
-                     aes(x=veg_type, y=spec_mean, fill=veg_type),
-                     position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-      geom_point(data = subset(collison_wavelength, region %in% c("blue")),
-               aes(x=veg_type, y=spec_mean, colour=plot),
-               position = position_jitter(width = .05), size = .5) +
-     geom_boxplot(data = subset(collison_wavelength, region %in% c("blue")),
-                 aes(x=veg_type, y=spec_mean),
-                 width=0.2, fill="white", alpha = 0.3) +
-    scale_fill_manual(values = c("#ffa544", "#2b299b")) +
-    theme_cowplot() +
-    scale_color_collison +
-    theme(panel.background =  element_rect(fill = "white"),
-          plot.background = element_rect(color = "#cfe2fd")))
-
-
+   geom_flat_violin(data = subset(collison_wavelength, region %in% c("blue")), 
+                    aes(x=veg_type, y=spec_mean, fill=veg_type),
+                    position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
+   geom_point(data = subset(collison_wavelength, region %in% c("blue")),
+              aes(x=veg_type, y=spec_mean, colour=plot),
+              position = position_jitter(width = .1), size = 1, alpha =0.5) +
+   geom_boxplot(data = subset(collison_wavelength, region %in% c("blue")),
+                aes(x=veg_type, y=spec_mean),
+                width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
+   scale_fill_manual(values = c("#ffa544", "#2b299b")) +
+   theme_cowplot() +
+   scale_color_collison +
+   ylab("Reflectance") +
+   theme(panel.background =  element_rect(fill = "white"),
+         plot.background = element_rect(color = "#cfe2fd")))
 
 # blue CV
 (p_blue_CV <- ggplot() +
@@ -781,14 +718,15 @@ collison_wavelength <- collison %>%
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = subset(collison_wavelength, region %in% c("blue")),
                aes(x=veg_type, y=CV, colour=plot),
-               position = position_jitter(width = .05), size = .5) +
+               position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(collison_wavelength, region %in% c("blue")),
                  aes(x=veg_type, y=CV),
-                 width=0.2, fill="white", alpha = 0.3) +
+                 width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
     theme_cowplot() +
     ylim(0.1, 0.4) +
+    ylab("Spectral diversity (CV)") +
     theme(panel.background =  element_rect(fill = "white"),
           plot.background = element_rect(color = "#cfe2fd")))
 
@@ -799,10 +737,10 @@ collison_wavelength <- collison %>%
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = subset(collison_wavelength, region %in% c("green")),
                aes(x=veg_type, y=spec_mean, colour=plot),
-               position = position_jitter(width = .05), size = .5) +
+               position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(collison_wavelength, region %in% c("green")),
                  aes(x=veg_type, y=spec_mean),
-                 width=0.2, fill="white", alpha = 0.3) +
+                 width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
     theme_cowplot() +
@@ -817,10 +755,10 @@ collison_wavelength <- collison %>%
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = subset(collison_wavelength, region %in% c("green")),
                aes(x=veg_type, y=CV, colour=plot),
-               position = position_jitter(width = .05), size = .5) +
+               position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(collison_wavelength, region %in% c("green")),
                  aes(x=veg_type, y=CV),
-                 width=0.2, fill="white", alpha = 0.3) +
+                 width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
     theme_cowplot() +
@@ -835,10 +773,10 @@ collison_wavelength <- collison %>%
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = subset(collison_wavelength, region %in% c("red")),
                aes(x=veg_type, y=spec_mean, colour=plot),
-               position = position_jitter(width = .05), size = .5) +
+               position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(collison_wavelength, region %in% c("red")),
                  aes(x=veg_type, y=spec_mean),
-                 width=0.2, fill="white", alpha = 0.3) +
+                 width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
     theme_cowplot() +
@@ -853,10 +791,10 @@ collison_wavelength <- collison %>%
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = subset(collison_wavelength, region %in% c("red")),
                aes(x=veg_type, y=CV, colour=plot),
-               position = position_jitter(width = .05), size = .5) +
+               position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(collison_wavelength, region %in% c("red")),
                  aes(x=veg_type, y=CV),
-                 width=0.2, fill="white", alpha = 0.3) +
+                 width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
     theme_cowplot() +
@@ -874,7 +812,7 @@ collison_wavelength <- collison %>%
                position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(collison_wavelength, region %in% c("NIR")),
                  aes(x=veg_type, y=spec_mean),
-                 width=0.2, fill="white", alpha = 0.3) +
+                 width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
     theme_cowplot() +
@@ -892,7 +830,7 @@ collison_wavelength <- collison %>%
                position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(collison_wavelength, region %in% c("NIR")),
                  aes(x=veg_type, y=CV),
-                 width=0.2, fill="white", alpha = 0.3) +
+                 width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
     theme_cowplot() +
@@ -910,7 +848,7 @@ collison_wavelength <- collison %>%
                position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(collison_wavelength, region %in% c("IR")),
                  aes(x=veg_type, y=spec_mean),
-                 width=0.2, fill="white", alpha = 0.3) +
+                 width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
     theme_cowplot() +
@@ -928,7 +866,7 @@ collison_wavelength <- collison %>%
                position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(collison_wavelength, region %in% c("IR")),
                  aes(x=veg_type, y=CV),
-                 width=0.2, fill="white", alpha = 0.3) +
+                 width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
     theme_cowplot() +
@@ -942,7 +880,7 @@ collison_wavelength <- collison %>%
 # STILL NEED TO ADD AVERAGE OF ENTIRE VEGETATION TYPE 
 
 # Move to a new page
-grid.newpage()
+grid.newpage()        
 
 # Create layout : nrow = 3, ncol = 2
 pushViewport(viewport(layout = grid.layout(nrow = 3, ncol = 5)))
@@ -1018,6 +956,11 @@ qqline(resid(m_H1a))  # points fall nicely onto the line - good!
 (re.effects <- plot_model(m_H1a, type = "re", show.values = TRUE))
 # visulise fixed effect
 (fe.effects <- plot_model(m_H1a, show.values = TRUE))
+
+ggpredict(m_H1a, terms = c("veg_type"), type = "fe") %>% 
+  plot(rawdata = TRUE) +
+  #scale_color_manual(values = c("#ffa544", "#2b299b")) +
+  theme_spectra()
 
 
 ggplot(collison_wavelength, aes(x = wavelength, y = spec_mean, group=veg_type, color = veg_type)) + 
@@ -1198,22 +1141,28 @@ library(broom)
 
 # spectral mean
 
-dwplot(list(m_H1a, m_H3a, m_H3c), 
+(p_H3a <- dwplot(list(m_H1a, m_H3a, m_H3c), 
        vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 1)) +
   theme_spectra() +
   theme(legend.position = c(0.8, 0.5),
         legend.justification = c(0, 0),
-        legend.title.align = .5)
+        legend.title.align = .5))
+
+ggsave(p_H3, path = "figures", filename = "H3_models_mean.png", height = 10, width = 12)
+
+#
 
 # CV
 
 # effect sizes and error dont seem to correspond with model summary...
-dwplot(list(m_H1b, m_H3b, m_H3d), 
+(p_H3b <-dwplot(list(m_H1b, m_H3b, m_H3d), 
        vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 1)) +
   theme_spectra() +
   theme(legend.position = c(0.8, 0.8),
         legend.justification = c(0, 0),
-        legend.title.align = .5)
+        legend.title.align = .5))
+
+ggsave(p_H3, path = "figures", filename = "H3_models_cv.png", height = 10, width = 12)
 
 # If needed I could use ggpredict to creat boxplot of predicted spec_mean and cv by VT by Model (but might not be compatable with lme4)
 # https://strengejacke.github.io/ggeffects/reference/ggpredict.html
@@ -1236,25 +1185,8 @@ ggplot(dat, aes(x, predicted, colour = group)) +
 # for all QHI measurements 
 pca <- QHI_small 
 
-# simple pca
-pca <- prcomp(pca[,4:5], scale = TRUE, center = TRUE) # for adding number of ranks (rank. = 4)
-
-summary(pca)
-
-(p_pca <-autoplot(pca, loadings = TRUE, loadings.label = TRUE,
-                  data = QHI_small, colour = 'veg_type', alpha = 0.5))
-#ggsave(p_pca, path = "figures", filename = "pca_attempt.png", height = 8, width = 10)
-
-(p_pca <-autoplot(pca, loadings = TRUE, loadings.label = TRUE,
-                  data = QHI, colour = 'plot', alpha = 0.5))
-
-ggbiplot(pca, ellipse=TRUE,  labels=rownames(QHI), groups=QHI)
-
-(p_pca <- autoplot(pam(pca), frame = TRUE, frame.type = 'norm'))
-
-
 # detailed pca; adapted from: http://www.sthda.com/english/articles/31-principal-component-methods-in-r-practical-guide/112-pca-principal-component-analysis-essentials/#pca-data-format
-res.pca <- PCA(pca[,4:5], scale.unit = TRUE, ncp = 5, graph = TRUE)
+res.pca <- PCA(pca[,c(5,7)], scale.unit = TRUE, ncp = 5, graph = TRUE)
 
 # pca results
 print(res.pca)
@@ -1303,6 +1235,8 @@ fviz_pca_var(res.pca, col.var = "contrib",
 (p_pca <- fviz_pca_ind(res.pca,
              geom.ind = "point", # show points only (nbut not "text")
              col.ind = QHI_small$veg_type, # color by groups
+             pointshape = 21,
+             fill.ind = QHI_small$veg_type, # color by groups
              palette = c("#ffa544", "#2b299b", "gray65"),
              addEllipses = TRUE, # Concentration ellipses
              # ellipse.type = "confidence",
@@ -1313,7 +1247,7 @@ fviz_pca_var(res.pca, col.var = "contrib",
              xlab = "PC1", ylab = "PC2", 
              ggtheme = theme_spectra()))
 
-#ggsave(p_pca, path = "figures", filename = "QHI_pca.png", height = 10, width = 12)
+ggsave(p_pca, path = "figures", filename = "QHI_pca.png", height = 10, width = 12)
 
 
 
@@ -1329,6 +1263,8 @@ res.pca_lowD <- PCA(pca_lowD[,4:5], scale.unit = TRUE, ncp = 5, graph = TRUE)
 # pca 
 (p_pca <- fviz_pca_ind(res.pca_lowD,
              geom.ind = "point", # show points only (nbut not "text")
+             pointshape = 21,
+             fill.ind = QHI_small$veg_type, # color by groups
              col.ind = QHI_small$veg_type, # color by groups
              palette = c("#ffa544", "#2b299b", "gray65"),
              addEllipses = TRUE, # Concentration ellipses
@@ -1340,12 +1276,14 @@ res.pca_lowD <- PCA(pca_lowD[,4:5], scale.unit = TRUE, ncp = 5, graph = TRUE)
              xlab = "PC1", ylab = "PC2", 
              ggtheme = theme_spectra()))
 
-#ggsave(p_pca, path = "figures", filename = "QHI_lowD_pca.png", height = 10, width = 12)
+ggsave(p_pca, path = "figures", filename = "QHI_lowD_pca.png", height = 10, width = 12)
 
 # biplot
 (p_pca <- fviz_pca_biplot(res.pca_lowD,
                 repel = TRUE, 
                 geom.ind = "point", # show points only (nbut not "text")
+                pointshape = 21,
+                fill.ind = QHI_small$veg_type, # color by groups
                 col.ind = QHI_small$veg_type, # color by groups
                 palette = c("#ffa544", "#2b299b", "gray65"),
                 addEllipses = TRUE, # Concentration ellipses
@@ -1365,7 +1303,9 @@ res.pca_QHI_2018_2019 <- PCA(QHI_2018_2019[,c(5,7)], scale.unit = TRUE, ncp = 5,
 # pca 
 (p_pca <- fviz_pca_ind(res.pca_QHI_2018_2019,
                        geom.ind = "point", # show points only (nbut not "text")
-                       col.ind = QHI_2018_2019$year, # color by groups
+                       pointshape = 21,
+                       col.ind = QHI_2018_2019$year,
+                       fill.ind = QHI_2018_2019$year, # color by groups
                        palette = c("#ffa544", "#2b299b", "gray65"),
                        addEllipses = TRUE, # Concentration ellipses
                        # ellipse.type = "confidence",
@@ -1376,7 +1316,7 @@ res.pca_QHI_2018_2019 <- PCA(QHI_2018_2019[,c(5,7)], scale.unit = TRUE, ncp = 5,
                        xlab = "PC1", ylab = "PC2", 
                        ggtheme = theme_spectra()))
 
-#ggsave(p_pca, path = "figures", filename = "QHI_lowD_biplot.png", height = 10, width = 12)
+ggsave(p_pca, path = "figures", filename = "QHI_lowD_biplot.png", height = 10, width = 12)
 
 # multiyear pca by year and vegtype
 
@@ -1386,9 +1326,8 @@ t <- QHI_2018_2019 %>%
 (p_pca <- fviz_pca_ind(res.pca_QHI_2018_2019,
                        geom.ind = "point", # show points only (nbut not "text")
                        fill.ind = t$veg_year, # color by groups
-                       color.ind = "black",
+                       color.ind = t$veg_year,
                        pointshape = 21,
-                       col.ind = "black",
                        palette = c( "tomato", "#ffa544", "purple", "#2b299b", "gray65"),
                        addEllipses = TRUE, # Concentration ellipses
                        # ellipse.type = "confidence",
@@ -1399,7 +1338,8 @@ t <- QHI_2018_2019 %>%
                        xlab = "PC1", ylab = "PC2", 
                        ggtheme = theme_spectra()))
 
-#ggsave(p_pca, path = "figures", filename = "QHI_lowD_biplot.png", height = 10, width = 12)
+ggsave(p_pca, path = "figures", filename = "QHI_lowD_biplot.png", height = 10, width = 12)
+
 
 
 # PS2 ----
@@ -1694,6 +1634,9 @@ fviz_pca_var(res.pca_QHI_PS2, col.var = "contrib",
              # ellipse.type = "confidence",
              legend.title = "Groups"))
 
+ggsave(p_pca_PS2, path = "figures", filename = "PS2_pca.png", height = 10, width = 12)
+
+
 
 # H2 Plot data ----
 
@@ -1722,8 +1665,11 @@ QHI_spec_plot <- left_join(QHI_2018_2019, QHI_plotdata, value = "plot_unique") %
 
 correlation <- cor(QHI_spec_plot[,c(5, 7, 9, 12:16, 19)])
 
-corrplot(correlation, method="circle", type="upper", #order="hclust",
-         tl.srt=45, tl.col="black", col=brewer.pal(n=10, name="RdYlBu"))
+(p_corr <- corrplot(correlation, method="circle", type="upper", #order="hclust",
+         tl.srt=45, tl.col="black", col=brewer.pal(n=10, name="RdYlBu")))
+
+ggsave(p_corr, path = "figures", filename = "corr_plot.png", height = 10, width = 12)
+
 
 
 # ugly alternative 
@@ -1743,7 +1689,15 @@ chart.Correlation(correlation, histogram=TRUE, pch=19)
 
 # spectral mean
 
-QHI_spec_plot_2019 <- QHI_spec_plot %>% filter(year == 2019)
+QHI_spec_plot_2019 <- QHI_spec_plot %>% filter(year == 2019) #%>%
+  mutate(evenness = (evenness- min(evenness))/(max(evenness)-min(evenness)))
+ 
+  # to scale or not to scale? 
+#QHI_spec_plot_2019$richness <- scale(QHI_spec_plot_2019$richness)
+#QHI_spec_plot_2019$evenness <- scale(QHI_spec_plot_2019$evenness)
+#QHI_spec_plot_2019$bareground <- scale(QHI_spec_plot_2019$bareground)
+
+str(QHI_spec_plot_2019)
 
 m_H2a <- lmer(data = QHI_spec_plot_2019, spec_mean ~ veg_type + richness + evenness + bareground + (1|plot))
 
@@ -1765,23 +1719,25 @@ ggpredict(m_H2a, terms = c("veg_type"), type = "fe") %>%
   scale_color_manual(values = c("#ffa544", "#2b299b")) +
   theme_spectra()
 
-ggpredict(m_H2a, terms = c("richness", "veg_type"), type = "fe") %>% 
+(p_H2a_rich <- ggpredict(m_H2a, terms = c("richness", "veg_type"), type = "fe") %>% 
+    plot(rawdata = TRUE) +
+    scale_color_manual(values = c("#ffa544", "#2b299b")) +
+  theme_spectra())
+
+(p_H2a_even <- ggpredict(m_H2a, terms = c("evenness", "veg_type"), type = "fe") %>% 
   plot(rawdata = TRUE) +
   scale_color_manual(values = c("#ffa544", "#2b299b")) +
-  theme_spectra()
+  theme_spectra())
 
-ggpredict(m_H2a, terms = c("evenness", "veg_type"), type = "fe") %>% 
+(p_H2a_ground <- ggpredict(m_H2a, terms = c("bareground", "veg_type"), type = "fe" ) %>% 
   plot(rawdata = TRUE) +
   scale_color_manual(values = c("#ffa544", "#2b299b")) +
-  theme_spectra() 
+  theme_spectra())
 
 
-ggpredict(m_H2a, terms = c("bareground", "veg_type"), type = "fe" ) %>% 
-  plot(rawdata = TRUE) +
-  scale_color_manual(values = c("#ffa544", "#2b299b")) +
-  theme_spectra()
+grid.arrange(p_H2a_rich, p_H2a_even, p_H2a_ground, nrow = 1)
 
-ggpre
+
 
 # CV
 
@@ -1808,20 +1764,24 @@ ggpredict(m_H2b, terms = c("veg_type"), type = "fe") %>%
   scale_color_manual(values = c("#ffa544", "#2b299b")) +
   theme_spectra()
 
-ggpredict(m_H2b, terms = c("richness", "veg_type"), type = "fe") %>% 
+(p_H2b_rich <- ggpredict(m_H2b, terms = c("richness", "veg_type"), type = "fe") %>% 
   plot(rawdata = TRUE) +
   scale_color_manual(values = c("#ffa544", "#2b299b")) +
-  theme_spectra()
+    ylim(0.3,1) +
+  theme_spectra())
 
-ggpredict(m_H2b, terms = c("evenness", "veg_type"), type = "fe") %>% 
+(p_H2b_even <- ggpredict(m_H2b, terms = c("evenness", "veg_type"), type = "fe") %>% 
   plot(rawdata = TRUE) +
   scale_color_manual(values = c("#ffa544", "#2b299b")) +
-  theme_spectra()
+  theme_spectra())
 
-ggpredict(m_H2b, terms = c("bareground", "veg_type"), type = "fe") %>% 
+(p_H2b_ground <- ggpredict(m_H2b, terms = c("bareground", "veg_type"), type = "fe") %>% 
   plot(rawdata = TRUE) +
   scale_color_manual(values = c("#ffa544", "#2b299b")) +
-  theme_spectra()
+  theme_spectra())
+
+grid.arrange(p_H2a_rich, p_H2a_even, p_H2a_ground, 
+             p_H2b_rich, p_H2b_even, p_H2b_ground, nrow = 2)
 
 # H2 plot PCA ----
 
@@ -1886,7 +1846,7 @@ t <- QHI_spec_plot %>%
                        fill.ind = t$plot_unique, # color by groups
                        pointshape = 21, 
                        col.ind = "black",
-                      # palette = c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FFB90F", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF"),
+                      # palette = c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FF4500", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF"),
                        addEllipses = TRUE, # Concentration ellipses
                        # ellipse.type = "confidence",
                        repel = TRUE,
@@ -1904,7 +1864,7 @@ t <- QHI_spec_plot %>%
                        legend.title = list(fill = "Sites", color = "cos2"),
                        axes.linetype = "dashed",
                        xlab = "PC1", ylab = "PC2")) +
-  ggpubr::fill_palette(c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FFB90F", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF"))+      # Indiviual fill color
+  ggpubr::fill_palette(c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FF4500", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF"))+      # Indiviual fill color
   ggpubr::color_palette("Dark2")      # Variable colors
 
 
@@ -1961,8 +1921,9 @@ fviz_pca_var(res.pca_H2_2018_2019, col.var = "contrib",
 (p_pca <- fviz_pca_biplot(res.pca_H2_2018_2019,
                           geom.ind = "point", # show points only (nbut not "text")
                           fill.ind = QHI_spec_plot$year, # color by groups
+                          coll.ind = QHI_spec_plot$year, # color by groups
                           pointshape = 21, 
-                          #  palette = c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FFB90F", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF"),
+                          #  palette = c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FF4500", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF"),
                           addEllipses = TRUE, # Concentration ellipses
                           # ellipse.type = "confidence",
                           repel = TRUE,
@@ -1981,7 +1942,7 @@ fviz_pca_var(res.pca_H2_2018_2019, col.var = "contrib",
                           axes.linetype = "dashed",
                           xlab = "PC1", ylab = "PC2")) +
   ggpubr::color_palette("Dark2")      # Variable colors
-  #ggpubr::fill_palette(c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FFB90F", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF"))+      # Indiviual fill color
+  #ggpubr::fill_palette(c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FF4500", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF"))+      # Indiviual fill color
   
 
 # biplot grouped by veg_type 
@@ -1989,7 +1950,7 @@ fviz_pca_var(res.pca_H2_2018_2019, col.var = "contrib",
                           geom.ind = "point", # show points only (nbut not "text")
                           fill.ind = QHI_spec_plot$veg_type, # color by groups
                           pointshape = 21, 
-                          #  palette = c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FFB90F", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF"),
+                          #  palette = c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FF4500", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF"),
                           addEllipses = TRUE, # Concentration ellipses
                           # ellipse.type = "confidence",
                           repel = TRUE,
@@ -2017,7 +1978,7 @@ t <- QHI_spec_plot %>%
                           geom.ind = "point", # show points only (nbut not "text")
                           fill.ind = t$site, # color by groups
                           pointshape = 21, 
-                        #  palette = c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FFB90F", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF"),
+                        #  palette = c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FF4500", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF"),
                           addEllipses = TRUE, # Concentration ellipses
                           # ellipse.type = "confidence",
                           repel = TRUE,
