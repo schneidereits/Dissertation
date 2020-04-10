@@ -342,6 +342,21 @@ QHI_2018_2019 <- QHI_2018_2019 %>%
          plot_unique = paste(veg_type,plot2,year,sep="_")) %>%
   select(-plot2)
 
+# grouped by id and wavelength
+QHI_2018_2019_wavelength <- spec_2018_2019 %>%
+  mutate(plot_unique = paste(plot, year, sep="_")) %>%
+  group_by(veg_type, plot, wavelength, year, plot_unique) %>%
+  summarise(spec_mean = mean(reflectance),
+            CV = mean(sd(reflectance)/mean(reflectance)))
+
+(p_col_mean <- ggplot(QHI_2018_2019_wavelength, aes(x = wavelength, y = spec_mean, group = plot_unique, color = plot_unique)) + 
+    geom_line(alpha = 0.7, size=1.) + 
+    guides(colour = guide_legend(override.aes = list(size=5))) +
+    labs(x = "Wavelength (mm)", y = "Reflectance") +
+    theme_spectra() +
+    theme(legend.position = "bottom") +
+    theme_rgb_mean)
+
 
 ggplot(spec_2018, aes(x = Wavelength, y = Reflectance, group = id, color = veg_type)) + 
     geom_line(alpha = 0.3) + 
@@ -503,6 +518,19 @@ ggplot(QHI_small, aes(x=veg_type, y=spec_mean, fill=veg_type)) +
     theme_cowplot())
 #ggsave(p_QHI, path = "figures", filename = "cloud_specmean.png", height = 8, width = 10)
 
+# cloud of spec mean 2018+2019
+(p_QHI <- ggplot() + 
+    geom_flat_violin(data = QHI_2018_2019, aes(x=veg_type, y=spec_mean, fill=veg_type),
+                     position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
+    geom_point(data = QHI_2018_2019, aes(x=veg_type, y=spec_mean, colour=year),
+               position = position_jitter(width = .15), size = 2) +
+    geom_boxplot(data = QHI_2018_2019, aes(x=veg_type, y=spec_mean),
+                 width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
+    scale_fill_manual(values = c("#ffa544", "#2b299b", "gray65")) +
+    scale_color_brewer(palette = "Dark2") +
+    theme_cowplot())
+ggsave(p_QHI, path = "figures", filename = "cloud_spec_mean_2018_2019.png", height = 8, width = 10)
+
 
 # violin of cv by vegtation type
 ggplot(QHI_small, aes(x=veg_type, y=CV, fill=veg_type)) + 
@@ -512,7 +540,7 @@ ggplot(QHI_small, aes(x=veg_type, y=CV, fill=veg_type)) +
   scale_fill_manual(values = c("#ffa544", "#2b299b", "gray65")) +
   theme_cowplot()
 
-# cloud of spec mean by VT
+# cloud of spec diversity (cv) by VT
 (p_QHI <- ggplot() +
     geom_flat_violin(data = QHI_small, aes(x=veg_type, y=CV, fill=veg_type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
@@ -525,6 +553,19 @@ ggplot(QHI_small, aes(x=veg_type, y=CV, fill=veg_type)) +
     theme_cowplot())
  #ggsave(p_QHI, path = "figures", filename = "cloud_CV.png", height = 8, width = 10)
 
+# cloud of spec diversity 2018+2019
+(p_QHI <- ggplot() + 
+    geom_flat_violin(data = QHI_2018_2019, aes(x=veg_type, y=CV, fill=veg_type),
+                     position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
+    geom_point(data = QHI_2018_2019, aes(x=veg_type, y=CV, colour=year),
+               position = position_jitter(width = .15), size = 2) +
+    geom_boxplot(data = QHI_2018_2019, aes(x=veg_type, y=CV),
+                 width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
+    scale_fill_manual(values = c("#ffa544", "#2b299b", "gray65")) +
+    scale_color_brewer(palette = "Dark2") +
+    theme_cowplot())
+ggsave(p_QHI, path = "figures", filename = "cloud_CV_2018_2019.png", height = 8, width = 10)
+
 
 # group by wavelength 
 QHI_wavelength <- QHI %>%
@@ -536,6 +577,16 @@ QHI_wavelength <- QHI %>%
 # GD advice: split full spec into regions (via background colors) and make seperate raincloud plot at each spec_region. (for full snazzyness add color of spec_region to backround)
 #plot spectral mean
 (p_QHI <- ggplot(QHI_wavelength, aes(x = wavelength, y = spec_mean, group = plot, color = plot)) + 
+    geom_line(alpha = 0.7, size=1.) + 
+    guides(colour = guide_legend(override.aes = list(size=5))) +
+    scale_color_brewer(palette = "Paired") +
+    labs(x = "\nWavelength (mm)", y = "Reflectance\n") +
+    theme_spectra()+
+    theme(legend.position = "right") +
+    theme_rgb_mean)
+
+#plot spectral mean 2018+2019
+(p_QHI <- ggplot(spec_2018_2019, aes(x = wavelength, y = spec_mean, group = plot, color = plot)) + 
     geom_line(alpha = 0.7, size=1.) + 
     guides(colour = guide_legend(override.aes = list(size=5))) +
     scale_color_brewer(palette = "Paired") +
@@ -1144,11 +1195,11 @@ library(broom)
 (p_H3a <- dwplot(list(m_H1a, m_H3a, m_H3c), 
        vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 1)) +
   theme_spectra() +
-  theme(legend.position = c(0.8, 0.5),
+  theme(legend.position = c(0.8, 0.2),
         legend.justification = c(0, 0),
         legend.title.align = .5))
 
-ggsave(p_H3, path = "figures", filename = "H3_models_mean.png", height = 10, width = 12)
+ggsave(p_H3a, path = "figures", filename = "H3_models_mean.png", height = 10, width = 12)
 
 #
 
@@ -1158,19 +1209,29 @@ ggsave(p_H3, path = "figures", filename = "H3_models_mean.png", height = 10, wid
 (p_H3b <-dwplot(list(m_H1b, m_H3b, m_H3d), 
        vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 1)) +
   theme_spectra() +
-  theme(legend.position = c(0.8, 0.8),
+  theme(legend.position = c(0.8, 0.2),
         legend.justification = c(0, 0),
         legend.title.align = .5))
 
-ggsave(p_H3, path = "figures", filename = "H3_models_cv.png", height = 10, width = 12)
+ggsave(p_H3b, path = "figures", filename = "H3_models_cv.png", height = 10, width = 12)
+
+grid.arrange(p_H3a, p_H3b)
 
 # If needed I could use ggpredict to creat boxplot of predicted spec_mean and cv by VT by Model (but might not be compatable with lme4)
 # https://strengejacke.github.io/ggeffects/reference/ggpredict.html
 
+ggpredict(m_H3a, terms = c("veg_type"), type = "fe") %>% 
+  plot(rawdata = TRUE) +
+  scale_color_manual(values = c("#ffa544", "#2b299b")) +
+  theme_spectra()
 
+ggpredict(m_H3c, terms = c("veg_type"), type = "fe") %>% 
+  plot(rawdata = TRUE) +
+  scale_color_manual(values = c("#ffa544", "#2b299b")) +
+  theme_spectra()
 
-dat <- ggpredict(fit, terms = c("c172code", "c161sex"))
-ggplot(dat, aes(x, predicted, colour = group)) +
+dat <- ggpredict(H3a, terms = c("c172code", "c161sex"))
+ggplot(H3a, aes(veg_type, predicted, colour = group)) +
   geom_point(position = position_dodge(.1)) +
   geom_errorbar(
     aes(ymin = conf.low, ymax = conf.high),
@@ -1845,7 +1906,7 @@ t <- QHI_spec_plot %>%
                        geom.ind = "point", # show points only (nbut not "text")
                        fill.ind = t$plot_unique, # color by groups
                        pointshape = 21, 
-                       col.ind = "black",
+                       col.ind = "transparent",
                       # palette = c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FF4500", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF"),
                        addEllipses = TRUE, # Concentration ellipses
                        # ellipse.type = "confidence",
@@ -2008,12 +2069,32 @@ QHI_spatial <- collison_small %>%
   mutate(x = as.numeric(group_indices(., plot)),
          y = as.numeric(group_indices(., plot)),
          # add spatial distance between HE and KO plots
-         x = case_when(veg_type == "HE" ~ x,
-                       veg_type == "KO" ~ x + 500),
-         y = case_when(veg_type == "HE" ~ y,
-                       veg_type == "KO" ~ y + 500)) %>%
+         x = case_when(plot == "HE2" ~ 10,
+                       plot == "HE3" ~ 11,
+                       plot == "HE4" ~ 26,
+                       plot == "HE5" ~ 45,
+                       plot == "HE6" ~ 50,
+                       plot == "KO1" ~ 1000,
+                       plot == "KO2" ~ 1001,
+                       plot == "KO3" ~ 1012,
+                       plot == "KO4" ~ 1013),
+         y = case_when(plot == "HE2" ~ 1.5,
+                       plot == "HE3" ~ 1.6,
+                       plot == "HE4" ~ 2.6,
+                       plot == "HE5" ~ 3.6,
+                       plot == "HE6" ~ 3.8,
+                       plot == "KO1" ~ 1,
+                       plot == "KO2" ~ 1.5,
+                       plot == "KO3" ~ 3,
+                       plot == "KO4" ~ 3.5)) %>%
   # select only relavent colunms for variogram?
-  select(spec_mean, x, y)
+  select(x, y, spec_mean)
+
+ggplot(QHI_spatial, aes(x = x, y = y)) +
+  geom_point()
+
+ggplot(QHI_spatial, aes(x = x, y = spec_mean)) +
+  geom_point()
   
 
 histogram(QHI_spatial$spec_mean)
@@ -2022,25 +2103,49 @@ histogram
 library(sp)
 library(gstat)
 
-?coordinates
-
+# assign cordinates
 coordinates(QHI_spatial) = ~x+y
-
 
 # variogram model
 (v0 = variogram(spec_mean~1, QHI_spatial))
 
 # fit under 4 different models
-(v.fit0 = fit.variogram(v0, vgm(c("Exp", "Mat", "Sph", "Ste")), fit.kappa = TRUE)) # Mat is selected to be the best 
+(v.fit0 = fit.variogram(v0, vgm(c("Exp", "Mat", "Sph", "Ste")), fit.kappa = TRUE)) # ste is selected to be the best
 
-preds = variogramLine(v.fit0, maxdist = 15)
+#semivariance
+?variogramLine
+plot(variogramLine(v.fit0, maxdist = 150, n=20))
+
+# covariance
+plot(variogramLine(v.fit0, maxdist = 150, n=20, covariance = TRUE))
+
+# ggplot semivariance
+
+s = variogramLine(v.fit0, maxdist = max(v0$dist))
 head(preds)
 
-ggplot(v0, aes(x = dist, y = gamma)) +
-  geom_line(data = preds) +
-  geom_vline(xintercept = 7, linetype="dotted") +
-  xlim(0,15) +
-  ylim(0,70) +
-  coord_cartesian(xlim = c(0.7, 15), ylim = c(2.5, 63)) +
-  theme_spectra()
+preds = variogramLine(v.fit0, maxdist =  150)
+head(preds)
+
+(p_variogram <- ggplot(v0, aes(x = dist, y = gamma)) +
+    geom_line(data = preds) +
+    geom_point() +
+    geom_vline(xintercept = 7, linetype="dotted") +
+    #  xlim(0,15) +
+    xlab("distance (m)") +
+    # ylim(0,70) +
+    #coord_cartesian(xlim = c(0.7, 15), ylim = c(2.5, 63)) +
+    theme_spectra())
+
+ggsave(p_variogram, path = "figures", filename = "variogram.png", height = 10, width = 12)
+
+plot(variogramLine(vgm(1, "Ste", 1, kappa = 5), 10), type = 'l')
+
+
+
+
+
+
+
+
 
