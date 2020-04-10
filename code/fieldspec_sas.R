@@ -651,7 +651,6 @@ print(p_QHI_specmean , vp = define_region(row = 2, col = 1))
 print(p_QHI_CV + rremove("legend"), vp = define_region(row = 2, col = 2))
 print(p_pca_veg_year , vp = define_region(row = 3:4, col = 1:2))
 
-
 #  collison vis -------
 
 # single wavelengths VT
