@@ -508,14 +508,16 @@ ggplot(QHI_small, aes(x=veg_type, y=spec_mean, fill=veg_type)) +
 
 # cloud of mean by vegetation type
 
-(p_QHI <- ggplot(QHI_small, aes(x=veg_type, y=spec_mean, fill=veg_type)) +
+(p_QHI_cloud_mean <- ggplot(QHI_small, aes(x=veg_type, y=spec_mean, fill=veg_type)) +
     geom_flat_violin(position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = QHI_small, aes(x=veg_type, y=spec_mean, colour=plot),
                position = position_jitter(width = .05), size = 2) +
     geom_boxplot(width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_fill_manual(values = c("#ffa544", "#2b299b", "gray65")) +
     scale_color_QHI +
-    theme_cowplot())
+    theme_cowplot() +
+    labs(y = "Reflectance") +
+    theme(legend.position = "none"))
 #ggsave(p_QHI, path = "figures", filename = "cloud_specmean.png", height = 8, width = 10)
 
 # cloud of spec mean 2018+2019
@@ -541,7 +543,7 @@ ggplot(QHI_small, aes(x=veg_type, y=CV, fill=veg_type)) +
   theme_cowplot()
 
 # cloud of spec diversity (cv) by VT
-(p_QHI <- ggplot() +
+(p_QHI_cloud_cv <- ggplot() +
     geom_flat_violin(data = QHI_small, aes(x=veg_type, y=CV, fill=veg_type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = QHI_small, aes(x=veg_type, y=CV, colour=plot),
@@ -550,7 +552,8 @@ ggplot(QHI_small, aes(x=veg_type, y=CV, fill=veg_type)) +
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_fill_manual(values = c("#ffa544", "#2b299b", "gray65")) +
     scale_color_QHI +
-    theme_cowplot())
+    theme_cowplot() +
+    theme(legend.position = "none"))
  #ggsave(p_QHI, path = "figures", filename = "cloud_CV.png", height = 8, width = 10)
 
 # cloud of spec diversity 2018+2019
@@ -576,13 +579,13 @@ QHI_wavelength <- QHI %>%
 
 # GD advice: split full spec into regions (via background colors) and make seperate raincloud plot at each spec_region. (for full snazzyness add color of spec_region to backround)
 #plot spectral mean
-(p_QHI <- ggplot(QHI_wavelength, aes(x = wavelength, y = spec_mean, group = plot, color = plot)) + 
+(p_QHI_specmean <- ggplot(QHI_wavelength, aes(x = wavelength, y = spec_mean, group = plot, color = plot)) + 
     geom_line(alpha = 0.7, size=1.) + 
     guides(colour = guide_legend(override.aes = list(size=5))) +
-    scale_color_brewer(palette = "Paired") +
-    labs(x = "\nWavelength (mm)", y = "Reflectance\n") +
-    theme_spectra()+
-    theme(legend.position = "right") +
+    labs(x = "Wavelength (mm)", y = "Reflectance") +
+    theme_cowplot() +
+    theme(legend.position = "none") +
+    scale_color_QHI +
     theme_rgb_mean)
 
 #plot spectral mean 2018+2019
@@ -590,7 +593,7 @@ QHI_wavelength <- QHI %>%
     geom_line(alpha = 0.7, size=1.) + 
     guides(colour = guide_legend(override.aes = list(size=5))) +
     scale_color_brewer(palette = "Paired") +
-    labs(x = "\nWavelength (mm)", y = "Reflectance\n") +
+    labs(x = "Wavelength (mm)", y = "Reflectance") +
     theme_spectra()+
     theme(legend.position = "right") +
     theme_rgb_mean)
@@ -599,32 +602,55 @@ QHI_wavelength <- QHI %>%
 #ggsave(p_QHI, path = "figures", filename = "spec_sig_plot.png", height = 8, width = 10)
 
 ## SMOOTHING NOT CORRECT
-ggplot(QHI_wavelength, aes(x = wavelength, y = spec_mean, group=veg_type, color = veg_type)) + 
-  geom_smooth(alpha = 0.2, se=TRUE) + 
-  theme_spectra() +
-  labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n") +
-  theme_rgb_mean
+(p_QHI_specmean <- ggplot(QHI_wavelength, aes(x = wavelength, y = spec_mean, group=veg_type, color = veg_type)) + 
+  geom_smooth(alpha = 0.2, se=TRUE) +
+  scale_color_manual(values = c("#ffa544", "#2b299b", "gray65")) +
+  theme_cowplot() +
+  labs(x = "Wavelength (mm)", y = "Reflectance") +
+    theme(legend.position = c(0.05,0.6)) +
+  theme_rgb_mean)
 
 # plot CV
 
-ggplot(QHI_wavelength, aes(x = wavelength, y = CV, group = plot, color = plot)) + 
-  geom_line(alpha = 0.9) + 
-  theme_spectra() +
-  theme(legend.position = "right") +
+(p_QHI_CV <- ggplot(QHI_wavelength, aes(x = wavelength, y = CV, group = plot, color = plot)) + 
+  geom_line(alpha = 0.7, size=1) + 
+  theme_cowplot() +
+  theme(legend.position = "none") +
   guides(colour = guide_legend(override.aes = list(size=5))) +
-  labs(x = "\nWavelength (mm)", y = "CV\n") + 
+  labs(x = "Wavelength (mm)", y = "CV") + 
   scale_color_QHI +
-  theme_rgb_CV
+    theme_rgb_CV)
 
 #ggsave(p_QHI, path = "figures", filename = "CV_plot.png", height = 8, width = 10)
 
 # SMOOTHING NOT CORRECT
-ggplot(QHI_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
+(p_QHI_CV <- ggplot(QHI_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
   geom_smooth(alpha = 0.2, se=TRUE) + 
-  theme_spectra() +
-  labs(x = "\nWavelength (mm)", y = "CV\n") +
-  scale_color_manual(values = c("#ffa544", "#2b299b", "gray65")) +
-  theme_rgb_CV
+  theme_cowplot() +
+  labs(x = "Wavelength (mm)", y = "CV") +
+   scale_color_manual(values = c("#ffa544", "#2b299b", "gray65")) +
+    theme(legend.position = "none"))
+
+#H1 figure ----
+
+
+grid.arrange(p_QHI_cloud_mean, p_QHI_cloud_cv,
+             p_QHI_specmean, p_QHI_CV, 
+             p_pca_veg_year,  nrow =3)
+
+# Move to a new page
+grid.newpage()        
+
+# Create layout : nrow = 3, ncol = 2
+pushViewport(viewport(layout = grid.layout(nrow = 4, ncol = 2)))
+
+# Arrange the plots
+print(p_QHI_cloud_mean, vp = define_region(row = 1, col = 1))   
+print(p_QHI_cloud_cv, vp = define_region(row = 1, col = 2))
+print(p_QHI_specmean , vp = define_region(row = 2, col = 1))
+print(p_QHI_CV + rremove("legend"), vp = define_region(row = 2, col = 2))
+print(p_pca_veg_year , vp = define_region(row = 3:4, col = 1:2))
+
 
 #  collison vis -------
 
@@ -1008,17 +1034,70 @@ qqline(resid(m_H1a))  # points fall nicely onto the line - good!
 # visulise fixed effect
 (fe.effects <- plot_model(m_H1a, show.values = TRUE))
 
+# gpreditct by type
 ggpredict(m_H1a, terms = c("veg_type"), type = "fe") %>% 
   plot(rawdata = TRUE) +
   #scale_color_manual(values = c("#ffa544", "#2b299b")) +
   theme_spectra()
 
+pred.mm <- ggpredict(m_H1a, terms = c("veg_type")) %>%  # this gives overall predictions for the model
+  rename(veg_type = x) %>%
+  mutate(veg_type = as.character(veg_type))
 
-ggplot(collison_wavelength, aes(x = wavelength, y = spec_mean, group=veg_type, color = veg_type)) + 
-  geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
-  stat_smooth(method = "lm", aes(fill = veg_type, color = veg_type), se=TRUE )+
+H1a_prediction <- collison_wavelength %>%
+  group_by(veg_type, wavelength) %>%
+  summarise(reflectance = mean(spec_mean)) %>%
+  left_join(H1a_prediction, pred.mm, by = "veg_type") %>%
+  mutate(reflectance = case_when(veg_type == "HE" ~reflectance,
+                                 veg_type == "HE" ~reflectance + predicted))
+
+ggplot(H1a_prediction, aes(x = wavelength, y = reflectance, group = veg_type, color = veg_type)) + 
+  geom_line(alpha = 0.7, size=1.) + 
+  guides(colour = guide_legend(override.aes = list(size=5))) +
+  labs(x = "Wavelength (mm)", y = "Reflectance") +
   theme_spectra() +
-  labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n")
+  theme(legend.position = "bottom") +
+  scale_color_manual(values = c("#ffa544", "#2b299b"))
+  theme_rgb_mean
+  
+  
+  biomass_KO_preds_df <- cbind.data.frame(lower = biomass_KO_preds_df[,1], 
+                                          mean = biomass_KO_preds_df[,2], upper = biomass_KO_preds_df[,3], year = seq(1:20))
+  
+  veg.cover <- ggplot() +
+    geom_point(data = biomass_hits, aes(x = YEAR, y = Biomass, colour = factor(SUBSITE)), alpha = 0.8, size = 4) +
+    scale_color_manual(values = c("#ffa544", "#2b299b"), name = "", labels = c("Her.", "Kom.")) +
+    scale_fill_manual(values = c("#ffa544","#2b299b")) +
+    scale_x_continuous(breaks = c(1999, 2004, 2009, 2013, 2017, 2018)) +
+    scale_y_continuous(breaks = c(0, 2.5, 5, 7.5, 10)) +
+    geom_ribbon(data = biomass_HE_preds_df, aes(x = year + 1998, ymin = lower, ymax = upper), 
+                fill = "#ffa544", alpha = 0.2) +
+    geom_line(data = biomass_HE_preds_df, aes(x = year + 1998, y = mean), colour = "#ffa544") +
+    geom_ribbon(data = biomass_KO_preds_df, aes(x = year + 1998, ymin = lower, ymax = upper), 
+                fill = "#2b299b", alpha = 0.2) +
+    geom_line(data = biomass_KO_preds_df, aes(x = year + 1998, y = mean), colour = "#2b299b") +
+    theme_QHI() +
+    theme(legend.position = c(0.1, 0.95), 
+          axis.line.x = element_line(color="black", size = 0.5),
+          axis.line.y = element_line(color="black", size = 0.5)) +
+    labs(x = "", y = "Vegetation cover index\n", title = "(a) Vegetation cover\n")
+
+# Plot the predictions 
+
+(ggplot(pred.mm) + 
+    geom_line(aes(x = x, y = predicted)) +          # slope
+    geom_ribbon(aes(x = x, ymin = predicted - std.error, ymax = predicted + std.error), 
+                fill = "lightgrey", alpha = 0.5) +  # error band
+    geom_line(aes(x = x, y = predicted + 25.5348)) +          # slope
+    geom_ribbon(aes(x = x, ymin = predicted + 25.5348 - std.error, ymax = predicted + 25.5348 + std.error), 
+                fill = "lightgrey", alpha = 0.5) +
+    geom_point(data = QHI_spec_plot_2019,                      # adding the raw data (scaled values)
+               aes(x = bareground, y = spec_mean, colour = veg_type)) + 
+    
+    theme_spectra()
+)
+
+
 
 
 # CV
@@ -1293,9 +1372,9 @@ fviz_pca_var(res.pca, col.var = "contrib",
              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"))
 
 # grouped by elipsise
-(p_pca <- fviz_pca_ind(res.pca,
+(p_pca_QHI <- fviz_pca_ind(res.pca,
              geom.ind = "point", # show points only (nbut not "text")
-             col.ind = QHI_small$veg_type, # color by groups
+             col.ind = "black", # color by groups
              pointshape = 21,
              fill.ind = QHI_small$veg_type, # color by groups
              palette = c("#ffa544", "#2b299b", "gray65"),
@@ -1308,7 +1387,7 @@ fviz_pca_var(res.pca, col.var = "contrib",
              xlab = "PC1", ylab = "PC2", 
              ggtheme = theme_spectra()))
 
-ggsave(p_pca, path = "figures", filename = "QHI_pca.png", height = 10, width = 12)
+ggsave(p_pca_QHI, path = "figures", filename = "QHI_pca.png", height = 10, width = 12)
 
 
 
@@ -1365,9 +1444,9 @@ res.pca_QHI_2018_2019 <- PCA(QHI_2018_2019[,c(5,7)], scale.unit = TRUE, ncp = 5,
 (p_pca <- fviz_pca_ind(res.pca_QHI_2018_2019,
                        geom.ind = "point", # show points only (nbut not "text")
                        pointshape = 21,
-                       col.ind = QHI_2018_2019$year,
+                       col.ind = QHI_2018_2019$veg_type,
                        fill.ind = QHI_2018_2019$year, # color by groups
-                       palette = c("#ffa544", "#2b299b", "gray65"),
+                       #palette = c("#ffa544", "#2b299b", "gray65"),
                        addEllipses = TRUE, # Concentration ellipses
                        # ellipse.type = "confidence",
                        ellipse.level = 0.95, # confidence level specification
@@ -1384,7 +1463,7 @@ ggsave(p_pca, path = "figures", filename = "QHI_lowD_biplot.png", height = 10, w
 t <- QHI_2018_2019 %>%
   unite(veg_year, c(veg_type, year))
 
-(p_pca <- fviz_pca_ind(res.pca_QHI_2018_2019,
+(p_pca_veg_year <- fviz_pca_ind(res.pca_QHI_2018_2019,
                        geom.ind = "point", # show points only (nbut not "text")
                        fill.ind = t$veg_year, # color by groups
                        color.ind = t$veg_year,
@@ -1399,7 +1478,7 @@ t <- QHI_2018_2019 %>%
                        xlab = "PC1", ylab = "PC2", 
                        ggtheme = theme_spectra()))
 
-ggsave(p_pca, path = "figures", filename = "QHI_lowD_biplot.png", height = 10, width = 12)
+ggsave(p_pca_veg_year, path = "figures", filename = "QHI_2018-2019_pca.png", height = 10, width = 12)
 
 
 
@@ -1722,16 +1801,23 @@ QHI_spec_plot <- left_join(QHI_2018_2019, QHI_plotdata, value = "plot_unique") %
 
 # H2 model ----
 
-# correlation plot
+# correlation plot full
 
 correlation <- cor(QHI_spec_plot[,c(5, 7, 9, 12:16, 19)])
 
 (p_corr <- corrplot(correlation, method="circle", type="upper", #order="hclust",
-         tl.srt=45, tl.col="black", col=brewer.pal(n=10, name="RdYlBu")))
+         tl.srt=45, tl.col="black", diag = FALSE, order="hclust", col=brewer.pal(n=10, name="RdYlBu")))
 
 ggsave(p_corr, path = "figures", filename = "corr_plot.png", height = 10, width = 12)
 
+# correlation plot for model
 
+correlation_small <- cor(QHI_spec_plot[,c(5,7, 9, 12:13)])
+
+(p_corr <- corrplot(correlation_small, method="circle", type="upper", #order="hclust",
+                    tl.srt=45, tl.col="black", diag = FALSE, col=brewer.pal(n=10, name="RdYlBu")))
+
+ggsave(p_corr_small, path = "figures", filename = "corr_plot_small.png", height = 10, width = 12)
 
 # ugly alternative 
 #install.packages("PerformanceAnalytics")
