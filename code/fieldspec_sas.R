@@ -231,21 +231,21 @@ QHI <- list_of_files %>%
          id = stringr::str_extract(FileName, "_\\d*"),
          id = str_remove_all(id, "_"),
          id = gsub("(?<![0-9])0+", "", id, perl = TRUE),
-         veg_type = case_when(grepl("HE|KO", FileName)   ~ 
+         type = case_when(grepl("HE|KO", FileName)   ~ 
                                 stringr::str_extract(FileName, "HE|KO")),
          # might need to split to just number...
          plot = case_when(grepl("HE|KO|PS2", FileName)   ~ 
                             stringr::str_extract(FileName, "HE\\d*|KO\\d*|PS2")))
 
-names(QHI) <- c("name", "wavelength", "reference", "target", "reflectance", "id", "veg_type", "plot")
+names(QHI) <- c("name", "wavelength", "reference", "target", "reflectance", "id", "type", "plot")
 
 QHI <- QHI %>%
   mutate(wavelength = parse_number(as.character(wavelength))/100,
          reflectance = parse_number(as.character(reflectance))/100,
          reference = parse_number(as.character(reference))/100,
          target = parse_number(as.character(target))/100,
-         veg_type = as.factor(veg_type),
-         veg_type =  fct_explicit_na(veg_type, na_level = "mixed"),
+         type = as.factor(type),
+         type =  fct_explicit_na(type, na_level = "mixed"),
          year = "2019") %>%
   drop_na(reflectance) %>% 
   drop_na(wavelength) %>%
@@ -268,16 +268,16 @@ QHI <- QHI %>%
 
 # group by id
 QHI_small <- QHI %>%
-  group_by(year, veg_type, plot, id) %>%
+  group_by(year, type, plot, id) %>%
   summarise(spec_mean = mean(reflectance),
             spec_SD = sd(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance)))
 
 collison <- QHI %>%
-  filter(veg_type != "mixed")
+  filter(type != "mixed")
 
 PS2 <- QHI %>%
-  filter(veg_type == "mixed")
+  filter(type == "mixed")
 
 ##### correction factros for 250-259 reflectance. but to small. need > 3. also dont know how to apply to refletance 
 #HE1_corr <- full_QHI %>%
@@ -315,23 +315,29 @@ spec_2018 <- spectra_040818 %>%
   mutate(Reflectance = Reflectance*100,
          plot = str_remove_all(plot, "LT"),
          year = "2018",
-         veg_type = case_when(site == "Herschel" ~ "HE",
+         type = case_when(site == "Herschel" ~ "HE",
                               site == "komukuk" ~ "KO")) %>%
          # add id by groups
-         mutate(id = as.character(group_indices(., veg_type, plot, measurement) + 385)) %>% # 384 IDs for 2019 spectral data
-  unite(plot, c(veg_type, plot), sep = "", remove = FALSE)
+         mutate(id = as.character(group_indices(., type, plot, measurement) + 385)) %>% # 384 IDs for 2019 spectral data
+  unite(plot, c(type, plot), sep = "", remove = FALSE) %>%
+  rename(reflectance = Reflectance,
+         wavelength = Wavelength)
+
   
 
 # summarized by measurment spec 2018 data 
 spec_2018_small <- spec_2018 %>%
-  group_by(year, veg_type, plot, id) %>%
-  summarise(spec_mean = mean(Reflectance),
-            spec_SD = sd(Reflectance),
-            CV = mean(sd(Reflectance)/mean(Reflectance)))
+  group_by(year, type, plot, id) %>%
+  summarise(spec_mean = mean(reflectance),
+            spec_SD = sd(reflectance),
+            CV = mean(sd(reflectance)/mean(reflectance)))
 
 # binding 2018 & 2019 spec data
 
+# by wavelength
+spec_2018_2019 <- bind_rows(QHI, spec_2018)
 
+# by plot
 QHI_2018_2019 <- bind_rows(QHI_small, spec_2018_small)
 
 # adding a unique plot id 
@@ -339,26 +345,37 @@ QHI_2018_2019 <- QHI_2018_2019 %>%
   ungroup() %>%
   # temporary colunm with only plot number 
   mutate(plot2 = str_remove_all(plot, "HE|KO"),
-         plot_unique = paste(veg_type,plot2,year,sep="_")) %>%
+         plot_unique = paste(type,plot2,year,sep="_")) %>%
   select(-plot2)
 
 # grouped by id and wavelength
 QHI_2018_2019_wavelength <- spec_2018_2019 %>%
-  mutate(plot_unique = paste(plot, year, sep="_")) %>%
-  group_by(veg_type, plot, wavelength, year, plot_unique) %>%
+  mutate(plot_unique = paste(plot, year, sep="_"),
+         type_year = paste(type, spe="_", year)) %>%
+  group_by(type, plot, wavelength, year, plot_unique, type_year) %>%
   summarise(spec_mean = mean(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance)))
 
-(p_col_mean <- ggplot(QHI_2018_2019_wavelength, aes(x = wavelength, y = spec_mean, group = plot_unique, color = plot_unique)) + 
+(p_QHI_2018_2019_mean <- ggplot(QHI_2018_2019_wavelength, aes(x = wavelength, y = spec_mean, group = plot_unique, color = type_year)) + 
     geom_line(alpha = 0.7, size=1.) + 
     guides(colour = guide_legend(override.aes = list(size=5))) +
     labs(x = "Wavelength (mm)", y = "Reflectance") +
     theme_spectra() +
     theme(legend.position = "bottom") +
+    ggpubr::color_palette(c("#FF4500", "#FF8C00", "#D15FEE", "#63B8FF", "grey")) +
     theme_rgb_mean)
 
+(p_QHI_2018_2019_cv <- ggplot(QHI_2018_2019_wavelength, aes(x = wavelength, y = CV, group = plot_unique, color = type_year)) + 
+    geom_line(alpha = 0.7, size=1.) + 
+    guides(colour = guide_legend(override.aes = list(size=5))) +
+    labs(x = "Wavelength (mm)", y = "Reflectance") +
+    theme_spectra() +
+    theme(legend.position = "bottom") +
+    ggpubr::color_palette(c("#FF4500", "#FF8C00", "#D15FEE", "#63B8FF", "grey")) +
+    theme_rgb_CV)
 
-ggplot(spec_2018, aes(x = Wavelength, y = Reflectance, group = id, color = veg_type)) + 
+
+ggplot(spec_2018, aes(x = wavelength, y = reflectance, group = id, color = type)) + 
     geom_line(alpha = 0.3) + 
     theme_spectra() +
     labs(x = "\nWavelength (mm)", y = "Reflectance\n")+ 
@@ -369,14 +386,14 @@ ggplot(spec_2018, aes(x = Wavelength, y = Reflectance, group = id, color = veg_t
 
 
 
-ggplot(spec_2018_small, aes(x=veg_type, y=spec_mean, fill=veg_type)) + 
+ggplot(spec_2018_small, aes(x=type, y=spec_mean, fill=type)) + 
   geom_violin(trim=FALSE, alpha = .5) +
   geom_point(position = position_jitter(0.05)) +
   geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
   scale_fill_manual(values = c("#ffa544", "#2b299b")) +
   theme_cowplot()
 
-ggplot(spec_2018_small, aes(x=veg_type, y=CV, fill=veg_type)) + 
+ggplot(spec_2018_small, aes(x=type, y=CV, fill=type)) + 
   geom_violin(trim=FALSE, alpha = .5) +
   geom_point(position = position_jitter(0.05)) +
   geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
@@ -397,7 +414,7 @@ supervised_band_selection <- tibble(wavelength =
 
 supervised_band_selection <- collison %>%
   filter(wavelength %in% supervised_band_selection$wavelength) %>%
-  group_by(veg_type, plot, id) %>%
+  group_by(type, plot, id) %>%
   summarise(spec_mean = mean(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance)))
  
@@ -405,10 +422,10 @@ supervised_band_selection <- collison %>%
 # ISI band selection and SZU 
 
 collison_ISI <- collison %>%
-  filter(veg_type %in% c("KO" , "HE")) %>%
+  filter(type %in% c("KO" , "HE")) %>%
   group_by(wavelength) %>%
-  summarise(ISI = (1.96*(mean(reflectance[veg_type=="HE"]) + mean(reflectance[veg_type=="KO"])))/
-                        abs(sd(reflectance[veg_type=="HE"] - sd(reflectance[veg_type=="KO"])))) 
+  summarise(ISI = (1.96*(mean(reflectance[type=="HE"]) + mean(reflectance[type=="KO"])))/
+                        abs(sd(reflectance[type=="HE"] - sd(reflectance[type=="KO"])))) 
 
 ISI_band_selection <- collison_ISI %>%
     mutate(n = row_number()) %>%
@@ -432,7 +449,7 @@ head(SZU, n=5)
 # reduced dimentionality; product of ISI band selection
 lowD <- collison %>%
   filter(wavelength %in% ISI_band_selection$wavelength) %>%
-  group_by(veg_type, plot, id) %>%
+  group_by(type, plot, id) %>%
   summarise(spec_mean = mean(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance)))
 
@@ -468,7 +485,7 @@ lowD <- collison %>%
 #  QHI vis -------
 
 # single wavelengths VT
-(p_QHI <-  ggplot(QHI, aes(x = wavelength, y = reflectance, group = id, color = veg_type)) + 
+(p_QHI <-  ggplot(QHI, aes(x = wavelength, y = reflectance, group = id, color = type)) + 
    geom_line(alpha = 0.3) + 
    theme_spectra() +
    labs(x = "\nWavelength (mm)", y = "Reflectance\n")+ 
@@ -499,8 +516,8 @@ facet_wrap(.~id)
 
 
 # violin of mean by vegtype
-ggplot(QHI_small, aes(x=veg_type, y=spec_mean, fill=veg_type)) + 
-  geom_violin(trim=FALSE, alpha = .5, aes(fill = veg_type)) +
+ggplot(QHI_small, aes(x=type, y=spec_mean, fill=type)) + 
+  geom_violin(trim=FALSE, alpha = .5, aes(fill = type)) +
   geom_point(position = position_jitter(0.05)) +
   geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
   scale_fill_manual(values = c("#ffa544", "#2b299b", "gray65")) +
@@ -508,10 +525,10 @@ ggplot(QHI_small, aes(x=veg_type, y=spec_mean, fill=veg_type)) +
 
 # cloud of mean by vegetation type
 
-(p_QHI_cloud_mean <- ggplot(QHI_small, aes(x=veg_type, y=spec_mean, fill=veg_type)) +
+(p_QHI_cloud_mean <- ggplot(QHI_2018_2019, aes(x=type, y=spec_mean, fill=type)) +
     geom_flat_violin(position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = QHI_small, aes(x=veg_type, y=spec_mean, colour=plot),
-               position = position_jitter(width = .05), size = 2) +
+    geom_point(data = QHI_small, aes(x=type, y=spec_mean, colour=plot),
+               position = position_jitter(width = .15), size = 2) +
     geom_boxplot(width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_fill_manual(values = c("#ffa544", "#2b299b", "gray65")) +
     scale_color_QHI +
@@ -522,11 +539,11 @@ ggplot(QHI_small, aes(x=veg_type, y=spec_mean, fill=veg_type)) +
 
 # cloud of spec mean 2018+2019
 (p_QHI <- ggplot() + 
-    geom_flat_violin(data = QHI_2018_2019, aes(x=veg_type, y=spec_mean, fill=veg_type),
+    geom_flat_violin(data = QHI_2018_2019, aes(x=type, y=spec_mean, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = QHI_2018_2019, aes(x=veg_type, y=spec_mean, colour=year),
+    geom_point(data = QHI_2018_2019, aes(x=type, y=spec_mean, colour=year),
                position = position_jitter(width = .15), size = 2) +
-    geom_boxplot(data = QHI_2018_2019, aes(x=veg_type, y=spec_mean),
+    geom_boxplot(data = QHI_2018_2019, aes(x=type, y=spec_mean),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_fill_manual(values = c("#ffa544", "#2b299b", "gray65")) +
     scale_color_brewer(palette = "Dark2") +
@@ -535,7 +552,7 @@ ggsave(p_QHI, path = "figures", filename = "cloud_spec_mean_2018_2019.png", heig
 
 
 # violin of cv by vegtation type
-ggplot(QHI_small, aes(x=veg_type, y=CV, fill=veg_type)) + 
+ggplot(QHI_small, aes(x=type, y=CV, fill=type)) + 
   geom_violin(trim=FALSE, alpha = .5) +
   geom_point(position = position_jitter(0.05)) +
   geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
@@ -544,11 +561,11 @@ ggplot(QHI_small, aes(x=veg_type, y=CV, fill=veg_type)) +
 
 # cloud of spec diversity (cv) by VT
 (p_QHI_cloud_cv <- ggplot() +
-    geom_flat_violin(data = QHI_small, aes(x=veg_type, y=CV, fill=veg_type),
+    geom_flat_violin(data = QHI_small, aes(x=type, y=CV, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = QHI_small, aes(x=veg_type, y=CV, colour=plot),
+    geom_point(data = QHI_small, aes(x=type, y=CV, colour=plot),
                position = position_jitter(width = .15), size = 2) +
-    geom_boxplot(data = QHI_small, aes(x=veg_type, y=CV),
+    geom_boxplot(data = QHI_small, aes(x=type, y=CV),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_fill_manual(values = c("#ffa544", "#2b299b", "gray65")) +
     scale_color_QHI +
@@ -558,11 +575,11 @@ ggplot(QHI_small, aes(x=veg_type, y=CV, fill=veg_type)) +
 
 # cloud of spec diversity 2018+2019
 (p_QHI <- ggplot() + 
-    geom_flat_violin(data = QHI_2018_2019, aes(x=veg_type, y=CV, fill=veg_type),
+    geom_flat_violin(data = QHI_2018_2019, aes(x=type, y=CV, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = QHI_2018_2019, aes(x=veg_type, y=CV, colour=year),
+    geom_point(data = QHI_2018_2019, aes(x=type, y=CV, colour=year),
                position = position_jitter(width = .15), size = 2) +
-    geom_boxplot(data = QHI_2018_2019, aes(x=veg_type, y=CV),
+    geom_boxplot(data = QHI_2018_2019, aes(x=type, y=CV),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_fill_manual(values = c("#ffa544", "#2b299b", "gray65")) +
     scale_color_brewer(palette = "Dark2") +
@@ -572,7 +589,7 @@ ggsave(p_QHI, path = "figures", filename = "cloud_CV_2018_2019.png", height = 8,
 
 # group by wavelength 
 QHI_wavelength <- QHI %>%
-  group_by(veg_type, plot, wavelength) %>%
+  group_by(type, plot, wavelength) %>%
   summarise(spec_mean = mean(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance)))
 
@@ -602,12 +619,12 @@ QHI_wavelength <- QHI %>%
 #ggsave(p_QHI, path = "figures", filename = "spec_sig_plot.png", height = 8, width = 10)
 
 ## SMOOTHING NOT CORRECT
-(p_QHI_specmean <- ggplot(QHI_wavelength, aes(x = wavelength, y = spec_mean, group=veg_type, color = veg_type)) + 
+(p_QHI_specmean <- ggplot(QHI_wavelength, aes(x = wavelength, y = spec_mean, group=type, color = type)) + 
   geom_smooth(alpha = 0.2, se=TRUE) +
   scale_color_manual(values = c("#ffa544", "#2b299b", "gray65")) +
   theme_cowplot() +
   labs(x = "Wavelength (mm)", y = "Reflectance") +
-    theme(legend.position = c(0.05,0.6)) +
+    theme(legend.position = c(0.05,0.7)) +
   theme_rgb_mean)
 
 # plot CV
@@ -624,7 +641,7 @@ QHI_wavelength <- QHI %>%
 #ggsave(p_QHI, path = "figures", filename = "CV_plot.png", height = 8, width = 10)
 
 # SMOOTHING NOT CORRECT
-(p_QHI_CV <- ggplot(QHI_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
+(p_QHI_CV <- ggplot(QHI_wavelength, aes(x = wavelength, y = CV, group=type, color = type)) + 
   geom_smooth(alpha = 0.2, se=TRUE) + 
   theme_cowplot() +
   labs(x = "Wavelength (mm)", y = "CV") +
@@ -654,7 +671,7 @@ print(p_pca_veg_year , vp = define_region(row = 3:4, col = 1:2))
 #  collison vis -------
 
 # single wavelengths VT
-(p_collison <-  ggplot(collison, aes(x = wavelength, y = reflectance, group = id, color = veg_type)) + 
+(p_collison <-  ggplot(collison, aes(x = wavelength, y = reflectance, group = id, color = type)) + 
    geom_line(alpha = 0.3) + 
    theme_spectra() +
    labs(x = "\nWavelength (mm)", y = "Reflectance\n")+ 
@@ -676,18 +693,18 @@ print(p_pca_veg_year , vp = define_region(row = 3:4, col = 1:2))
 
 # group by id
 collison_small <- collison %>%
-  group_by(veg_type, plot, id) %>%
+  group_by(type, plot, id) %>%
   summarise(spec_mean = mean(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance)))
 
 # group by wavelength grouping
 collison_wavelength <- collison %>%
-  group_by(veg_type, plot, wavelength) %>%
+  group_by(type, plot, wavelength) %>%
   summarise(spec_mean = mean(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance)))
 
 # violin of mean by vegetation type
-ggplot(collison_small, aes(x=veg_type, y=spec_mean, fill=veg_type)) + 
+ggplot(collison_small, aes(x=type, y=spec_mean, fill=type)) + 
   geom_violin(trim=FALSE, alpha = .5) +
   geom_point(position = position_jitter(0.05)) +
   geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
@@ -696,9 +713,9 @@ ggplot(collison_small, aes(x=veg_type, y=spec_mean, fill=veg_type)) +
 
 # cloud of mean by vegetation type
 
-(p_collison <- ggplot(collison_small, aes(x=veg_type, y=spec_mean, fill=veg_type)) +
+(p_collison <- ggplot(collison_small, aes(x=type, y=spec_mean, fill=type)) +
     geom_flat_violin(position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = collison_small, aes(x=veg_type, y=spec_mean, colour=plot),
+    geom_point(data = collison_small, aes(x=type, y=spec_mean, colour=plot),
                position = position_jitter(width = .05), size = 2) +
     geom_boxplot(width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
@@ -708,7 +725,7 @@ ggplot(collison_small, aes(x=veg_type, y=spec_mean, fill=veg_type)) +
 
 
 # violin of cv by vegtation type
-ggplot(collison_small, aes(x=veg_type, y=CV, fill=veg_type)) + 
+ggplot(collison_small, aes(x=type, y=CV, fill=type)) + 
   geom_violin(trim=FALSE, alpha = .5) +
   geom_point(position = position_jitter(0.05)) +
   geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
@@ -717,11 +734,11 @@ ggplot(collison_small, aes(x=veg_type, y=CV, fill=veg_type)) +
 
 # cloud of spec mean by VT
 (p_collison <- ggplot() +
-    geom_flat_violin(data = collison_small, aes(x=veg_type, y=CV, fill=veg_type),
+    geom_flat_violin(data = collison_small, aes(x=type, y=CV, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = collison_small, aes(x=veg_type, y=CV, colour=plot),
+    geom_point(data = collison_small, aes(x=type, y=CV, colour=plot),
                position = position_jitter(width = .05), size = 2) +
-    geom_boxplot(data = collison_small, aes(x=veg_type, y=CV),
+    geom_boxplot(data = collison_small, aes(x=type, y=CV),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
     scale_color_collison +
@@ -740,7 +757,7 @@ ggplot(collison_small, aes(x=veg_type, y=CV, fill=veg_type)) +
 #ggsave(p_col_mean, path = "figures", filename = "spec_sig_plot_collison.png", height = 8, width = 10)
 
 ##  smoothed plots mean reflectance SMOOTHING NOT CORRECT
-ggplot(collison_wavelength, aes(x = wavelength, y = spec_mean, group=veg_type, color = veg_type)) + 
+ggplot(collison_wavelength, aes(x = wavelength, y = spec_mean, group=type, color = type)) + 
   geom_smooth(alpha = 0.2, se=TRUE) + 
   theme_spectra() +
   scale_color_manual(values = c("#ffa544", "#2b299b")) +
@@ -760,7 +777,7 @@ ggplot(collison_wavelength, aes(x = wavelength, y = spec_mean, group=veg_type, c
 #ggsave(p_col_CV, path = "figures", filename = "CV_plot_collison.png", height = 8, width = 10)
 
 # SMOOTHING NOT CORRECT
-ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
+ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=type, color = type)) + 
   geom_smooth(alpha = 0.2, se=TRUE) + 
   scale_color_manual(values = c("#ffa544", "#2b299b")) +
   theme_spectra() +
@@ -772,13 +789,13 @@ ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = 
 # blue mean
 (p_blue_mean <- ggplot() +
    geom_flat_violin(data = subset(collison_wavelength, region %in% c("blue")), 
-                    aes(x=veg_type, y=spec_mean, fill=veg_type),
+                    aes(x=type, y=spec_mean, fill=type),
                     position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
    geom_point(data = subset(collison_wavelength, region %in% c("blue")),
-              aes(x=veg_type, y=spec_mean, colour=plot),
+              aes(x=type, y=spec_mean, colour=plot),
               position = position_jitter(width = .1), size = 1, alpha =0.5) +
    geom_boxplot(data = subset(collison_wavelength, region %in% c("blue")),
-                aes(x=veg_type, y=spec_mean),
+                aes(x=type, y=spec_mean),
                 width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
    scale_fill_manual(values = c("#ffa544", "#2b299b")) +
    theme_cowplot() +
@@ -790,13 +807,13 @@ ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = 
 # blue CV
 (p_blue_CV <- ggplot() +
     geom_flat_violin(data = subset(collison_wavelength, region %in% c("blue")), 
-                     aes(x=veg_type, y=CV, fill=veg_type),
+                     aes(x=type, y=CV, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = subset(collison_wavelength, region %in% c("blue")),
-               aes(x=veg_type, y=CV, colour=plot),
+               aes(x=type, y=CV, colour=plot),
                position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(collison_wavelength, region %in% c("blue")),
-                 aes(x=veg_type, y=CV),
+                 aes(x=type, y=CV),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
@@ -809,13 +826,13 @@ ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = 
 # green mean
 (p_green_mean <- ggplot() +
     geom_flat_violin(data = subset(collison_wavelength, region %in% c("green")), 
-                     aes(x=veg_type, y=spec_mean, fill=veg_type),
+                     aes(x=type, y=spec_mean, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = subset(collison_wavelength, region %in% c("green")),
-               aes(x=veg_type, y=spec_mean, colour=plot),
+               aes(x=type, y=spec_mean, colour=plot),
                position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(collison_wavelength, region %in% c("green")),
-                 aes(x=veg_type, y=spec_mean),
+                 aes(x=type, y=spec_mean),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
@@ -827,13 +844,13 @@ ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = 
 # green CV
 (p_green_CV <- ggplot() +
     geom_flat_violin(data = subset(collison_wavelength, region %in% c("green")), 
-                     aes(x=veg_type, y=CV, fill=veg_type),
+                     aes(x=type, y=CV, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = subset(collison_wavelength, region %in% c("green")),
-               aes(x=veg_type, y=CV, colour=plot),
+               aes(x=type, y=CV, colour=plot),
                position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(collison_wavelength, region %in% c("green")),
-                 aes(x=veg_type, y=CV),
+                 aes(x=type, y=CV),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
@@ -845,13 +862,13 @@ ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = 
 # red mean
 (p_red_mean <- ggplot() +
     geom_flat_violin(data = subset(collison_wavelength, region %in% c("red")), 
-                     aes(x=veg_type, y=spec_mean, fill=veg_type),
+                     aes(x=type, y=spec_mean, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = subset(collison_wavelength, region %in% c("red")),
-               aes(x=veg_type, y=spec_mean, colour=plot),
+               aes(x=type, y=spec_mean, colour=plot),
                position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(collison_wavelength, region %in% c("red")),
-                 aes(x=veg_type, y=spec_mean),
+                 aes(x=type, y=spec_mean),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
@@ -863,13 +880,13 @@ ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = 
 # red CV
 (p_red_CV <- ggplot() +
     geom_flat_violin(data = subset(collison_wavelength, region %in% c("red")), 
-                     aes(x=veg_type, y=CV, fill=veg_type),
+                     aes(x=type, y=CV, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = subset(collison_wavelength, region %in% c("red")),
-               aes(x=veg_type, y=CV, colour=plot),
+               aes(x=type, y=CV, colour=plot),
                position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(collison_wavelength, region %in% c("red")),
-                 aes(x=veg_type, y=CV),
+                 aes(x=type, y=CV),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
@@ -881,13 +898,13 @@ ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = 
 # NIR mean
 (p_NIR_mean <- ggplot() +
     geom_flat_violin(data = subset(collison_wavelength, region %in% c("NIR")), 
-                     aes(x=veg_type, y=spec_mean, fill=veg_type),
+                     aes(x=type, y=spec_mean, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = subset(collison_wavelength, region %in% c("NIR")),
-               aes(x=veg_type, y=spec_mean, colour=plot),
+               aes(x=type, y=spec_mean, colour=plot),
                position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(collison_wavelength, region %in% c("NIR")),
-                 aes(x=veg_type, y=spec_mean),
+                 aes(x=type, y=spec_mean),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
@@ -899,13 +916,13 @@ ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = 
 # NIR CV
 (p_NIR_CV <- ggplot() +
     geom_flat_violin(data = subset(collison_wavelength, region %in% c("NIR")), 
-                     aes(x=veg_type, y=CV, fill=veg_type),
+                     aes(x=type, y=CV, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = subset(collison_wavelength, region %in% c("NIR")),
-               aes(x=veg_type, y=CV, colour=plot),
+               aes(x=type, y=CV, colour=plot),
                position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(collison_wavelength, region %in% c("NIR")),
-                 aes(x=veg_type, y=CV),
+                 aes(x=type, y=CV),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
@@ -917,13 +934,13 @@ ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = 
 # IR mean
 (p_IR_mean <- ggplot() +
     geom_flat_violin(data = subset(collison_wavelength, region %in% c("IR")), 
-                     aes(x=veg_type, y=spec_mean, fill=veg_type),
+                     aes(x=type, y=spec_mean, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = subset(collison_wavelength, region %in% c("IR")),
-               aes(x=veg_type, y=spec_mean, colour=plot),
+               aes(x=type, y=spec_mean, colour=plot),
                position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(collison_wavelength, region %in% c("IR")),
-                 aes(x=veg_type, y=spec_mean),
+                 aes(x=type, y=spec_mean),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
@@ -935,13 +952,13 @@ ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = 
 # IR CV
 (p_IR_CV <- ggplot() +
     geom_flat_violin(data = subset(collison_wavelength, region %in% c("IR")), 
-                     aes(x=veg_type, y=CV, fill=veg_type),
+                     aes(x=type, y=CV, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = subset(collison_wavelength, region %in% c("IR")),
-               aes(x=veg_type, y=CV, colour=plot),
+               aes(x=type, y=CV, colour=plot),
                position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(collison_wavelength, region %in% c("IR")),
-                 aes(x=veg_type, y=CV),
+                 aes(x=type, y=CV),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
@@ -1006,21 +1023,32 @@ library(ggeffects)  # to visualise model predictions
 library(glmmTMB) # to visualise model predictions
 library(dotwhisker) # to visulaise effect whiskerplots
 
+# only 2019 collison data
 collison_small <- collison %>%
-  group_by(veg_type, plot, id) %>%
+  group_by(type, plot, id) %>%
   summarise(spec_mean = mean(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance)))
 
+# 2018+2019 QHI data
+QHI_spec_plot <- left_join(QHI_2018_2019, QHI_plotdata, value = "plot_unique") %>%
+  filter(!plot == "PS2")
 
+(hist <- ggplot(QHI_spec_plot, aes(x = spec_mean)) +
+    geom_histogram() +
+    theme_classic())
 
-(hist <- ggplot(collison_small, aes(x = spec_mean)) +
+# does not converge
+summary(lmer(data = QHI_spec_plot, spec_mean ~ type + (1|plot) + (1|year))) # does not converge
+
+# model 2018 + 2019 HE & KO
+
+(hist <- ggplot(collison_spec_plot, aes(x = spec_mean)) +
    geom_histogram() +
    theme_classic())
 
 # linear model for H1
 
-m_H1a <- lmer(data = QHI_spec_plot, spec_mean ~ veg_type + (1|plot) + (1|year))
-
+m_H1a <- lmer(data = collison_spec_plot, spec_mean ~ type + (1|plot) + (1|year))
 
 summary(m_H1a)
 
@@ -1034,23 +1062,23 @@ qqline(resid(m_H1a))  # points fall nicely onto the line - good!
 (fe.effects <- plot_model(m_H1a, show.values = TRUE))
 
 # gpreditct by type
-ggpredict(m_H1a, terms = c("veg_type"), type = "fe") %>% 
+ggpredict(m_H1a, terms = c("type"), type = "fe") %>% 
   plot(rawdata = TRUE) +
   #scale_color_manual(values = c("#ffa544", "#2b299b")) +
   theme_spectra()
 
-pred.mm <- ggpredict(m_H1a, terms = c("veg_type")) %>%  # this gives overall predictions for the model
-  rename(veg_type = x) %>%
-  mutate(veg_type = as.character(veg_type))
+pred.mm <- ggpredict(m_H1a, terms = c("type")) %>%  # this gives overall predictions for the model
+  rename(type = x) %>%
+  mutate(type = as.character(type))
 
 H1a_prediction <- collison_wavelength %>%
-  group_by(veg_type, wavelength) %>%
+  group_by(type, wavelength) %>%
   summarise(reflectance = mean(spec_mean)) %>%
-  left_join(H1a_prediction, pred.mm, by = "veg_type") %>%
-  mutate(reflectance = case_when(veg_type == "HE" ~reflectance,
-                                 veg_type == "HE" ~reflectance + predicted))
+  left_join(H1a_prediction, pred.mm, by = "type") %>%
+  mutate(reflectance = case_when(type == "HE" ~reflectance,
+                                 type == "HE" ~reflectance + predicted))
 
-ggplot(H1a_prediction, aes(x = wavelength, y = reflectance, group = veg_type, color = veg_type)) + 
+ggplot(H1a_prediction, aes(x = wavelength, y = reflectance, group = type, color = type)) + 
   geom_line(alpha = 0.7, size=1.) + 
   guides(colour = guide_legend(override.aes = list(size=5))) +
   labs(x = "Wavelength (mm)", y = "Reflectance") +
@@ -1091,7 +1119,7 @@ ggplot(H1a_prediction, aes(x = wavelength, y = reflectance, group = veg_type, co
     geom_ribbon(aes(x = x, ymin = predicted + 25.5348 - std.error, ymax = predicted + 25.5348 + std.error), 
                 fill = "lightgrey", alpha = 0.5) +
     geom_point(data = QHI_spec_plot_2019,                      # adding the raw data (scaled values)
-               aes(x = bareground, y = spec_mean, colour = veg_type)) + 
+               aes(x = bareground, y = spec_mean, colour = type)) + 
     
     theme_spectra()
 )
@@ -1105,7 +1133,7 @@ ggplot(H1a_prediction, aes(x = wavelength, y = reflectance, group = veg_type, co
     geom_histogram() +
     theme_classic())
 
-m_H1b <- lmer(data = QHI_spec_plot, CV ~ veg_type + (1|plot) + (1|year))
+m_H1b <- lmer(data = collison_spec_plot, CV ~ type + (1|plot) + (1|year))
 
 summary(m_H1b)
 
@@ -1118,9 +1146,9 @@ qqline(resid(m_H1b))
 # visulise fixed effect
 (fe.effects <- plot_model(m_H1b, show.values = TRUE))
 
-ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
+ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=type, color = type)) + 
   geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
-  stat_smooth(method = "lm", aes(fill = veg_type, color = veg_type), se=TRUE )+
+  stat_smooth(method = "lm", aes(fill = type, color = type), se=TRUE )+
   theme_spectra() +
   labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n")
 
@@ -1128,12 +1156,12 @@ ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = 
 
 
 collison_small_VT <- collison %>%
-  group_by(veg_type,wavelength) %>%
+  group_by(type,wavelength) %>%
   summarise(spec_mean = mean(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance)))
 
-ggplot(collison, aes(x = wavelength, y = reflectance, group = veg_type, color = veg_type)) + 
-    stat_smooth(method = "lm", aes(fill = veg_type, color = veg_type), se=TRUE ) +
+ggplot(collison, aes(x = wavelength, y = reflectance, group = type, color = type)) + 
+    stat_smooth(method = "lm", aes(fill = type, color = type), se=TRUE ) +
     geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
     guides(colour = guide_legend(override.aes = list(size=5))) +
     labs(x = "Wavelength (mm)", y = "Reflectance") +
@@ -1150,7 +1178,7 @@ ggplot(collison, aes(x = wavelength, y = reflectance, group = veg_type, color = 
 
 # linear model with band selection
 
-m_H3a <- lmer(data = lowD, spec_mean ~ veg_type + (1|plot))
+m_H3a <- lmer(data = lowD, spec_mean ~ type + (1|plot))
 
 summary(m_H3a)
 
@@ -1164,9 +1192,9 @@ qqline(resid(m_H3a))
 # visulise fixed effect
 (fe.effects <- plot_model(m_H3a, show.values = TRUE))
 
-ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
+ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=type, color = type)) + 
   geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
-  stat_smooth(method = "lm", aes(fill = veg_type, color = veg_type), se=TRUE )+
+  stat_smooth(method = "lm", aes(fill = type, color = type), se=TRUE )+
   theme_spectra() +
   labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n")
 
@@ -1178,9 +1206,9 @@ ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = 
 
 # linear model with band selection
 
-m_H3b <- glm(data = lowD, CV ~ veg_type + plot)
+m_H3b <- glm(data = lowD, CV ~ type + plot)
 
-m_H3b <- lmer(data = lowD, CV ~ veg_type + (1|plot))
+m_H3b <- lmer(data = lowD, CV ~ type + (1|plot))
 
 summary(m_H3b)
 
@@ -1194,9 +1222,9 @@ qqline(resid(m_H3b))
 # visulise fixed effect
 (fe.effects <- plot_model(m_H3b, show.values = TRUE))
 
-ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
+ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=type, color = type)) + 
   geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
-  stat_smooth(method = "lm", aes(fill = veg_type, color = veg_type), se=TRUE )+
+  stat_smooth(method = "lm", aes(fill = type, color = type), se=TRUE )+
   theme_spectra() +
   labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n")
 
@@ -1211,9 +1239,9 @@ ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = 
 
 # linear model with band selection
 
-m_H3c <- glm(data = supervised_band_selection, spec_mean ~ veg_type + plot)
+m_H3c <- glm(data = supervised_band_selection, spec_mean ~ type + plot)
 
-m_H3c <- lmer(data = supervised_band_selection, spec_mean ~ veg_type + (1|plot))
+m_H3c <- lmer(data = supervised_band_selection, spec_mean ~ type + (1|plot))
 
 summary(m_H3c)
 
@@ -1227,9 +1255,9 @@ qqline(resid(m_H3c))
 # visulise fixed effect
 (fe.effects <- plot_model(m_H3c, show.values = TRUE))
 
-ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
+ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=type, color = type)) + 
   geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
-  stat_smooth(method = "lm", aes(fill = veg_type, color = veg_type), se=TRUE )+
+  stat_smooth(method = "lm", aes(fill = type, color = type), se=TRUE )+
   theme_spectra() +
   labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n")
 
@@ -1241,9 +1269,9 @@ ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = 
 
 # linear model with band selection
 
-m_H3d <- glm(data = supervised_band_selection, CV ~ veg_type + plot)
+m_H3d <- glm(data = supervised_band_selection, CV ~ type + plot)
 
-m_H3d <- lmer(data = supervised_band_selection, CV ~ veg_type + (1|plot))
+m_H3d <- lmer(data = supervised_band_selection, CV ~ type + (1|plot))
 
 summary(m_H3d)
 
@@ -1257,9 +1285,9 @@ qqline(resid(m_H3d))
 # visulise fixed effect
 (fe.effects <- plot_model(m_H3d, show.values = TRUE))
 
-ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
+ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=type, color = type)) + 
   geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
-  stat_smooth(method = "lm", aes(fill = veg_type, color = veg_type), se=TRUE )+
+  stat_smooth(method = "lm", aes(fill = type, color = type), se=TRUE )+
   theme_spectra() +
   labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n")
 
@@ -1298,18 +1326,18 @@ grid.arrange(p_H3a, p_H3b)
 # If needed I could use ggpredict to creat boxplot of predicted spec_mean and cv by VT by Model (but might not be compatable with lme4)
 # https://strengejacke.github.io/ggeffects/reference/ggpredict.html
 
-ggpredict(m_H3a, terms = c("veg_type"), type = "fe") %>% 
+ggpredict(m_H3a, terms = c("type"), type = "fe") %>% 
   plot(rawdata = TRUE) +
   scale_color_manual(values = c("#ffa544", "#2b299b")) +
   theme_spectra()
 
-ggpredict(m_H3c, terms = c("veg_type"), type = "fe") %>% 
+ggpredict(m_H3c, terms = c("type"), type = "fe") %>% 
   plot(rawdata = TRUE) +
   scale_color_manual(values = c("#ffa544", "#2b299b")) +
   theme_spectra()
 
 dat <- ggpredict(H3a, terms = c("c172code", "c161sex"))
-ggplot(H3a, aes(veg_type, predicted, colour = group)) +
+ggplot(H3a, aes(type, predicted, colour = group)) +
   geom_point(position = position_dodge(.1)) +
   geom_errorbar(
     aes(ymin = conf.low, ymax = conf.high),
@@ -1375,7 +1403,7 @@ fviz_pca_var(res.pca, col.var = "contrib",
              geom.ind = "point", # show points only (nbut not "text")
              col.ind = "black", # color by groups
              pointshape = 21,
-             fill.ind = QHI_small$veg_type, # color by groups
+             fill.ind = QHI_small$type, # color by groups
              palette = c("#ffa544", "#2b299b", "gray65"),
              addEllipses = TRUE, # Concentration ellipses
              # ellipse.type = "confidence",
@@ -1393,7 +1421,7 @@ ggsave(p_pca_QHI, path = "figures", filename = "QHI_pca.png", height = 10, width
 # pca for all QHI measurements, with band selection
 pca_lowD <- QHI %>%
   filter(wavelength %in% ISI_band_selection$wavelength) %>%
-  group_by(veg_type, plot, id) %>%
+  group_by(type, plot, id) %>%
   summarise(spec_mean = mean(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance)))
 
@@ -1403,8 +1431,8 @@ res.pca_lowD <- PCA(pca_lowD[,4:5], scale.unit = TRUE, ncp = 5, graph = TRUE)
 (p_pca <- fviz_pca_ind(res.pca_lowD,
              geom.ind = "point", # show points only (nbut not "text")
              pointshape = 21,
-             fill.ind = QHI_small$veg_type, # color by groups
-             col.ind = QHI_small$veg_type, # color by groups
+             fill.ind = QHI_small$type, # color by groups
+             col.ind = QHI_small$type, # color by groups
              palette = c("#ffa544", "#2b299b", "gray65"),
              addEllipses = TRUE, # Concentration ellipses
              # ellipse.type = "confidence",
@@ -1422,8 +1450,8 @@ ggsave(p_pca, path = "figures", filename = "QHI_lowD_pca.png", height = 10, widt
                 repel = TRUE, 
                 geom.ind = "point", # show points only (nbut not "text")
                 pointshape = 21,
-                fill.ind = QHI_small$veg_type, # color by groups
-                col.ind = QHI_small$veg_type, # color by groups
+                fill.ind = QHI_small$type, # color by groups
+                col.ind = QHI_small$type, # color by groups
                 palette = c("#ffa544", "#2b299b", "gray65"),
                 addEllipses = TRUE, # Concentration ellipses
                 # ellipse.type = "confidence",
@@ -1443,7 +1471,7 @@ res.pca_QHI_2018_2019 <- PCA(QHI_2018_2019[,c(5,7)], scale.unit = TRUE, ncp = 5,
 (p_pca <- fviz_pca_ind(res.pca_QHI_2018_2019,
                        geom.ind = "point", # show points only (nbut not "text")
                        pointshape = 21,
-                       col.ind = QHI_2018_2019$veg_type,
+                       col.ind = QHI_2018_2019$type,
                        fill.ind = QHI_2018_2019$year, # color by groups
                        #palette = c("#ffa544", "#2b299b", "gray65"),
                        addEllipses = TRUE, # Concentration ellipses
@@ -1460,7 +1488,7 @@ ggsave(p_pca, path = "figures", filename = "QHI_lowD_biplot.png", height = 10, w
 # multiyear pca by year and vegtype
 
 t <- QHI_2018_2019 %>%
-  unite(veg_year, c(veg_type, year))
+  unite(veg_year, c(type, year))
 
 (p_pca_veg_year <- fviz_pca_ind(res.pca_QHI_2018_2019,
                        geom.ind = "point", # show points only (nbut not "text")
@@ -1498,21 +1526,21 @@ PS2 <- list_of_files %>%
          id = stringr::str_extract(FileName, "_\\d*"),
          id = str_remove_all(id, "_"),
          id = gsub("(?<![0-9])0+", "", id, perl = TRUE),
-         veg_type = case_when(grepl("HE|KO", FileName)   ~ 
+         type = case_when(grepl("HE|KO", FileName)   ~ 
                                 stringr::str_extract(FileName, "HE|KO")),
          # might need to split to just number...
          plot = case_when(grepl("HE|KO", FileName)   ~ 
                             stringr::str_extract(FileName, "HE\\d*|KO\\d*")))
 
 
-names(PS2) <- c("name", "wavelength", "reference", "target", "reflectance", "id", "veg_type", "plot")
+names(PS2) <- c("name", "wavelength", "reference", "target", "reflectance", "id", "type", "plot")
 
 PS2 <- PS2 %>%
   mutate(wavelength = parse_number(as.character(wavelength))/100,
          reflectance = parse_number(as.character(reflectance))/100,
          reference = parse_number(as.character(reference))/100,
          target = parse_number(as.character(target))/100,
-         veg_type = as.factor(veg_type)) %>%
+         type = as.factor(type)) %>%
   drop_na(reflectance) %>% 
   drop_na(wavelength) %>%
   drop_na(reference) %>%
@@ -1525,7 +1553,7 @@ PS2 <- PS2 %>%
 
 
 # single wavelengths VT
-(p_PS2 <-  ggplot(PS2, aes(x = wavelength, y = reflectance, group = id, color = veg_type)) + 
+(p_PS2 <-  ggplot(PS2, aes(x = wavelength, y = reflectance, group = id, color = type)) + 
    geom_line(alpha = 0.3) + 
    theme_spectra() +
    labs(x = "\nWavelength (mm)", y = "Reflectance\n")+ 
@@ -1536,13 +1564,13 @@ PS2 <- PS2 %>%
 
 
 PS2_small <- PS2 %>%
-  group_by(veg_type, plot, id) %>%
+  group_by(type, plot, id) %>%
   summarise(spec_mean = mean(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance)))
 
 
 # violin of mean by vegetation type
-ggplot(PS2_small, aes(x=veg_type, y=spec_mean, fill=veg_type)) + 
+ggplot(PS2_small, aes(x=type, y=spec_mean, fill=type)) + 
   geom_violin(trim=FALSE, alpha = .5) +
   geom_point(position = position_jitter(0.05)) +
   scale_fill_manual(values = c("#ffa544", "#2b299b")) +
@@ -1550,7 +1578,7 @@ ggplot(PS2_small, aes(x=veg_type, y=spec_mean, fill=veg_type)) +
   theme_cowplot()
 
 # cloud of mean by vegetation type
-(p_PS2 <- ggplot(PS2_small, aes(x=veg_type, y=spec_mean, fill=veg_type)) +
+(p_PS2 <- ggplot(PS2_small, aes(x=type, y=spec_mean, fill=type)) +
     geom_flat_violin(position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(position = position_jitter(width = .05), size = .8) +
     geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
@@ -1558,14 +1586,14 @@ ggplot(PS2_small, aes(x=veg_type, y=spec_mean, fill=veg_type)) +
     theme_cowplot())
 
 # violin of cv by vegtation type
-ggplot(PS2_small, aes(x=veg_type, y=CV, fill=veg_type)) + 
+ggplot(PS2_small, aes(x=type, y=CV, fill=type)) + 
   geom_violin(trim=FALSE, alpha = .5) +
   geom_point(position = position_jitter(0.05)) +
   geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
   scale_fill_manual(values = c("#ffa544", "#2b299b")) +
   theme_cowplot()
 
-ggplot(PS2_small, aes(x=veg_type, y=CV, fill=veg_type)) +
+ggplot(PS2_small, aes(x=type, y=CV, fill=type)) +
   geom_flat_violin(position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
   geom_point(position = position_jitter(width = .05), size = .8) +
   geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
@@ -1576,7 +1604,7 @@ ggplot(PS2_small, aes(x=veg_type, y=CV, fill=veg_type)) +
 
 # group by wavelength 
 PS2_wavelength <- PS2 %>%
-  group_by(veg_type, plot, wavelength) %>%
+  group_by(type, plot, wavelength) %>%
   summarise(spec_mean = mean(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance)))
 
@@ -1592,7 +1620,7 @@ PS2_wavelength <- PS2 %>%
 
 
 ## SMOOTHING NOT CORRECT
-ggplot(PS2_wavelength, aes(x = wavelength, y = spec_mean, group=veg_type, color = veg_type)) + 
+ggplot(PS2_wavelength, aes(x = wavelength, y = spec_mean, group=type, color = type)) + 
   geom_smooth(alpha = 0.2, se=TRUE) + 
   theme_spectra() +
   scale_color_manual(values = c("#ffa544", "#2b299b")) +
@@ -1608,7 +1636,7 @@ ggplot(PS2_wavelength, aes(x = wavelength, y = CV, group = plot, color = plot)) 
   labs(x = "\nWavelength (mm)", y = "CV\n")
 
 # SMOOTHING NOT CORRECT
-ggplot(PS2_wavelength, aes(x = wavelength, y = CV, group=veg_type, color = veg_type)) + 
+ggplot(PS2_wavelength, aes(x = wavelength, y = CV, group=type, color = type)) + 
   geom_smooth(alpha = 0.2, se=TRUE) + 
   theme_spectra() +
   scale_color_manual(values = c("#ffa544", "#2b299b")) +
@@ -1627,7 +1655,7 @@ res.pca_PS2 <- PCA(pca_PS2[,4:5], scale.unit = TRUE, ncp = 5, graph = TRUE)
 # PS2 pca 
 (p_PS2 <- fviz_pca_ind(res.pca_PS2,
                        geom.ind = FALSE, # show points only (nbut not "text")
-                       col.ind = PS2_small$veg_type, # color by groups
+                       col.ind = PS2_small$type, # color by groups
                        addEllipses = TRUE, # Concentration ellipses
                        # ellipse.type = "confidence",
                        ellipse.level = 0.95, # confidence level specification
@@ -1683,20 +1711,20 @@ QHI_PS2plot <- list_of_files %>%
          id = stringr::str_extract(FileName, "_\\d*"),
          id = str_remove_all(id, "_"),
          id = gsub("(?<![0-9])0+", "", id, perl = TRUE),
-         veg_type = case_when(grepl("HE|KO", FileName)   ~ 
+         type = case_when(grepl("HE|KO", FileName)   ~ 
                                 stringr::str_extract(FileName, "HE|KO")),
          # might need to split to just number...
          plot = case_when(grepl("HE|KO|PS2", FileName)   ~ 
                             stringr::str_extract(FileName, "HE\\d*|KO\\d*|PS2")))
 
-names(QHI_PS2plot) <- c("name", "wavelength", "reference", "target", "reflectance", "id", "veg_type", "plot")
+names(QHI_PS2plot) <- c("name", "wavelength", "reference", "target", "reflectance", "id", "type", "plot")
 
 QHI_PS2plot <- QHI_PS2plot %>%
   mutate(wavelength = parse_number(as.character(wavelength))/100,
          reflectance = parse_number(as.character(reflectance))/100,
          reference = parse_number(as.character(reference))/100,
          target = parse_number(as.character(target))/100,
-         veg_type = as.factor(veg_type)) %>%
+         type = as.factor(type)) %>%
   drop_na(reflectance) %>% 
   drop_na(wavelength) %>%
   drop_na(reference) %>%
@@ -1710,8 +1738,8 @@ QHI_PS2plot %>% filter(reflectance>100) %>%
   count(id)
 
 QHI_PS2plot_small <- QHI_PS2plot %>%
-  mutate(veg_type =  fct_explicit_na(veg_type, na_level = "NA")) %>%
-  group_by(veg_type, plot, id) %>%
+  mutate(type =  fct_explicit_na(type, na_level = "NA")) %>%
+  group_by(type, plot, id) %>%
   summarise(spec_mean = mean(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance)))
 
@@ -1766,7 +1794,7 @@ fviz_pca_var(res.pca_QHI_PS2, col.var = "contrib",
 # grouped by elipsise
 (p_pca_PS2 <- fviz_pca_ind(res.pca_PS2,
              geom.ind = c("point"), # show points only (nbut not "text")
-             col.ind = PS2_small$veg_type, # color by groups
+             col.ind = PS2_small$type, # color by groups
              palette = c("#ffa544", "#2b299b"),
              
              addEllipses = TRUE, # Concentration ellipses
@@ -1786,7 +1814,7 @@ QHI_plotdata <- read_csv("data/QHI_biodiversity/QHI_plotdata_2018_2019_sas.csv",
 
 # (redundant) adding sperate columns for vegtype, plot, and year
 #QHI_plotdata <- QHI_plotdata %>%
-#  mutate(veg_type = case_when(grepl("HE|KO", plot_unique, ignore.case=TRUE) ~ 
+#  mutate(type = case_when(grepl("HE|KO", plot_unique, ignore.case=TRUE) ~ 
 #                                stringr::str_extract(plot_unique, "HE|KO")),
 #         plot = case_when(grepl("_", plot_unique)   ~ 
 #                            stringr::str_extract(plot_unique, "_\\d*")),
@@ -1795,14 +1823,14 @@ QHI_plotdata <- read_csv("data/QHI_biodiversity/QHI_plotdata_2018_2019_sas.csv",
 #         year = substring(plot_unique,6,9))
          
 
-QHI_spec_plot <- left_join(QHI_2018_2019, QHI_plotdata, value = "plot_unique") %>%
+collison_spec_plot <- left_join(QHI_2018_2019, QHI_plotdata, by = "plot_unique") %>%
   filter(!plot == "PS2")
 
 # H2 model ----
 
 # correlation plot full
 
-correlation <- cor(QHI_spec_plot[,c(5, 7, 9, 12:16, 19)])
+correlation <- cor(collison_spec_plot[,c(5, 7, 9, 12:16, 19)])
 
 (p_corr <- corrplot(correlation, method="circle", type="upper", #order="hclust",
          tl.srt=45, tl.col="black", diag = FALSE, order="hclust", col=brewer.pal(n=10, name="RdYlBu")))
@@ -1811,7 +1839,7 @@ ggsave(p_corr, path = "figures", filename = "corr_plot.png", height = 10, width 
 
 # correlation plot for model
 
-correlation_small <- cor(QHI_spec_plot[,c(5,7, 9, 12:13)])
+correlation_small <- cor(collison_spec_plot[,c(5,7, 9, 12:13)])
 
 (p_corr <- corrplot(correlation_small, method="circle", type="upper", #order="hclust",
                     tl.srt=45, tl.col="black", diag = FALSE, col=brewer.pal(n=10, name="RdYlBu")))
@@ -1826,7 +1854,7 @@ chart.Correlation(correlation, histogram=TRUE, pch=19)
 
 
 # spectral mean 
-(hist <- ggplot(QHI_spec_plot_2019, aes(x = spec_mean)) +
+(hist <- ggplot(collison_spec_plot_2019, aes(x = spec_mean)) +
     geom_histogram() +
     theme_classic())
 
@@ -1835,17 +1863,17 @@ chart.Correlation(correlation, histogram=TRUE, pch=19)
 
 # spectral mean
 
-QHI_spec_plot_2019 <- QHI_spec_plot %>% filter(year == 2019) #%>%
+collison_spec_plot_2019 <- collison_spec_plot %>% filter(year == 2019) #%>%
   mutate(evenness = (evenness- min(evenness))/(max(evenness)-min(evenness)))
  
   # to scale or not to scale? 
-#QHI_spec_plot_2019$richness <- scale(QHI_spec_plot_2019$richness)
-#QHI_spec_plot_2019$evenness <- scale(QHI_spec_plot_2019$evenness)
-#QHI_spec_plot_2019$bareground <- scale(QHI_spec_plot_2019$bareground)
+#collison_spec_plot_2019$richness <- scale(collison_spec_plot_2019$richness)
+#collison_spec_plot_2019$evenness <- scale(collison_spec_plot_2019$evenness)
+#collison_spec_plot_2019$bareground <- scale(collison_spec_plot_2019$bareground)
 
-str(QHI_spec_plot_2019)
+str(collison_spec_plot_2019)
 
-m_H2a <- lmer(data = QHI_spec_plot_2019, spec_mean ~ veg_type + richness + evenness + bareground + (1|plot))
+m_H2a <- lmer(data = collison_spec_plot_2019, spec_mean ~ type + richness + evenness + bareground + (1|plot))
 
 
 summary(m_H2a)
@@ -1860,22 +1888,22 @@ qqline(resid(m_H2a))
 (fe.effects <- plot_model(m_H2a, show.values = TRUE))
 
 
-ggpredict(m_H2a, terms = c("veg_type"), type = "fe") %>% 
+ggpredict(m_H2a, terms = c("type"), type = "fe") %>% 
   plot(rawdata = TRUE) +
   scale_color_manual(values = c("#ffa544", "#2b299b")) +
   theme_spectra()
 
-(p_H2a_rich <- ggpredict(m_H2a, terms = c("richness", "veg_type"), type = "fe") %>% 
+(p_H2a_rich <- ggpredict(m_H2a, terms = c("richness", "type"), type = "fe") %>% 
     plot(rawdata = TRUE) +
     scale_color_manual(values = c("#ffa544", "#2b299b")) +
   theme_spectra())
 
-(p_H2a_even <- ggpredict(m_H2a, terms = c("evenness", "veg_type"), type = "fe") %>% 
+(p_H2a_even <- ggpredict(m_H2a, terms = c("evenness", "type"), type = "fe") %>% 
   plot(rawdata = TRUE) +
   scale_color_manual(values = c("#ffa544", "#2b299b")) +
   theme_spectra())
 
-(p_H2a_ground <- ggpredict(m_H2a, terms = c("bareground", "veg_type"), type = "fe" ) %>% 
+(p_H2a_ground <- ggpredict(m_H2a, terms = c("bareground", "type"), type = "fe" ) %>% 
   plot(rawdata = TRUE) +
   scale_color_manual(values = c("#ffa544", "#2b299b")) +
   theme_spectra())
@@ -1887,11 +1915,11 @@ grid.arrange(p_H2a_rich, p_H2a_even, p_H2a_ground, nrow = 1)
 
 # CV
 
-(hist <- ggplot(QHI_spec_plot_2019, aes(x = CV)) +
+(hist <- ggplot(collison_spec_plot_2019, aes(x = CV)) +
     geom_histogram() +
     theme_classic())
 
-m_H2b <- lmer(data = QHI_spec_plot_2019, CV ~ veg_type + richness + evenness + bareground + (1|plot))
+m_H2b <- lmer(data = collison_spec_plot_2019, CV ~ type + richness + evenness + bareground + (1|plot))
 
 summary(m_H2b)
 
@@ -1905,23 +1933,23 @@ qqline(resid(m_H2b))
 (fe.effects <- plot_model(m_H2b, show.values = TRUE))
 
 
-ggpredict(m_H2b, terms = c("veg_type"), type = "fe") %>% 
+ggpredict(m_H2b, terms = c("type"), type = "fe") %>% 
   plot(rawdata = TRUE) +
   scale_color_manual(values = c("#ffa544", "#2b299b")) +
   theme_spectra()
 
-(p_H2b_rich <- ggpredict(m_H2b, terms = c("richness", "veg_type"), type = "fe") %>% 
+(p_H2b_rich <- ggpredict(m_H2b, terms = c("richness", "type"), type = "fe") %>% 
   plot(rawdata = TRUE) +
   scale_color_manual(values = c("#ffa544", "#2b299b")) +
     ylim(0.3,1) +
   theme_spectra())
 
-(p_H2b_even <- ggpredict(m_H2b, terms = c("evenness", "veg_type"), type = "fe") %>% 
+(p_H2b_even <- ggpredict(m_H2b, terms = c("evenness", "type"), type = "fe") %>% 
   plot(rawdata = TRUE) +
   scale_color_manual(values = c("#ffa544", "#2b299b")) +
   theme_spectra())
 
-(p_H2b_ground <- ggpredict(m_H2b, terms = c("bareground", "veg_type"), type = "fe") %>% 
+(p_H2b_ground <- ggpredict(m_H2b, terms = c("bareground", "type"), type = "fe") %>% 
   plot(rawdata = TRUE) +
   scale_color_manual(values = c("#ffa544", "#2b299b")) +
   theme_spectra())
@@ -1933,7 +1961,7 @@ grid.arrange(p_H2a_rich, p_H2a_even, p_H2a_ground,
 
 # only 2019
 
-pca_H2 <- QHI_spec_plot %>%
+pca_H2 <- collison_spec_plot %>%
   filter(year == 2019)
 
 head(pca_H2)
@@ -1984,7 +2012,7 @@ fviz_pca_var(res.pca_H2, col.var = "contrib",
 
 # grouped by elipsise
 
-t <- QHI_spec_plot %>%
+t <- collison_spec_plot %>%
   filter(year == 2019)
 
 (p_pca <- fviz_pca_biplot(res.pca_H2,
@@ -2016,7 +2044,7 @@ t <- QHI_spec_plot %>%
 
 # pca 2018 & 2019
 
-pca_H2_2018_2019 <- QHI_spec_plot 
+pca_H2_2018_2019 <- collison_spec_plot 
 
 head(pca_H2)
 
@@ -2057,7 +2085,7 @@ fviz_pca_var(res.pca_H2_2018_2019, col.var = "cos2",
              repel = TRUE)
 
 # contributions of variables 
-corrplot(var$contrib, is.corr=FALSE)    
+corrplot(var$contrib, is.corr=FALSE, axes = 1:2)    
 
 
 fviz_pca_var(res.pca_H2_2018_2019, col.var = "contrib",
@@ -2066,8 +2094,8 @@ fviz_pca_var(res.pca_H2_2018_2019, col.var = "contrib",
 # biplot grouped by year 
 (p_pca <- fviz_pca_biplot(res.pca_H2_2018_2019,
                           geom.ind = "point", # show points only (nbut not "text")
-                          fill.ind = QHI_spec_plot$year, # color by groups
-                          coll.ind = QHI_spec_plot$year, # color by groups
+                          fill.ind = collison_spec_plot$year, # color by groups
+                          coll.ind = collison_spec_plot$year, # color by groups
                           pointshape = 21, 
                           #  palette = c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FF4500", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF"),
                           addEllipses = TRUE, # Concentration ellipses
@@ -2091,10 +2119,10 @@ fviz_pca_var(res.pca_H2_2018_2019, col.var = "contrib",
   #ggpubr::fill_palette(c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FF4500", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF"))+      # Indiviual fill color
   
 
-# biplot grouped by veg_type 
+# biplot grouped by type 
 (p_pca <- fviz_pca_biplot(res.pca_H2_2018_2019,
                           geom.ind = "point", # show points only (nbut not "text")
-                          fill.ind = QHI_spec_plot$veg_type, # color by groups
+                          fill.ind = collison_spec_plot$type, # color by groups
                           pointshape = 21, 
                           #  palette = c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FF4500", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF"),
                           addEllipses = TRUE, # Concentration ellipses
@@ -2116,9 +2144,9 @@ fviz_pca_var(res.pca_H2_2018_2019, col.var = "contrib",
                           xlab = "PC1", ylab = "PC2")) +
   ggpubr::color_palette("Dark2")      # Variable colors
 
-# pca by veg_type and year
-t <- QHI_spec_plot %>%
-  unite(site, c(veg_type,year))
+# pca by type and year
+t <- collison_spec_plot %>%
+  unite(site, c(type,year))
 
 (p_pca <- fviz_pca_biplot(res.pca_H2_2018_2019,
                           geom.ind = "point", # show points only (nbut not "text")
@@ -2151,6 +2179,7 @@ t <- QHI_spec_plot %>%
 
 QHI_spatial <- collison_small %>% 
  ungroup() %>%
+  #filter(type == "HE") %>%
   mutate(x = as.numeric(group_indices(., plot)),
          y = as.numeric(group_indices(., plot)),
          # add spatial distance between HE and KO plots
@@ -2174,6 +2203,7 @@ QHI_spatial <- collison_small %>%
                        plot == "KO4" ~ 3.5)) %>%
   # select only relavent colunms for variogram?
   select(x, y, spec_mean)
+ 
 
 ggplot(QHI_spatial, aes(x = x, y = y)) +
   geom_point()
@@ -2194,6 +2224,8 @@ coordinates(QHI_spatial) = ~x+y
 # variogram model
 (v0 = variogram(spec_mean~1, QHI_spatial))
 
+
+
 # fit under 4 different models
 (v.fit0 = fit.variogram(v0, vgm(c("Exp", "Mat", "Sph", "Ste")), fit.kappa = TRUE)) # ste is selected to be the best
 
@@ -2206,19 +2238,17 @@ plot(variogramLine(v.fit0, maxdist = 150, n=20, covariance = TRUE))
 
 # ggplot semivariance
 
-s = variogramLine(v.fit0, maxdist = max(v0$dist))
-head(preds)
-
 preds = variogramLine(v.fit0, maxdist =  150)
 head(preds)
 
 (p_variogram <- ggplot(v0, aes(x = dist, y = gamma)) +
     geom_line(data = preds) +
-    geom_point() +
-    geom_vline(xintercept = 7, linetype="dotted") +
+  #  geom_point() +
+    geom_vline(xintercept = 110, linetype="dotted") +
     #  xlim(0,15) +
     xlab("distance (m)") +
-    # ylim(0,70) +
+    coord_cartesian(xlim = c(8, 150)) + 
+     ylim(0,70) +
     #coord_cartesian(xlim = c(0.7, 15), ylim = c(2.5, 63)) +
     theme_spectra())
 
