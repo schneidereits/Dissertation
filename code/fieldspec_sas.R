@@ -19,6 +19,7 @@ library(factoextra) # for pca visulizaiton
 library(gridExtra)
 library(ggpmisc) # for ISI minima visulizaiton
 library(RColorBrewer)
+library(broom)
 library(sjPlot)  # to visualise model outputs
 library(ggeffects)  # to visualise model predictions
 library(glmmTMB) # to visualise model predictions
@@ -430,9 +431,10 @@ supervised_band_selection <- tibble(wavelength =
                                         seq(745, 755, by = 0.01), # End of red-edge transition
                                         seq(920, 985, by = 0.01)))# Vascular plant structures & H20 
 
-supervised_band_selection <- collison %>%
-  filter(wavelength %in% supervised_band_selection$wavelength) %>%
-  group_by(type, plot, id) %>%
+supervised_band_selection <- QHI_2018_2019 %>%
+  filter(!type == "mixed", 
+    wavelength %in% supervised_band_selection$wavelength) %>%
+  group_by(type, plot, id, year) %>%
   summarise(spec_mean = mean(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance)))
 
@@ -448,7 +450,7 @@ collison_ISI <- collison %>%
 ISI_band_selection <- collison_ISI %>%
   mutate(n = row_number()) %>%
   # filter wavelengths that are local ISI minima; (-) is to denote minima
-  filter(n %in% find_peaks(-collison_ISI$ISI))          
+  filter(n %in% find_peaks(-collison_ISI$ISI)) 
 
 
 SZU <- collison_ISI %>%
@@ -465,9 +467,10 @@ SZU <- collison_ISI %>%
 head(SZU, n=5)
 
 # reduced dimentionality; product of ISI band selection
-lowD <- collison %>%
-  filter(wavelength %in% ISI_band_selection$wavelength) %>%
-  group_by(type, plot, id) %>%
+lowD <- QHI_2018_2019 %>%
+  filter(!type == "mixed",
+         wavelength %in% ISI_band_selection$wavelength) %>%
+  group_by(type, plot, id, year) %>%
   summarise(spec_mean = mean(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance)))
 
@@ -1242,17 +1245,11 @@ ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=type, color = type
   labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n")
 
 
-# model H3 (band selection) ----
+# H3 models (band selection) ----
 
-# spectral mean
+# linear model with supervised band selection 2018+2019
 
-(hist <- ggplot(lowD, aes(x = spec_mean)) +
-   geom_histogram() +
-   theme_classic())
-
-# linear model with band selection ()
-
-m_H3a <- lmer(data = lowD, spec_mean ~ type + (1|plot))
+m_H3a <- lmer(data = supervised_band_selection, spec_mean ~ type + (1|plot) + (1|year))
 
 summary(m_H3a)
 
@@ -1274,13 +1271,13 @@ ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=type, color = type
 
 # CV
 
-(hist <- ggplot(lowD, aes(x = CV)) +
+(hist <- ggplot(supervised_band_selection, aes(x = CV)) +
     geom_histogram() +
     theme_classic())
 
 # linear model with band selection
 
-m_H3b <- lmer(data = lowD, CV ~ type + (1|plot))
+m_H3b <- lmer(data = supervised_band_selection, CV ~ type + (1|plot) + (1|year))
 
 summary(m_H3b)
 
@@ -1301,17 +1298,12 @@ ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=type, color = type
   labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n")
 
 
-# models with supervised band selection for dimention reduction 
+# linear model with supervised band selection only 2019
 
-# spectral mean
+supervised_band_selection_2019 <- supervised_band_selection %>%
+  filter(year == 2019)
 
-(hist <- ggplot(supervised_band_selection, aes(x = spec_mean)) +
-    geom_histogram() +
-    theme_classic())
-
-# linear model with band selection
-
-m_H3c <- lmer(data = supervised_band_selection, spec_mean ~ type + (1|plot))
+m_H3c <- lmer(data = supervised_band_selection_2019, spec_mean ~ type + (1|plot))
 
 summary(m_H3c)
 
@@ -1333,13 +1325,14 @@ ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=type, color = type
 
 # CV
 
-(hist <- ggplot(supervised_band_selection, aes(x = CV)) +
+(hist <- ggplot(supervised_band_selection_2019, aes(x = CV)) +
     geom_histogram() +
     theme_classic())
 
-# linear model with band selection
 
-m_H3d <- lmer(data = supervised_band_selection, CV ~ type + (1|plot))
+# models with supervised band selection for dimention reduction 
+
+m_H3d <- lmer(data = supervised_band_selection_2019, CV ~ type + (1|plot))
 
 summary(m_H3d)
 
@@ -1360,13 +1353,68 @@ ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=type, color = type
   labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n")
 
 
+# spectral mean (2018 + 2019)
+
+(hist <- ggplot(lowD, aes(x = spec_mean)) +
+   geom_histogram() +
+   theme_classic())
+
+# linear model with band selection ()
+
+m_H3e <- lmer(data = lowD, spec_mean ~ type + (1|plot))
+
+summary(m_H3e)
+
+plot(m_H3e)
+qqnorm(resid(m_H3e))
+qqline(resid(m_H3e)) 
+
+
+# Visualises random effects 
+(re.effects <- plot_model(m_H3e, type = "re", show.values = TRUE))
+# visulise fixed effect
+(fe.effects <- plot_model(m_H3e, show.values = TRUE))
+
+ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=type, color = type)) + 
+  geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
+  stat_smooth(method = "lm", aes(fill = type, color = type), se=TRUE )+
+  theme_cowplot() +
+  labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n")
+
+# CV
+
+(hist <- ggplot(lowD, aes(x = CV)) +
+    geom_histogram() +
+    theme_classic())
+
+# linear model with band selection
+
+m_H3f <- lmer(data = lowD, CV ~ type + (1|plot))
+
+summary(m_H3f)
+
+plot(m_H3f)
+qqnorm(resid(m_H3f))
+qqline(resid(m_H3f)) 
+
+
+# Visualises random effects 
+(re.effects <- plot_model(m_H3f, type = "re", show.values = TRUE))
+# visulise fixed effect
+(fe.effects <- plot_model(m_H3f, show.values = TRUE))
+
+ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=type, color = type)) + 
+  geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
+  stat_smooth(method = "lm", aes(fill = type, color = type), se=TRUE )+
+  theme_cowplot() +
+  labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n")
+
+
+
 # combined model vis
 
-library(broom)
-
 # spectral mean
-
-(p_H3a <- dwplot(list(m_H1a, m_H3a, m_H3c), 
+(p_H3a <- dwplot(list(m_H1a, m_H3a, m_H3c, m_H3e), 
                  vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 1)) +
     theme_cowplot() +
     theme(legend.position = c(0.8, 0.2),
@@ -1375,12 +1423,9 @@ library(broom)
 
 ggsave(p_H3a, path = "figures", filename = "H3_models_mean.png", height = 10, width = 12)
 
-#
-
 # CV
-
 # effect sizes and error dont seem to correspond with model summary...
-(p_H3b <-dwplot(list(m_H1b, m_H3b, m_H3d), 
+(p_H3b <-dwplot(list(m_H1b, m_H3b, m_H3d, m_H3f), 
                 vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 1)) +
     theme_cowplot() +
     theme(legend.position = c(0.8, 0.2),
