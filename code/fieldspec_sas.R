@@ -177,7 +177,7 @@ raincloud_theme <- theme(
   axis.line.y = element_line(colour = "black", size = 0.5, linetype = "solid"))
 
 # finding extrema; source: https://github.com/stas-g/findPeaks
-find_peaks <- function (x, m = 3){
+find_peaks <- function (x, m = 1){
   shape <- diff(sign(diff(x, na.pad = FALSE)))
   pks <- sapply(which(shape < 0), FUN = function(i){
     z <- i - m + 1
@@ -288,6 +288,8 @@ QHI_small <- QHI %>%
   summarise(spec_mean = mean(reflectance),
             spec_SD = sd(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance)))
+
+head(QHI_small)
 
 
 # group by wavelength 
@@ -479,7 +481,8 @@ lowD <- QHI_2018_2019 %>%
 (p_ISI <-  ggplot(collison_ISI, aes(x=wavelength, y=ISI)) +
     geom_line() +
     theme_cowplot() +
-    stat_valleys(span = 3, shape = 1, size = 2, color = "black", fill = NA) +
+    geom_point(data = ISI_band_selection) +
+    #stat_valleys(span = 3, shape = 1, size = 2, color = "black", fill = NA) +
     scale_y_continuous(expand = expand_scale(mult = c(0, .1))) +
     scale_x_continuous(expand = expand_scale(mult = c(0, .1))) +
     annotate("rect", xmin = 400, xmax = 500, ymin = 16,
@@ -1476,43 +1479,9 @@ print(res.pca)
 eig.val <- get_eigenvalue(res.pca)
 eig.val
 
-# pca barplot
-fviz_eig(res.pca, addlabels = TRUE, ylim = c(0, 50))
-
-# saving results
-var <- get_pca_var(res.pca)
-var
-
-# Coordinates
-head(var$coord)
-# Cos2: quality on the factore map
-head(var$cos2)
-# Contributions to the principal components
-head(var$contrib)
-
-# plotting variables
-fviz_pca_var(res.pca, col.var = "black")
-
-# to visulize correlation on of varibals in each dimention
-library("corrplot")
-corrplot(var$cos2, is.corr=FALSE)
-
-# Total cos2 of variables on Dim.1 and Dim.2
-fviz_cos2(res.pca, choice = "var", axes = 1:2)
-
-# Color by cos2 values: quality on the factor map
-fviz_pca_var(res.pca, col.var = "cos2",
-             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), 
-             repel = TRUE)
-
-# contributions of variables 
-corrplot(var$contrib, is.corr=FALSE)    
-
-fviz_pca_var(res.pca, col.var = "contrib",
-             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"))
 
 # grouped by elipsise
-(p_pca_QHI <- fviz_pca_ind(res.pca,
+(p_pca_QHI <- fviz_pca_biplot(res.pca,
                            geom.ind = "point", # show points only (nbut not "text")
                            col.ind = "black", # color by groups
                            pointshape = 21,
@@ -1540,8 +1509,50 @@ pca_lowD <- QHI %>%
 
 res.pca_lowD <- PCA(pca_lowD[,4:5], scale.unit = TRUE, ncp = 5, graph = TRUE)
 
+# pca results
+print(res.pca_lowD)
+
+# eigen values
+
+eig.val <- get_eigenvalue(res.pca_lowD)
+eig.val
+
+# pca barplot
+fviz_eig(res.pca, addlabels = TRUE, ylim = c(0, 50))
+
+# saving results
+var <- get_pca_var(res.pca)
+var
+
+# Coordinates
+head(var$coord)
+# Cos2: quality on the factore map
+head(var$cos2)
+# Contributions to the principal components
+head(var$contrib)
+
+# plotting variables
+fviz_pca_var(res.pca, col.var = "black")
+
+# to visulize correlation on of varibals in each dimention
+corrplot(var$cos2, is.corr=FALSE)
+
+# Total cos2 of variables on Dim.1 and Dim.2
+fviz_cos2(res.pca, choice = "var", axes = 1:2)
+
+# Color by cos2 values: quality on the factor map
+fviz_pca_var(res.pca, col.var = "cos2",
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), 
+             repel = TRUE)
+
+# contributions of variables 
+corrplot(var$contrib, is.corr=FALSE)    
+
+fviz_pca_var(res.pca, col.var = "contrib",
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"))
+
 # pca 
-(p_pca <- fviz_pca_ind(res.pca_lowD,
+(p_pca <- fviz_pca_biplot(res.pca_lowD,
                        geom.ind = "point", # show points only (nbut not "text")
                        pointshape = 21,
                        fill.ind = QHI_small$type, # color by groups
