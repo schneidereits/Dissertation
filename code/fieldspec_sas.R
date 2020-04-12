@@ -85,8 +85,10 @@ theme_rgb_CV <- list(annotate("rect", xmin = 400, xmax = 500, ymin = 0, ymax = 0
                      scale_y_continuous(expand = expand_scale(mult = c(0, .1))),
                      scale_x_continuous(expand = expand_scale(mult = c(0, .1))))
 
-scale_color_QHI <- list(scale_color_manual(values = c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FF4500", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF", "#A8A8A8")))
-scale_color_collison <- list(scale_color_manual(values = c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FF4500", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF")))
+scale_color_QHI <- list(scale_color_manual(values = c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FF8247", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF", "#A8A8A8")))
+scale_color_collison <- list(scale_color_manual(values = c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FF8247", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF")))
+
+
 
 # ploting spectral signatures 
 spec_plot <- function(x){
@@ -446,14 +448,47 @@ supervised_band_selection <- QHI_2018_2019 %>%
 collison_ISI <- collison %>%
   filter(type %in% c("KO" , "HE")) %>%
   group_by(wavelength) %>%
-  summarise(ISI = (1.96*(mean(reflectance[type=="HE"]) + mean(reflectance[type=="KO"])))/
-              abs(sd(reflectance[type=="HE"] - sd(reflectance[type=="KO"])))) 
+  summarise(ISI = ((mean(reflectance[type=="HE"]) + mean(reflectance[type=="KO"]))*1.96)/
+              (abs(sd(reflectance[type=="HE"] - sd(reflectance[type=="KO"]))))) %>%
+  mutate(region = case_when(between(wavelength, 400, 500) ~ "blue",		
+                            between(wavelength, 500, 600) ~ "green",		
+                            between(wavelength, 600, 680) ~ "red",		
+                            between(wavelength, 680, 800) ~ "NIR",		
+                            between(wavelength, 800, 1000) ~ "IR")) 
+
 
 ISI_band_selection <- collison_ISI %>%
   mutate(n = row_number()) %>%
   # filter wavelengths that are local ISI minima; (-) is to denote minima
-  filter(n %in% find_peaks(-collison_ISI$ISI)) 
+  filter(n %in% find_peaks(-collison_ISI$ISI)) %>%
+  mutate(region = case_when(between(wavelength, 400, 500) ~ "blue",		
+                            between(wavelength, 500, 600) ~ "green",		
+                            between(wavelength, 600, 680) ~ "red",		
+                            between(wavelength, 680, 800) ~ "NIR",		
+                            between(wavelength, 800, 1000) ~ "IR")) 
 
+ISI_band_selection_sum_tbl <- collison_ISI %>%
+  group_by(region) %>%
+  summarise(ISI = sum(ISI))
+
+ISI_band_selection_sum_tbl <- collison_ISI %>%
+  group_by(region) %>%
+  count(region) %>%
+  left_join(ISI_band_selection_sum_tbl) %>%
+  # relative ISI colunm (ISI* portotional size of region)
+  mutate(relative_ISI = ISI/(n/123))
+
+ISI_band_selection_sum_tbl <- ISI_band_selection %>%
+  group_by(region) %>%
+  count(region) %>%
+  right_join(ISI_band_selection_sum_tbl, value="region")
+  
+ISI_band_selection_sum_tbl <- ISI_band_selection %>%
+  group_by(region) %>%
+  summarise(selected_ISI = sum(ISI)) %>%
+  left_join(ISI_band_selection_sum_tbl) 
+            
+ 
 
 SZU <- collison_ISI %>%
   arrange(ISI) %>%
@@ -500,7 +535,9 @@ lowD <- QHI_2018_2019 %>%
 
 # plot of trends in accumulated D_ISIi values
 (p_SZU <- ggplot(SZU, aes(x=n, y=D_ISIi)) +
+    geom_vline(xintercept = 63, linetype="dotted") +
     geom_line() +
+    labs(x= "Number of bands selected ") +
     theme_cowplot())
 
 #ggsave(p_SZU, path = "figures", filename = "SZU.png", height = 10, width = 12)
@@ -905,9 +942,10 @@ collison_wavelength <- collison %>%
                  aes(x=type, y=spec_mean),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
-    theme_cowplot() +
+    theme_spectra() +
     scale_color_collison +
     ylab("Reflectance") +
+    ylim(0, 85) +
     theme(panel.background =  element_rect(fill = "white"),
           plot.background = element_rect(color = "#cfe2fd")))
 
@@ -924,7 +962,7 @@ collison_wavelength <- collison %>%
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
-    theme_cowplot() +
+    theme_spectra() +
     ylim(0.1, 0.4) +
     ylab("Spectral diversity (CV)") +
     theme(panel.background =  element_rect(fill = "white"),
@@ -943,7 +981,8 @@ collison_wavelength <- collison %>%
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
-    theme_cowplot() +
+    theme_spectra() +
+    ylim(0, 85) +
     theme(panel.background =  element_rect(fill = "white"),
           plot.background = element_rect(color = "lightgreen")))
 
@@ -961,7 +1000,7 @@ collison_wavelength <- collison %>%
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
-    theme_cowplot() +
+    theme_spectra() +
     ylim(0.1, 0.4) +
     theme(panel.background =  element_rect(fill = "white"),
           plot.background = element_rect(color = "lightgreen")))
@@ -979,7 +1018,8 @@ collison_wavelength <- collison %>%
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
-    theme_cowplot() +
+    theme_spectra() +
+    ylim(0, 85) +
     theme(panel.background =  element_rect(fill = "white"),
           plot.background = element_rect(color = "red")))
 
@@ -997,7 +1037,7 @@ collison_wavelength <- collison %>%
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
-    theme_cowplot() +
+    theme_spectra() +
     ylim(0.1, 0.4) +
     theme(panel.background =  element_rect(fill = "white"),
           plot.background = element_rect(color = "red")))
@@ -1015,7 +1055,8 @@ collison_wavelength <- collison %>%
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
-    theme_cowplot() +
+    theme_spectra() +
+    ylim(0, 85) +
     theme(panel.background =  element_rect(fill = "white"),
           plot.background = element_rect(color = "tomato")))
 
@@ -1033,7 +1074,7 @@ collison_wavelength <- collison %>%
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
-    theme_cowplot() +
+    theme_spectra() +
     ylim(0.1, 0.4) +
     theme(panel.background =  element_rect(fill = "white"),
           plot.background = element_rect(color = "tomato")))
@@ -1051,7 +1092,8 @@ collison_wavelength <- collison %>%
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
-    theme_cowplot() +
+    theme_spectra() +
+    ylim(0, 85) +
     theme(panel.background =  element_rect(fill = "white"),
           plot.background = element_rect(color = "darkgrey")))
 
@@ -1069,7 +1111,7 @@ collison_wavelength <- collison %>%
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
-    theme_cowplot() +
+    theme_spectra() +
     ylim(0.1, 0.4) +
     theme(panel.background =  element_rect(fill = "white"),
           plot.background = element_rect(color = "darkgrey")))
