@@ -28,6 +28,7 @@ library(lme4) # for models
 library(sp) # spatial variogram
 library(gstat) # spatial variogram
 library(tidyverse)
+library(effects) # for model vis with interaction terms
 
 
 
@@ -468,10 +469,12 @@ ISI_band_selection <- collison_ISI %>%
                             between(wavelength, 680, 800) ~ "NIR",		
                             between(wavelength, 800, 1000) ~ "IR")) 
 
+# ISI by region
 ISI_band_selection_sum_tbl <- collison_ISI %>%
   group_by(region) %>%
   summarise(ISI = sum(ISI))
 
+# number relative ISI (as groups include differnt numbers of wavebands)
 ISI_band_selection_sum_tbl <- collison_ISI %>%
   group_by(region) %>%
   count(region) %>%
@@ -479,11 +482,13 @@ ISI_band_selection_sum_tbl <- collison_ISI %>%
   # relative ISI colunm (ISI* portotional size of region)
   mutate(relative_ISI = ISI/(n/123))
 
+# number wavebands selected 
 ISI_band_selection_sum_tbl <- ISI_band_selection %>%
   group_by(region) %>%
   count(region) %>%
   right_join(ISI_band_selection_sum_tbl, value="region")
-  
+
+# ISI of these selected wavebands   
 ISI_band_selection_sum_tbl <- ISI_band_selection %>%
   group_by(region) %>%
   summarise(selected_ISI = sum(ISI)) %>%
@@ -531,6 +536,127 @@ lowD <- QHI_2018_2019 %>%
              ymax = 23, alpha = .15, fill = "tomato") +
     annotate("rect", xmin = 800, xmax = 985, ymin = 16, 
              ymax = 23, alpha = .15, fill = "darkgrey"))
+
+#ggsave(p_ISI, path = "figures", filename = "ISI_by_wavelength.png", height = 10, width = 12)
+
+# plot of trends in accumulated D_ISIi values
+(p_SZU <- ggplot(SZU, aes(x=n, y=D_ISIi)) +
+    geom_vline(xintercept = 63, linetype="dotted") +
+    geom_line() +
+    labs(x= "Number of bands selected ") +
+    theme_cowplot())
+
+#ggsave(p_SZU, path = "figures", filename = "SZU.png", height = 10, width = 12)
+
+
+############# QHI ISI band selection and SZU 
+
+# inelegant solution to selecting only 2018 wavebands that have a matching 2019 evivalent 
+# # # REASON: (2018 has a higher resolution that breaks selection algorythem)
+# first filter only 2019 
+# then round (as 2018 has no significant digits)
+# finally filter QHI_2018_2019 for band in  (next chunk)
+wavelengths_2019_rounded <- QHI_2018_2019 %>%
+  filter(year =="2019") %>%
+  mutate(wavelength = round(wavelength, digits = 0)) 
+
+QHI_ISI <- QHI_2018_2019 %>%
+  filter(type %in% c("KO" , "HE")) %>% # alothough later the selected wavebands get applied to PS2 data you only selected wavebands with known vegtypes
+  mutate(wavelength = round(wavelength, digits = 0)) %>%
+  filter(wavelength %in% wavelengths_2019_rounded$wavelength) %>%
+  group_by(wavelength) %>%
+  summarise(ISI = ((mean(reflectance[type=="HE"]) + mean(reflectance[type=="KO"]))*1.96)/
+              (abs(sd(reflectance[type=="HE"] - sd(reflectance[type=="KO"]))))) %>%
+  mutate(region = case_when(between(wavelength, 400, 500) ~ "blue",		
+                            between(wavelength, 500, 600) ~ "green",		
+                            between(wavelength, 600, 680) ~ "red",		
+                            between(wavelength, 680, 800) ~ "NIR",		
+                            between(wavelength, 800, 1000) ~ "IR")) 
+
+
+QHI_ISI_band_selection <- QHI_ISI %>%
+  mutate(n = row_number()) %>%
+  # filter wavelengths that are local ISI minima; (-) is to denote minima
+  filter(n %in% find_peaks(-QHI_ISI$ISI)) %>%
+  mutate(region = case_when(between(wavelength, 400, 500) ~ "blue",		
+                            between(wavelength, 500, 600) ~ "green",		
+                            between(wavelength, 600, 680) ~ "red",		
+                            between(wavelength, 680, 800) ~ "NIR",		
+                            between(wavelength, 800, 1000) ~ "IR")) 
+
+ ggplot(QHI_ISI, aes(x=wavelength, y=ISI)) +
+    geom_line() +
+    theme_cowplot()
+  
+  
+# ISI by region
+QHI_ISI_band_selection_sum_tbl <- QHI_ISI %>%
+  group_by(region) %>%
+  summarise(ISI = sum(ISI))
+
+# number relative ISI (as groups include differnt numbers of wavebands)
+QHI_ISI_band_selection_sum_tbl <- QHI_ISI %>%
+  group_by(region) %>%
+  count(region) %>%
+  left_join(QHI_ISI_band_selection_sum_tbl) %>%
+  # relative ISI colunm (ISI* portotional size of region)
+  mutate(relative_ISI = ISI/(n/123))
+
+# number wavebands selected 
+QHI_ISI_band_selection_sum_tbl <- QHI_ISI_band_selection %>%
+  group_by(region) %>%
+  count(region) %>%
+  right_join(QHI_ISI_band_selection_sum_tbl, value="region")
+
+# ISI of these selected wavebands   
+QHI_ISI_band_selection_sum_tbl <- QHI_ISI_band_selection %>%
+  group_by(region) %>%
+  summarise(selected_ISI = sum(ISI)) %>%
+  left_join(QHI_ISI_band_selection_sum_tbl) 
+
+
+
+QHI_SZU <- QHI_ISI %>%
+  arrange(ISI) %>%
+  mutate(ISI = as.numeric(ISI),
+         n = row_number(),
+         d_ISI = (lead(ISI)/ISI - 1) *100,
+         # 0.015 is the trade-off value (q)
+         d_qi = (0.015- d_ISI),
+         # number of bands is equal to max DISIi 
+         D_ISIi = cumsum(d_qi))
+
+# the selcted wavelengths according to SZU
+head(QHI_SZU, n=5)
+
+# reduced dimentionality; product of ISI band selection
+lowD <- QHI_2018_2019 %>%
+  filter(!type == "mixed",
+         wavelength %in% ISI_band_selection$wavelength) %>%
+  group_by(type, plot, id, year) %>%
+  summarise(spec_mean = mean(reflectance),
+            CV = mean(sd(reflectance)/mean(reflectance)))
+
+# need to spruce up https://www.rdocumentation.org/packages/ggpmisc/versions/0.3.3/topics/stat_peaks
+# plot of ISI by wavelength and local minima
+ggplot(QHI_ISI, aes(x=wavelength, y=ISI)) +
+    geom_line() +
+    theme_cowplot() +
+    geom_point(data = QHI_ISI_band_selection, shape = 1) +
+    geom_rug(data = QHI_ISI_band_selection, sides = "b" ) +
+    #stat_valleys(span = 3, shape = 1, size = 2, color = "black", fill = NA) +
+    scale_y_continuous(expand = expand_scale(mult = c(0, .1))) +
+    scale_x_continuous(expand = expand_scale(mult = c(0, .1))) +
+    annotate("rect", xmin = 400, xmax = 500, ymin = 15,
+             ymax = 21, alpha = .15, fill = "blue") + 
+    annotate("rect", xmin = 500, xmax = 600, ymin = 15, 
+             ymax = 21, alpha = .15, fill = "green") +
+    annotate("rect", xmin = 600, xmax = 680, ymin = 15, 
+             ymax = 21, alpha = .15, fill = "red") + 
+    annotate("rect", xmin = 680, xmax = 800, ymin = 15, 
+             ymax = 21, alpha = .15, fill = "tomato") +
+    annotate("rect", xmin = 800, xmax = 985, ymin = 15, 
+             ymax = 21, alpha = .15, fill = "darkgrey")
 
 #ggsave(p_ISI, path = "figures", filename = "ISI_by_wavelength.png", height = 10, width = 12)
 
@@ -1166,7 +1292,7 @@ print(p_IR_CV + rremove("legend")  + rremove("xylab"), vp = define_region(row = 
    theme_classic())
 
 # does not converge
-summary(lmer(data = QHI_2018_2019_small, spec_mean ~ type + (1|plot) + (1|year))) # does not converge
+summary(lmer(data = QHI_2018_2019_small, spec_mean ~ type + year + (1|plot))) # does not converge
 
 # model only 2018+2019 only HE and KO
 
@@ -1176,7 +1302,11 @@ summary(lmer(data = QHI_2018_2019_small, spec_mean ~ type + (1|plot) + (1|year))
 
 # linear model for H1
 
-m_H1a <- lmer(data = collison_2018_2019_small, spec_mean ~ (type-1) + (1|plot) + (1|year)) # (type-1) changes intercpt to HE 
+m_H1a <- (lmer(data = collison_2018_2019_small, spec_mean ~ type + year + (1|plot))) # (type-1) changes intercpt to HE 
+
+# temporary additon of mixed
+m_H1a <- (lmer(data = QHI_2018_2019_small, spec_mean ~ type + year + (1|plot))) # (type-1) changes intercpt to HE 
+
 
 summary(m_H1a)
 
@@ -1190,7 +1320,7 @@ qqline(resid(m_H1a))  # points fall nicely onto the line - good!
 (fe.effects <- plot_model(m_H1a, show.values = TRUE))
 
 # gpreditct by type
-ggpredict(m_H1a, terms = c("type"), type = "fe") %>% 
+ggpredict(m_H1a, terms = c("type", "year"), type = "fe") %>% 
   plot(rawdata = TRUE) +
   #scale_color_manual(values = c("#ffa544", "#2b299b")) +
   theme_cowplot()
@@ -1262,7 +1392,7 @@ veg.cover <- ggplot() +
     geom_histogram() +
     theme_classic())
 
-lmer(data = QHI_2018_2019_small, CV ~ (type-1) + (1|plot) + (1|year))
+lmer(data = QHI_2018_2019_small, CV ~ (type-1) + year + (1|plot))
 # does converge but for consistence should leave out
 
 
@@ -1271,7 +1401,11 @@ lmer(data = QHI_2018_2019_small, CV ~ (type-1) + (1|plot) + (1|year))
     geom_histogram() +
     theme_classic())
 
-m_H1b <- lmer(data = collison_2018_2019_small, CV ~ type + (1|plot) + (1|year))
+m_H1b <- lmer(data = collison_2018_2019_small, CV ~ type + year + (1|plot))
+
+# temporary addition of mixed
+m_H1b <- lmer(data = QHI_2018_2019_small, CV ~ type + year + (1|plot))
+
 
 summary(m_H1b)
 
@@ -1284,18 +1418,18 @@ qqline(resid(m_H1b))
 # visulise fixed effect
 (fe.effects <- plot_model(m_H1b, show.values = TRUE))
 
-ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=type, color = type)) + 
-  geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
-  stat_smooth(method = "lm", aes(fill = type, color = type), se=TRUE )+
-  theme_cowplot() +
-  labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n")
+# gpreditct by type
+ggpredict(m_H1b, terms = c("type"), type = "fe") %>% 
+  plot(rawdata = TRUE) +
+  #scale_color_manual(values = c("#ffa544", "#2b299b")) +
+  theme_cowplot()
 
 
 # H3 models (band selection) ----
 
 # linear model with supervised band selection 2018+2019
 
-m_H3a <- lmer(data = supervised_band_selection, spec_mean ~ (type-1) + (1|plot) + (1|year))
+m_H3a <- lmer(data = supervised_band_selection, spec_mean ~ type + year + (1|plot))
 
 summary(m_H3a)
 
@@ -1309,11 +1443,6 @@ qqline(resid(m_H3a))
 # visulise fixed effect
 (fe.effects <- plot_model(m_H3a, show.values = TRUE))
 
-ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=type, color = type)) + 
-  geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
-  stat_smooth(method = "lm", aes(fill = type, color = type), se=TRUE )+
-  theme_cowplot() +
-  labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n")
 
 # CV
 
@@ -1323,7 +1452,7 @@ ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=type, color = type
 
 # linear model with band selection
 
-m_H3b <- lmer(data = supervised_band_selection, CV ~ (type-1) + (1|plot) + (1|year))
+m_H3b <- lmer(data = supervised_band_selection, CV ~ type + year + (1|plot))
 
 summary(m_H3b)
 
@@ -1337,19 +1466,13 @@ qqline(resid(m_H3b))
 # visulise fixed effect
 (fe.effects <- plot_model(m_H3b, show.values = TRUE))
 
-ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=type, color = type)) + 
-  geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
-  stat_smooth(method = "lm", aes(fill = type, color = type), se=TRUE )+
-  theme_cowplot() +
-  labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n")
-
 
 # linear model with supervised band selection only 2019
 
 supervised_band_selection_2019 <- supervised_band_selection %>%
   filter(year == 2019)
 
-m_H3c <- lmer(data = supervised_band_selection_2019, spec_mean ~ (type-1) + (1|plot))
+m_H3c <- lmer(data = supervised_band_selection_2019, spec_mean ~ type + (1|plot))
 
 summary(m_H3c)
 
@@ -1363,11 +1486,6 @@ qqline(resid(m_H3c))
 # visulise fixed effect
 (fe.effects <- plot_model(m_H3c, show.values = TRUE))
 
-ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=type, color = type)) + 
-  geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
-  stat_smooth(method = "lm", aes(fill = type, color = type), se=TRUE )+
-  theme_cowplot() +
-  labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n")
 
 # CV
 
@@ -1378,7 +1496,7 @@ ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=type, color = type
 
 # models with supervised band selection for dimention reduction 
 
-m_H3d <- lmer(data = supervised_band_selection_2019, CV ~ (type-1) + (1|plot))
+m_H3d <- lmer(data = supervised_band_selection_2019, CV ~ type + (1|plot))
 
 summary(m_H3d)
 
@@ -1392,14 +1510,8 @@ qqline(resid(m_H3d))
 # visulise fixed effect
 (fe.effects <- plot_model(m_H3d, show.values = TRUE))
 
-ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=type, color = type)) + 
-  geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
-  stat_smooth(method = "lm", aes(fill = type, color = type), se=TRUE )+
-  theme_cowplot() +
-  labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n")
 
-
-# spectral mean (2018 + 2019)
+# ISI band selecrtion models
 
 (hist <- ggplot(lowD, aes(x = spec_mean)) +
    geom_histogram() +
@@ -1407,7 +1519,7 @@ ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=type, color = type
 
 # linear model with ISI band selection (2019 only)
 
-m_H3e <- lmer(data = lowD, spec_mean ~ (type-1) + (1|plot))
+m_H3e <- lmer(data = lowD, spec_mean ~ type + (1|plot))
 
 summary(m_H3e)
 
@@ -1421,11 +1533,6 @@ qqline(resid(m_H3e))
 # visulise fixed effect
 (fe.effects <- plot_model(m_H3e, show.values = TRUE))
 
-ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=type, color = type)) + 
-  geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
-  stat_smooth(method = "lm", aes(fill = type, color = type), se=TRUE )+
-  theme_cowplot() +
-  labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n")
 
 # CV
 
@@ -1435,7 +1542,7 @@ ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=type, color = type
 
 # linear model with band selection
 
-m_H3f <- lmer(data = lowD, CV ~ (type-1) + (1|plot))
+m_H3f <- lmer(data = lowD, CV ~ type + (1|plot))
 
 summary(m_H3f)
 
@@ -1448,13 +1555,6 @@ qqline(resid(m_H3f))
 (re.effects <- plot_model(m_H3f, type = "re", show.values = TRUE))
 # visulise fixed effect
 (fe.effects <- plot_model(m_H3f, show.values = TRUE))
-
-ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=type, color = type)) + 
-  geom_smooth(methods = "lm", alpha = 0.2, se=TRUE) + 
-  stat_smooth(method = "lm", aes(fill = type, color = type), se=TRUE )+
-  theme_cowplot() +
-  labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n")
-
 
 
 # combined model vis
@@ -1487,12 +1587,12 @@ grid.arrange(p_H3a, p_H3b)
 
 ggpredict(m_H3a, terms = c("type"), type = "fe") %>% 
   plot(rawdata = TRUE) +
-  scale_color_manual(values = c("#ffa544", "#2b299b")) +
+  #scale_color_manual(values = c("#ffa544", "#2b299b")) +
   theme_cowplot()
 
-ggpredict(m_H3a, terms = c("type"), type = "fe") %>% 
+ggpredict(m_H3b, terms = c("type", "year"), type = "fe") %>% 
   plot(rawdata = TRUE) +
-  scale_color_manual(values = c("#ffa544", "#2b299b")) +
+  #scale_color_manual(values = c("#ffa544", "#2b299b")) +
   theme_cowplot()
 
 dat <- ggpredict(H3a, terms = c("c172code", "c161sex"))
@@ -1976,7 +2076,7 @@ collison_spec_plot_small_2019$bareground <- scale(collison_spec_plot_small_2019$
 
 str(collison_spec_plot_small_2019)
 
-m_H2a <- lmer(data = collison_spec_plot_small_2019, spec_mean ~ (type-1) + richness + evenness + bareground + (1|plot))
+m_H2a <- lmer(data = collison_spec_plot_small_2019, spec_mean ~ (type-1) * (type*richness) + (type*evenness) + (type*bareground) + (1|plot))
 
 
 summary(m_H2a)
@@ -1989,6 +2089,45 @@ qqline(resid(m_H2a))
 (re.effects <- plot_model(m_H2a, type = "re", show.values = TRUE))
 # visulise fixed effect
 (fe.effects <- plot_model(m_H2a, show.values = TRUE))
+
+
+# attempting to visulize model output
+ggpredict(data = m_H2a, c("type", "richness")) %>% plot()
+
+
+
+e <- allEffects(m_H2a)
+print(e)
+
+plot(e)
+
+e.df <- as.data.frame(e)
+
+ggplot(fe.effects)
+
+
+ggplot(e.df$`type:richness`, aes(x=richness, y=fit, color=type, ymin=lower, ymax=upper)) + 
+  geom_pointrange(position=position_dodge(width=.1), mapping = NULL) + 
+  geom_ribbon(data = e.df$`type:richness`, aes(x = richness, ymin = lower, ymax = upper, 
+                                               fill = type), alpha = 0.2) +
+  geom_line(data = e.df$`type:richness`, aes(x = richness, y = fit)) +
+  xlab("Richness") + 
+  ylab("Spectral mean") +
+  scale_color_manual(values = c("#ffa544", "#2b299b")) +
+  theme_cowplot()
+
+  geom_ribbon(aes(x = x, ymin = predicted - std.error, ymax = predicted + std.error), 
+              fill = "lightgrey", alpha = 0.5) +  # error band
+    geom_line(aes(x = x, y = predicted + 25.5348)) +          # slope
+  
+  
+geom_ribbon(data = e.df$`type:richness`, aes(x = year + 1998, ymin = lower, ymax = upper), 
+            fill = "#ffa544", alpha = 0.2) +
+  geom_line(data = biomass_HE_preds_df, aes(x = year + 1998, y = mean), colour = "#ffa544") +
+  geom_ribbon(data = biomass_KO_preds_df, aes(x = year + 1998, ymin = lower, ymax = upper), 
+              fill = "#2b299b", alpha = 0.2) +
+  geom_line(data = biomass_KO_preds_df, aes(x = year + 1998, y = mean), colour = "#2b299b") +
+
 
 
 ggpredict(m_H2a, terms = c("type"), type = "fe") %>% 
@@ -2022,7 +2161,8 @@ grid.arrange(p_H2a_rich, p_H2a_even, p_H2a_ground, nrow = 1)
     geom_histogram() +
     theme_classic())
 
-m_H2b <- lmer(data = collison_spec_plot_small_2019, CV ~ (type-1) + richness + evenness + bareground + (1|plot))
+m_H2b <- lmer(data = collison_spec_plot_small_2019, 
+              CV ~ (type-1) + (type*richness) + (type*evenness) + (type*bareground) + (1|plot))
 
 summary(m_H2b)
 
@@ -2059,6 +2199,22 @@ ggpredict(m_H2b, terms = c("type"), type = "fe") %>%
 
 grid.arrange(p_H2a_rich, p_H2a_even, p_H2a_ground, 
              p_H2b_rich, p_H2b_even, p_H2b_ground, nrow = 2)
+
+# alternative with interaction terms (base r)
+
+# spectral mean (richness, eveness, and bareground)
+p_H2a_base <- allEffects(m_H2a)
+
+print(p_H2a_base)
+plot(p_H2a_base)
+
+# spectral diverstiy (richness, eveness, and bareground)
+p_H2b_base <- allEffects(m_H2b)
+
+print(p_H2b_base)
+plot(p_H2b_base)
+
+
 
 # H2 plot PCA ----
 
