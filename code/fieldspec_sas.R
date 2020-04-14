@@ -180,12 +180,12 @@ raincloud_theme <- theme(
   axis.line.y = element_line(colour = "black", size = 0.5, linetype = "solid"))
 
 # finding extrema; source: https://github.com/stas-g/findPeaks
-find_peaks <- function (x, m = 1){
+find_peaks <- function (x, window = y){
   shape <- diff(sign(diff(x, na.pad = FALSE)))
   pks <- sapply(which(shape < 0), FUN = function(i){
-    z <- i - m + 1
+    z <- i - window + 1
     z <- ifelse(z > 0, z, 1)
-    w <- i + m + 1
+    w <- i + window + 1
     w <- ifelse(w < length(x), w, length(x))
     if(all(x[c(z : i, (i + 2) : w)] <= x[i + 1])) return(i + 1) else return(numeric(0))
   })
@@ -462,7 +462,7 @@ collison_ISI <- collison %>%
 ISI_band_selection <- collison_ISI %>%
   mutate(n = row_number()) %>%
   # filter wavelengths that are local ISI minima; (-) is to denote minima
-  filter(n %in% find_peaks(-collison_ISI$ISI)) %>%
+  filter(n %in% find_peaks(-collison_ISI$ISI, window = 1)) %>%
   mutate(region = case_when(between(wavelength, 400, 500) ~ "blue",		
                             between(wavelength, 500, 600) ~ "green",		
                             between(wavelength, 600, 680) ~ "red",		
