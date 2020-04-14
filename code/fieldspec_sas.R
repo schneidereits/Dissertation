@@ -430,6 +430,7 @@ head(QHI_2018_2019)
 supervised_band_selection <- tibble(wavelength = 
                                       # need to sequence by 0.01 to subsequently filter wavelengths
                                       c(seq(430, 450, by = 0.01), # Chlorophyll & carotenoid absorption
+                                        seq(545, 555, by = 0.01), # green reflectance peak
                                         seq(660, 680, by = 0.01), # Max absorption of chlorophyll
                                         seq(700, 725, by = 0.01), # Middle of red-edge transition
                                         seq(745, 755, by = 0.01), # End of red-edge transition
@@ -1175,7 +1176,7 @@ summary(lmer(data = QHI_2018_2019_small, spec_mean ~ type + (1|plot) + (1|year))
 
 # linear model for H1
 
-m_H1a <- lmer(data = collison_2018_2019_small, spec_mean ~ type + (1|plot) + (1|year))
+m_H1a <- lmer(data = collison_2018_2019_small, spec_mean ~ (type-1) + (1|plot) + (1|year)) # (type-1) changes intercpt to HE 
 
 summary(m_H1a)
 
@@ -1261,7 +1262,7 @@ veg.cover <- ggplot() +
     geom_histogram() +
     theme_classic())
 
-lmer(data = QHI_2018_2019_small, CV ~ type + (1|plot) + (1|year))
+lmer(data = QHI_2018_2019_small, CV ~ (type-1) + (1|plot) + (1|year))
 # does converge but for consistence should leave out
 
 
@@ -1294,7 +1295,7 @@ ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=type, color = type
 
 # linear model with supervised band selection 2018+2019
 
-m_H3a <- lmer(data = supervised_band_selection, spec_mean ~ type + (1|plot) + (1|year))
+m_H3a <- lmer(data = supervised_band_selection, spec_mean ~ (type-1) + (1|plot) + (1|year))
 
 summary(m_H3a)
 
@@ -1322,7 +1323,7 @@ ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=type, color = type
 
 # linear model with band selection
 
-m_H3b <- lmer(data = supervised_band_selection, CV ~ type + (1|plot) + (1|year))
+m_H3b <- lmer(data = supervised_band_selection, CV ~ (type-1) + (1|plot) + (1|year))
 
 summary(m_H3b)
 
@@ -1348,7 +1349,7 @@ ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=type, color = type
 supervised_band_selection_2019 <- supervised_band_selection %>%
   filter(year == 2019)
 
-m_H3c <- lmer(data = supervised_band_selection_2019, spec_mean ~ type + (1|plot))
+m_H3c <- lmer(data = supervised_band_selection_2019, spec_mean ~ (type-1) + (1|plot))
 
 summary(m_H3c)
 
@@ -1377,7 +1378,7 @@ ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=type, color = type
 
 # models with supervised band selection for dimention reduction 
 
-m_H3d <- lmer(data = supervised_band_selection_2019, CV ~ type + (1|plot))
+m_H3d <- lmer(data = supervised_band_selection_2019, CV ~ (type-1) + (1|plot))
 
 summary(m_H3d)
 
@@ -1404,9 +1405,9 @@ ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=type, color = type
    geom_histogram() +
    theme_classic())
 
-# linear model with band selection ()
+# linear model with ISI band selection (2019 only)
 
-m_H3e <- lmer(data = lowD, spec_mean ~ type + (1|plot))
+m_H3e <- lmer(data = lowD, spec_mean ~ (type-1) + (1|plot))
 
 summary(m_H3e)
 
@@ -1434,7 +1435,7 @@ ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=type, color = type
 
 # linear model with band selection
 
-m_H3f <- lmer(data = lowD, CV ~ type + (1|plot))
+m_H3f <- lmer(data = lowD, CV ~ (type-1) + (1|plot))
 
 summary(m_H3f)
 
@@ -1489,7 +1490,7 @@ ggpredict(m_H3a, terms = c("type"), type = "fe") %>%
   scale_color_manual(values = c("#ffa544", "#2b299b")) +
   theme_cowplot()
 
-ggpredict(m_H3c, terms = c("type"), type = "fe") %>% 
+ggpredict(m_H3a, terms = c("type"), type = "fe") %>% 
   plot(rawdata = TRUE) +
   scale_color_manual(values = c("#ffa544", "#2b299b")) +
   theme_cowplot()
@@ -1968,14 +1969,14 @@ collison_spec_plot_small_2019 <- collison_spec_plot_small %>% filter(year == 201
 # to normalize evenness
 mutate(evenness = (evenness- min(evenness))/(max(evenness)-min(evenness)))
 
-# to scale or not to scale? 
-#collison_spec_plot_2019$richness <- scale(collison_spec_plot_2019$richness)
-#collison_spec_plot_2019$evenness <- scale(collison_spec_plot_2019$evenness)
-#collison_spec_plot_2019$bareground <- scale(collison_spec_plot_2019$bareground)
+# to scale all continous varibales
+collison_spec_plot_small_2019$richness <- scale(collison_spec_plot_small_2019$richness)
+collison_spec_plot_small_2019$evenness <- scale(collison_spec_plot_small_2019$evenness)
+collison_spec_plot_small_2019$bareground <- scale(collison_spec_plot_small_2019$bareground)
 
 str(collison_spec_plot_small_2019)
 
-m_H2a <- lmer(data = collison_spec_plot_small_2019, spec_mean ~ type + richness + evenness + bareground + (1|plot))
+m_H2a <- lmer(data = collison_spec_plot_small_2019, spec_mean ~ (type-1) + richness + evenness + bareground + (1|plot))
 
 
 summary(m_H2a)
@@ -2021,7 +2022,7 @@ grid.arrange(p_H2a_rich, p_H2a_even, p_H2a_ground, nrow = 1)
     geom_histogram() +
     theme_classic())
 
-m_H2b <- lmer(data = collison_spec_plot_small_2019, CV ~ type + richness + evenness + bareground + (1|plot))
+m_H2b <- lmer(data = collison_spec_plot_small_2019, CV ~ (type-1) + richness + evenness + bareground + (1|plot))
 
 summary(m_H2b)
 
@@ -2332,16 +2333,21 @@ plot(variogramLine(v.fit0, maxdist = 150, n=20, covariance = TRUE))
 
 # ggplot semivariance
 
-preds = variogramLine(v.fit0, maxdist =  150)
+preds = variogramLine(v.fit0, maxdist =  160)
 head(preds)
+min(preds$gamma)
+max(preds$gamma)
+print(preds)
 
 (p_variogram <- ggplot(v0, aes(x = dist, y = gamma)) +
     geom_line(data = preds) +
     #  geom_point() +
-    geom_vline(xintercept = 110, linetype="dotted") +
+    geom_vline(xintercept = 100, linetype="dashed", color = "red") +
+    geom_vline(xintercept = 50, linetype="dotted") + 
     #  xlim(0,15) +
     xlab("distance (m)") +
-    coord_cartesian(xlim = c(8, 150)) + 
+    coord_cartesian(xlim = c(8, 130)) + 
+    scale_x_continuous(breaks=seq(0, 150, 10)) +
     ylim(0,70) +
     #coord_cartesian(xlim = c(0.7, 15), ylim = c(2.5, 63)) +
     theme_cowplot())
