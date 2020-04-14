@@ -1,4 +1,4 @@
-# QHI 2019 field spec 
+# QHI 2018_2019 field spec 
 # shawn schneidereit edit
 # 5.3.2020
 
