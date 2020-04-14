@@ -462,7 +462,7 @@ collison_ISI <- collison %>%
 ISI_band_selection <- collison_ISI %>%
   mutate(n = row_number()) %>%
   # filter wavelengths that are local ISI minima; (-) is to denote minima
-  filter(n %in% find_peaks(-collison_ISI$ISI, window = 1)) %>%
+  filter(n %in% find_peaks(-collison_ISI$ISI, window = 3)) %>%
   mutate(region = case_when(between(wavelength, 400, 500) ~ "blue",		
                             between(wavelength, 500, 600) ~ "green",		
                             between(wavelength, 600, 680) ~ "red",		
@@ -470,29 +470,30 @@ ISI_band_selection <- collison_ISI %>%
                             between(wavelength, 800, 1000) ~ "IR")) 
 
 # ISI by region
-ISI_band_selection_sum_tbl <- collison_ISI %>%
+ISI_tbl <- collison_ISI %>%
   group_by(region) %>%
   summarise(ISI = sum(ISI))
 
 # number relative ISI (as groups include differnt numbers of wavebands)
-ISI_band_selection_sum_tbl <- collison_ISI %>%
+ISI_tbl <- collison_ISI %>%
   group_by(region) %>%
   count(region) %>%
-  left_join(ISI_band_selection_sum_tbl) %>%
+  left_join(ISI_tbl) %>%
   # relative ISI colunm (ISI* portotional size of region)
-  mutate(relative_ISI = ISI/(n/123))
+  mutate(relative_ISI = ISI/(n/123)) # need to change value with number of bands in largest region
 
 # number wavebands selected 
-ISI_band_selection_sum_tbl <- ISI_band_selection %>%
+ISI_tbl <- ISI_band_selection %>%
   group_by(region) %>%
   count(region) %>%
-  right_join(ISI_band_selection_sum_tbl, value="region")
+  rename(wavebands_selected = n) %>%
+  right_join(ISI_tbl, value="region")
 
 # ISI of these selected wavebands   
-ISI_band_selection_sum_tbl <- ISI_band_selection %>%
+ISI_tbl <- ISI_band_selection %>%
   group_by(region) %>%
   summarise(selected_ISI = sum(ISI)) %>%
-  left_join(ISI_band_selection_sum_tbl) 
+  left_join(ISI_tbl) 
             
  
 
@@ -511,8 +512,7 @@ head(SZU, n=5)
 
 # reduced dimentionality; product of ISI band selection
 lowD <- QHI_2018_2019 %>%
-  filter(!type == "mixed",
-         wavelength %in% ISI_band_selection$wavelength) %>%
+  filter(wavelength %in% ISI_band_selection$wavelength) %>%
   group_by(type, plot, id, year) %>%
   summarise(spec_mean = mean(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance)))
@@ -541,10 +541,13 @@ lowD <- QHI_2018_2019 %>%
 
 # plot of trends in accumulated D_ISIi values
 (p_SZU <- ggplot(SZU, aes(x=n, y=D_ISIi)) +
-    geom_vline(xintercept = 63, linetype="dotted") +
+    # hardcode to match total number of selected wavebands USE: sum(ISI_tbl$wavebands_selected)
+    geom_vline(xintercept = 25, linetype="dotted") + 
     geom_line() +
     labs(x= "Number of bands selected ") +
     theme_cowplot())
+
+
 
 #ggsave(p_SZU, path = "figures", filename = "SZU.png", height = 10, width = 12)
 
@@ -577,7 +580,7 @@ QHI_ISI <- QHI_2018_2019 %>%
 QHI_ISI_band_selection <- QHI_ISI %>%
   mutate(n = row_number()) %>%
   # filter wavelengths that are local ISI minima; (-) is to denote minima
-  filter(n %in% find_peaks(-QHI_ISI$ISI)) %>%
+  filter(n %in% find_peaks(-QHI_ISI$ISI, window = 3)) %>%
   mutate(region = case_when(between(wavelength, 400, 500) ~ "blue",		
                             between(wavelength, 500, 600) ~ "green",		
                             between(wavelength, 600, 680) ~ "red",		
@@ -589,31 +592,31 @@ QHI_ISI_band_selection <- QHI_ISI %>%
     theme_cowplot()
   
   
-# ISI by region
-QHI_ISI_band_selection_sum_tbl <- QHI_ISI %>%
-  group_by(region) %>%
-  summarise(ISI = sum(ISI))
-
-# number relative ISI (as groups include differnt numbers of wavebands)
-QHI_ISI_band_selection_sum_tbl <- QHI_ISI %>%
-  group_by(region) %>%
-  count(region) %>%
-  left_join(QHI_ISI_band_selection_sum_tbl) %>%
-  # relative ISI colunm (ISI* portotional size of region)
-  mutate(relative_ISI = ISI/(n/123))
-
-# number wavebands selected 
-QHI_ISI_band_selection_sum_tbl <- QHI_ISI_band_selection %>%
-  group_by(region) %>%
-  count(region) %>%
-  right_join(QHI_ISI_band_selection_sum_tbl, value="region")
-
-# ISI of these selected wavebands   
-QHI_ISI_band_selection_sum_tbl <- QHI_ISI_band_selection %>%
-  group_by(region) %>%
-  summarise(selected_ISI = sum(ISI)) %>%
-  left_join(QHI_ISI_band_selection_sum_tbl) 
-
+ # ISI by region
+ QHI_ISI_tbl <- QHI_ISI %>%
+   group_by(region) %>%
+   summarise(ISI = sum(ISI))
+ 
+ # number relative ISI (as groups include differnt numbers of wavebands)
+ QHI_ISI_tbl <- QHI_ISI %>%
+   group_by(region) %>%
+   count(region) %>%
+   left_join(QHI_ISI_tbl) %>%
+   # relative ISI colunm (ISI* portotional size of region)
+   mutate(relative_ISI = ISI/(n/122)) # NEED TO HARDCODE VALUE TO CORREPOND WITH THE LARGEST N VALUE IN QHI_ISI_tbl
+ 
+ # number wavebands selected 
+ QHI_ISI_tbl <- QHI_ISI_band_selection %>%
+   group_by(region) %>%
+   count(region) %>%
+   rename(wavebands_selected = n) %>%
+   right_join(QHI_ISI_tbl, value="region")
+ 
+ # ISI of these selected wavebands   
+ QHI_ISI_tbl <- QHI_ISI_band_selection %>%
+   group_by(region) %>%
+   summarise(selected_ISI = sum(ISI)) %>%
+   left_join(QHI_ISI_tbl) 
 
 
 QHI_SZU <- QHI_ISI %>%
@@ -630,9 +633,8 @@ QHI_SZU <- QHI_ISI %>%
 head(QHI_SZU, n=5)
 
 # reduced dimentionality; product of ISI band selection
-lowD <- QHI_2018_2019 %>%
-  filter(!type == "mixed",
-         wavelength %in% ISI_band_selection$wavelength) %>%
+QHI_lowD <- QHI_2018_2019 %>%
+  filter(wavelength %in% QHI_ISI_band_selection$wavelength) %>%
   group_by(type, plot, id, year) %>%
   summarise(spec_mean = mean(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance)))
@@ -661,11 +663,12 @@ ggplot(QHI_ISI, aes(x=wavelength, y=ISI)) +
 #ggsave(p_ISI, path = "figures", filename = "ISI_by_wavelength.png", height = 10, width = 12)
 
 # plot of trends in accumulated D_ISIi values
-(p_SZU <- ggplot(SZU, aes(x=n, y=D_ISIi)) +
-    geom_vline(xintercept = 63, linetype="dotted") +
+ggplot(QHI_SZU, aes(x=n, y=D_ISIi)) +
+    # hardcode to match total number of selected wavebands USE: sum(QHI_ISI_tbl$wavebands_selected)
+    geom_vline(xintercept = 24, linetype="dotted") + # need to pick correct vline
     geom_line() +
     labs(x= "Number of bands selected ") +
-    theme_cowplot())
+    theme_cowplot()
 
 #ggsave(p_SZU, path = "figures", filename = "SZU.png", height = 10, width = 12)
 
@@ -1519,7 +1522,7 @@ qqline(resid(m_H3d))
 
 # linear model with ISI band selection (2019 only)
 
-m_H3e <- lmer(data = lowD, spec_mean ~ type + (1|plot))
+m_H3e <- lmer(data = QHI_lowD, spec_mean ~ type + year + (1|plot))
 
 summary(m_H3e)
 
