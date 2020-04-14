@@ -1583,7 +1583,8 @@ ggsave(p_H3a, path = "figures", filename = "H3_models_mean.png", height = 10, wi
 
 ggsave(p_H3b, path = "figures", filename = "H3_models_cv.png", height = 10, width = 12)
 
-grid.arrange(p_H3a, p_H3b)
+grid.arrange(p_H3a, p_H3b)  
+
 
 # If needed I could use ggpredict to creat boxplot of predicted spec_mean and cv by VT by Model (but might not be compatable with lme4)
 # https://strengejacke.github.io/ggeffects/reference/ggpredict.html
