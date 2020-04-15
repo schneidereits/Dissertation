@@ -47,6 +47,14 @@ pca_lowD <- QHI %>%
   summarise(spec_mean = mean(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance)))
 
+# both with new band selection?
+pca_lowD <- QHI_2018_2019 %>%
+  mutate(wavelength = round(wavelength, digits = 0)) %>%
+  filter(wavelength %in% QHI_ISI_band_selection$wavelength) %>%
+  group_by(type, plot, id) %>%
+  summarise(spec_mean = mean(reflectance),
+            CV = mean(sd(reflectance)/mean(reflectance)))
+
 res.pca_lowD <- PCA(pca_lowD[,4:5], scale.unit = TRUE, ncp = 5, graph = TRUE)
 
 # pca results
@@ -92,12 +100,13 @@ fviz_pca_var(res.pca, col.var = "contrib",
              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"))
 
 # pca 
-(p_pca <- fviz_pca_biplot(res.pca_lowD,
+(p_pca <- fviz_pca_ind(res.pca_lowD,
                           geom.ind = "point", # show points only (nbut not "text")
                           pointshape = 21,
-                          fill.ind = QHI_small$type, # color by groups
-                          col.ind = QHI_small$type, # color by groups
-                          palette = c("#ffa544", "#2b299b", "gray65"),
+                         fill.ind = QHI_2018_2019_small$type_year, # color by groups
+                          col.ind = "black", # color by groups
+                         # palette = c("#ffa544", "#2b299b", "gray65"),
+                          palette = c( "tomato", "#ffa544", "purple", "#2b299b", "gray65"),
                           addEllipses = TRUE, # Concentration ellipses
                           # ellipse.type = "confidence",
                           ellipse.level = 0.95, # confidence level specification
