@@ -21,7 +21,20 @@ supervised_band_selection <- QHI_2018_2019 %>%
   filter(wavelength %in% supervised_band_selection$wavelength) %>%
   group_by(type, plot, id, year) %>%
   summarise(spec_mean = mean(reflectance),
-            CV = mean(sd(reflectance)/mean(reflectance)))
+            CV = mean(sd(reflectance)/mean(reflectance))) 
+  
+# visual representaiton of supervised  selected areas 
+ ggplot(QHI_2018_2019, aes(x = wavelength, y = reflectance)) + 
+    geom_smooth(alpha = 0.2, se=TRUE) +
+    geom_rug(data = supervised_band_selection, sides = "b" ) +
+    # scale_color_manual(values = c("#ffa544", "#2b299b", "gray65")) +
+    theme_cowplot() +
+    labs(x = "Wavelength (mm)", y = "Mean Reflectance") +
+    theme(legend.position = c(0.05,0.7)) +
+    scale_color_manual(values = c("#FF4500", "#FF8C00", "#D15FEE", "#63B8FF", "grey")) +
+    theme_rgb_mean
+ 
+
 
 
 # ISI band selection and SZU 

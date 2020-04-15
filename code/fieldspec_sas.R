@@ -29,6 +29,8 @@ library(sp) # spatial variogram
 library(gstat) # spatial variogram
 library(tidyverse)
 library(effects) # for model vis with interaction terms
+library(stargazer) # for summary tables 
+
 
 
 

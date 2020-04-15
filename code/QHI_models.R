@@ -42,10 +42,10 @@ qqline(resid(m_H1a))  # points fall nicely onto the line - good!
 (fe.effects <- plot_model(m_H1a, show.values = TRUE))
 
 # gpreditct by type
-ggpredict(m_H1a, terms = c("type", "year"), type = "fe") %>% 
+(p_H1a <- ggpredict(m_H1a, terms = c("type"), type = "fe") %>% 
   plot(rawdata = TRUE) +
   #scale_color_manual(values = c("#ffa544", "#2b299b")) +
-  theme_cowplot()
+  theme_cowplot())
 
 pred.mm <- ggpredict(m_H1a, terms = c("type")) %>%  # this gives overall predictions for the model
   rename(type = x) %>%
@@ -233,7 +233,7 @@ qqline(resid(m_H3d))
 (fe.effects <- plot_model(m_H3d, show.values = TRUE))
 
 
-# ISI band selecrtion models
+############ ISI band selecrtion models
 
 (hist <- ggplot(lowD, aes(x = spec_mean)) +
     geom_histogram() +
@@ -258,13 +258,13 @@ qqline(resid(m_H3e))
 
 # CV
 
-(hist <- ggplot(lowD, aes(x = CV)) +
+(hist <- ggplot(QHI_lowD, aes(x = CV)) +
     geom_histogram() +
     theme_classic())
 
 # linear model with band selection
 
-m_H3f <- lmer(data = lowD, CV ~ type + (1|plot))
+m_H3f <- lmer(data = QHI_lowD, CV ~ type + year + (1|plot))
 
 summary(m_H3f)
 
@@ -282,7 +282,7 @@ qqline(resid(m_H3f))
 # combined model vis
 
 # spectral mean
-(p_H3a <- dwplot(list(m_H1a, m_H3a, m_H3c, m_H3e), 
+(p_H3a <- dwplot(list(m_H1a, m_H3a, m_H3e), 
                  vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 1)) +
     theme_cowplot() +
     theme(legend.position = c(0.8, 0.2),
@@ -293,7 +293,7 @@ ggsave(p_H3a, path = "figures", filename = "H3_models_mean.png", height = 10, wi
 
 # CV
 # effect sizes and error dont seem to correspond with model summary...
-(p_H3b <-dwplot(list(m_H1b, m_H3b, m_H3d, m_H3f), 
+(p_H3b <-dwplot(list(m_H1b, m_H3b, m_H3f), 
                 vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 1)) +
     theme_cowplot() +
     theme(legend.position = c(0.8, 0.2),
@@ -326,6 +326,47 @@ ggplot(H3a, aes(type, predicted, colour = group)) +
     position = position_dodge(.1)
   ) +
   scale_x_discrete(breaks = 1:3, labels = get_x_labels(dat))
+
+
+
+
+(p_H1a <- ggpredict(m_H1a, terms = c("type"), type = "fe") %>% 
+    plot(rawdata = TRUE) +
+    scale_color_manual(values = c("#ffa544", "#2b299b", "grey")) +
+    theme_cowplot())
+
+
+(p_H3a <- ggpredict(m_H3a, terms = c("type", "year"), type = "fe") %>% 
+    plot(rawdata = TRUE) +
+    #scale_color_manual(values = c("#ffa544", "#2b299b")) +
+    theme_cowplot())
+
+(p_H3e <- ggpredict(m_H3e, terms = c("type"), type = "fe") %>% 
+    plot(rawdata = TRUE) +
+    #scale_color_manual(values = c("#ffa544", "#2b299b")) +
+    theme_cowplot())
+
+# CV predicitons
+(p_H1b <- ggpredict(m_H1b, terms = c("type"), type = "fe") %>% 
+    plot(rawdata = FALSE) +
+    scale_color_manual(values = c("#ffa544", "#2b299b", "grey")) +
+    ylim(.2,1) +
+    theme_cowplot())
+
+
+(p_H3b <- ggpredict(m_H3b, terms = c("type", "year"), type = "fe") %>% 
+    plot(rawdata = TRUE) +
+    #scale_color_manual(values = c("#ffa544", "#2b299b")) +
+    theme_cowplot())
+
+(p_H3f <- ggpredict(m_H3f, terms = c("type"), type = "fe") %>% 
+    plot(rawdata = TRUE) +
+    #scale_color_manual(values = c("#ffa544", "#2b299b")) +
+    theme_cowplot())
+
+grid.arrange(p_H1a, p_H3a, p_H3e, 
+             p_H1b, p_H3b, p_H3f, nrow=2) 
+
 # H2 model ----
 
 # correlation plot full
