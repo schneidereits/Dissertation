@@ -365,7 +365,7 @@ spec_2018_small <- spec_2018 %>%
   group_by(year, type, plot, id) %>%
   summarise(spec_mean = mean(reflectance),
             spec_SD = sd(reflectance),
-            CV = mean(sd(reflectance)/mean(reflectance)))
+            CV = mean(sd(reflectance)/mean(reflectance)*100))
 
 # binding 2018 & 2019 spec data
 
@@ -2518,6 +2518,7 @@ ggsave(p_variogram, path = "figures", filename = "variogram.png", height = 10, w
 
 # plot from tutoral that doesnt really make sense...
 plot(variogramLine(vgm(1, "Ste", 1, kappa = 5), 10), type = 'l')
+
 
 
 
