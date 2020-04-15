@@ -215,12 +215,24 @@ QHI_SZU <- QHI_ISI %>%
 # the selcted wavelengths according to SZU
 head(QHI_SZU, n=5)
 
+
+# reduced dimentionality; product of ISI band selection
+lowD <- QHI_2018_2019 %>%
+  filter(wavelength %in% ISI_band_selection$wavelength) %>%
+  group_by(type, plot, id, year) %>%
+  summarise(spec_mean = mean(reflectance),
+            CV = mean(sd(reflectance)/mean(reflectance)))
+
 # reduced dimentionality; product of ISI band selection
 QHI_lowD <- QHI_2018_2019 %>%
+  # need to sound so that 2019 correspond with selection wavebands 
+  mutate(wavelength = round(wavelength, digits = 0)) %>%
   filter(wavelength %in% QHI_ISI_band_selection$wavelength) %>%
   group_by(type, plot, id, year) %>%
   summarise(spec_mean = mean(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance)))
+
+head(QHI_lowD)
 
 # need to spruce up https://www.rdocumentation.org/packages/ggpmisc/versions/0.3.3/topics/stat_peaks
 # plot of ISI by wavelength and local minima
