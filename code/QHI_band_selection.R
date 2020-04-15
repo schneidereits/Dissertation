@@ -73,10 +73,18 @@ supervised_band_selection <- QHI_2018_2019 %>%
    scale_color_manual(values = c("blue", "green", "grey", "tomato", "red")) +
    theme(legend.position = "none")
    
-   
+ ggplot(QHI_2018_2019, aes(x = wavelength, y = reflectance)) + 
+   geom_smooth(alpha = 0.2, se=FALSE, color = "black") +
+   # scale_color_manual(values = c("#ffa544", "#2b299b", "gray65")) +
+   theme_cowplot() +
+   labs(x = "Wavelength (mm)", y = "Mean Reflectance") +
+   theme(legend.position = c(0.05,0.7)) +
+   ylim(0,50) +
+   xlim(400,1000) +
+   coord_cartesian(ylim =c(3,50)) +
+   theme_rgb_mean
 
- geom_boxplot(data = subset(collison_wavelength, region %in% c("green")),
-              aes(x=type, y=spec_mean),
+ 
  
  
 # ISI band selection and SZU 
@@ -318,6 +326,8 @@ ggplot(QHI_SZU, aes(x=n, y=D_ISIi)) +
   # hardcode to match total number of selected wavebands USE: sum(QHI_ISI_tbl$wavebands_selected)
   geom_vline(xintercept = 24, linetype="dotted") + # need to pick correct vline
   geom_vline(xintercept = 3, linetype="dashed", color="red") + # need to pick correct vline
+  coord_cartesian(xlim = c(15,365)) +
+  scale_x_continuous(breaks=seq(0,365,50)) +
   geom_line() +
   labs(x= "Number of bands selected ") +
   theme_cowplot()
