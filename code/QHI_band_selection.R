@@ -23,20 +23,62 @@ supervised_band_selection <- QHI_2018_2019 %>%
   summarise(spec_mean = mean(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance))) 
   
+
 # visual representaiton of supervised  selected areas 
  ggplot(QHI_2018_2019, aes(x = wavelength, y = reflectance)) + 
-    geom_smooth(alpha = 0.2, se=TRUE) +
-    geom_rug(data = supervised_band_selection, sides = "b" ) +
+    geom_smooth(alpha = 0.2, se=FALSE, color = "black") +
     # scale_color_manual(values = c("#ffa544", "#2b299b", "gray65")) +
     theme_cowplot() +
     labs(x = "Wavelength (mm)", y = "Mean Reflectance") +
     theme(legend.position = c(0.05,0.7)) +
+   ylim(0,50) +
+   xlim(400,1000) +
+  coord_cartesian(ylim =c(3,50)) +
     scale_color_manual(values = c("#FF4500", "#FF8C00", "#D15FEE", "#63B8FF", "grey")) +
-    theme_rgb_mean
+    annotate("rect", xmin = 430, xmax = 450, alpha = .15,ymin = 0,
+              ymax = 50, fill = "blue") + 
+   annotate("rect", xmin = 545, xmax = 555, ymin = 0, 
+            ymax = 50, alpha = .15, fill = "green") +
+   annotate("rect", xmin = 660, xmax =680 , ymin = 0, 
+            ymax = 50, alpha = .25, fill = "red") + 
+   annotate("rect", xmin = 700, xmax = 725, ymin = 0, 
+            ymax = 50, alpha = .15, fill = "tomato") +
+   annotate("rect", xmin = 745, xmax = 755, ymin = 0, 
+            ymax = 50, alpha = .15, fill = "tomato") +
+   annotate("rect", xmin = 920, xmax = 985, ymin = 0, 
+            ymax = 50, alpha = .15, fill = "darkgrey")
  
+ 
+ 
+ # visual representaiton of ISI  selected wavebands
+ ggplot(QHI_2018_2019, aes(x = wavelength, y = reflectance)) + 
+   geom_smooth(alpha = 0.2, se=FALSE, color = "black") +
+   # scale_color_manual(values = c("#ffa544", "#2b299b", "gray65")) +
+   theme_cowplot() +
+   labs(x = "Wavelength (mm)", y = "Mean Reflectance") +
+   theme(legend.position = c(0.05,0.7)) +
+   ylim(0,50) +
+   xlim(400,1000) +
+   coord_cartesian(ylim =c(3,50)) +
+   geom_vline(data =subset(ISI_band_selection, region %in% c("blue")), 
+             aes(xintercept= wavelength , color = region, alpha = .15, size=.5))  +
+   geom_vline(data =subset(ISI_band_selection, region %in% c("green")), 
+              aes(xintercept= wavelength , color = region, alpha = .15,size=.5)) +
+   geom_vline(data =subset(ISI_band_selection, region %in% c("red")), 
+              aes(xintercept= wavelength , color = region, alpha = .15, size=.6)) +
+   geom_vline(data =subset(ISI_band_selection, region %in% c("NIR")), 
+              aes(xintercept= wavelength , color = region, alpha = .15, size=.5)) +
+   geom_vline(data =subset(ISI_band_selection, region %in% c("IR")), 
+              aes(xintercept= wavelength , color = region, alpha = .15, size=.5)) +
+   scale_color_manual(values = c("blue", "green", "grey", "tomato", "red")) +
+   theme(legend.position = "none")
+   
+   
 
-
-
+ geom_boxplot(data = subset(collison_wavelength, region %in% c("green")),
+              aes(x=type, y=spec_mean),
+ 
+ 
 # ISI band selection and SZU 
 
 collison_ISI <- collison %>%
