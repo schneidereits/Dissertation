@@ -619,12 +619,17 @@ QHI_plotdata <- read_csv("data/QHI_biodiversity/QHI_plotdata_2018_2019_sas.csv",
 QHI_spec_plot <- left_join(spec_2018_2019, QHI_plotdata, value = "plot_unique") 
 
 collison_spec_plot_small <- left_join(spec_2018_2019, QHI_plotdata, value = "plot_unique") %>%
-  filter(!plot == "PS2") %>%
-  group_by(id, type, plot, year, plot_unique, richness, shannon,
+  filter(!type == "mixed") %>%
+  group_by(wavelength, type, plot, year, plot_unique, richness, shannon,
            simpson, evenness, bareground, dead,
            reproductive_tissue, total_cover, gram_shrub_ratio) %>%
   summarise(spec_mean = mean(reflectance),
-            CV = mean(sd(reflectance)/mean(reflectance)))
+            CV = mean(sd(reflectance)/mean(reflectance))) %>%
+  group_by(type, plot, year, plot_unique, richness, shannon,
+           simpson, evenness, bareground, dead,
+           reproductive_tissue, total_cover, gram_shrub_ratio) %>%
+  summarise(CV = mean(CV),
+            spec_mean = mean(spec_mean))
 
 head(spec_2018_2019)
 
