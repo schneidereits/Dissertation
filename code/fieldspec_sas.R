@@ -365,7 +365,7 @@ spec_2018_small <- spec_2018 %>%
   group_by(year, type, plot, id) %>%
   summarise(spec_mean = mean(reflectance),
             spec_SD = sd(reflectance),
-            CV = mean(sd(reflectance)/mean(reflectance)*100))
+            CV = mean(sd(reflectance)/mean(reflectance)))
 
 # binding 2018 & 2019 spec data
 
@@ -394,6 +394,8 @@ QHI_2018_2019_wavelength <- QHI_2018_2019 %>%
   group_by(type, plot, wavelength, year, plot_unique, type_year) %>%
   summarise(spec_mean = mean(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance)))
+
+
 
 # H2 Plot data ----
 
