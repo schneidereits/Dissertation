@@ -285,12 +285,27 @@ QHI %>% filter(reflectance>100) %>%
 QHI <- QHI %>%
   filter(!id %in% c(100, 104, 106, 147, 172, 207, 208))
 
+t_QHI_2018_2019_wavelength <- QHI_2018_2019 %>%
+  mutate(plot_unique = paste(plot, year, sep="_"),
+         type_year = paste(type, year, sep="_")) %>%
+  group_by(year, type, plot, plot_unique, type_year, wavelength) %>%
+  summarise(spec_mean = mean(reflectance),
+            spec_SD = sd(reflectance),
+            CV = sd(reflectance)/mean(reflectance))
+
+
+t_QHI_2018_2019_small <- t_QHI_2018_2019_wavelength %>%
+  group_by(type, plot_unique, year) %>%
+  summarise(CV = mean(CV),
+            spec_mean = mean(spec_mean))
+
 # group by id
 QHI_small <- QHI %>%
   group_by(year, type, plot, id) %>%
   summarise(spec_mean = mean(reflectance),
             spec_SD = sd(reflectance),
-            CV = mean(sd(reflectance)/mean(reflectance)))
+            CV = sd(reflectance)/mean(reflectance))
+
 
 head(QHI_small)
 
@@ -346,7 +361,7 @@ spec_2018 <- spectra_040818 %>%
          !plot== "H20",
          # no NAs in data, but if not filtered unique(spec_2018$measurement) aswell as plot indicate there are NAs...
          !measurement == "NA") %>%
-  mutate(Reflectance = Reflectance*100,
+  mutate(Reflectance = Reflectance,
          plot = str_remove_all(plot, "LT"),
          year = "2018",
          type = case_when(site == "Herschel" ~ "HE",
@@ -381,17 +396,207 @@ QHI_2018_2019_small <- bind_rows(QHI_small, spec_2018_small) %>%
   mutate(plot_unique = paste(plot, year, sep="_"),
          type_year = paste(type, year, sep="_"))
 
+QHI_2018_2019_small <- QHI_2018_2019 %>%
+group_by(year, type, plot, id) %>%
+  summarise(spec_mean = mean(reflectance),
+            spec_SD = sd(reflectance),
+            CV = sd(reflectance)/mean(reflectance))
+
 
 collison_2018_2019_small <- QHI_2018_2019_small %>%
   filter(!type == "mixed")
 
 # df of spectra wuth plot and wavelength grouping
 QHI_2018_2019_wavelength <- QHI_2018_2019 %>%
+  filter(!type =="mixed") %>%
   mutate(plot_unique = paste(plot, year, sep="_"),
          type_year = paste(type, sep="_", year)) %>%
   group_by(type, plot, wavelength, year, plot_unique, type_year) %>%
   summarise(spec_mean = mean(reflectance),
-            CV = mean(sd(reflectance)/mean(reflectance)))
+            CV = sd(reflectance)/mean(reflectance))
+
+
+# changed to just type year and wavelength
+QHI_2018_2019_type_wavelength <- QHI_2018_2019 %>%
+  mutate(type_year = paste(type, year, sep="_")) %>%
+  group_by(type_year, wavelength) %>%
+  summarise(spec_mean = mean(reflectance),
+            CV = sd(reflectance)/mean(reflectance))
+
+
+ggplot(QHI_2018_2019_type_wavelength, aes(x = wavelength, y = spec_mean, group = type_year, color = type_year)) + 
+  geom_line(size=1) + 
+  theme_cowplot() +
+  labs(x = "Wavelength (mm)", y = "Mean CV") +
+  scale_color_manual(values = c("#FF4500", "#FF8C00", "#D15FEE", "#63B8FF", "grey")) +
+  theme(legend.position = "right")
+
+ggplot(QHI_2018_2019_type_wavelength, aes(x = wavelength, y = CV, group = type_year, color = type_year)) + 
+  geom_line(size=1) + 
+  theme_cowplot() +
+  labs(x = "Wavelength (mm)", y = "Mean CV") +
+  scale_color_manual(values = c("#FF4500", "#FF8C00", "#D15FEE", "#63B8FF", "grey")) +
+  theme(legend.position = "right")
+
+# just 2018 by wavelength
+spec_2018_wavelength <- spec_2018 %>%
+  group_by(type, wavelength) %>%
+  summarise(spec_mean = mean(reflectance),
+            spec_SD = sd(reflectance),
+            CV = sd(reflectance)/mean(reflectance))
+
+
+ggplot(spec_2018_wavelength, aes(x = wavelength, y = CV, group = type, color = type)) + 
+  geom_line(alpha = 0.2) + 
+  theme_cowplot() +
+  labs(x = "\nWavelength (mm)", y = "reflectance\n")+ 
+  theme(legend.position = "right") +
+  # scale_color_QHI +
+  guides(colour = guide_legend(override.aes = list(size=5)))
+
+# trying violine via small df
+
+Wavelength + site + plot + sub_site
+
+t_QHI_2018_2019_wavelength <- QHI_2018_2019 %>%
+  mutate(plot_unique = paste(plot, year, sep="_"),
+         type_year = paste(type, year, sep="_")) %>%
+  group_by(year, type, plot, plot_unique, type_year, wavelength) %>%
+  summarise(spec_mean = mean(reflectance),
+            spec_SD = sd(reflectance),
+            CV = sd(reflectance)/mean(reflectance))
+
+
+t_QHI_2018_2019_small <- t_QHI_2018_2019_wavelength %>%
+  group_by(type, plot_unique, year) %>%
+  summarise(CV = mean(CV),
+            spec_mean = mean(spec_mean))
+
+# violin with cv per wavelength
+ggplot(t_QHI_2018_2019_wavelength, aes(x=type, y=CV, fill=year)) + 
+  geom_violin(trim=FALSE, alpha = .5) +
+  geom_point(position = position_jitter(0.05)) +
+  geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
+  #  scale_fill_manual(values = c("#ffa544", "#2b299b", "gray65")) +
+  theme_cowplot()
+
+# violin with cv per plot (mixed no violin as the is only one plot)
+ggplot(t_QHI_2018_2019_small, aes(x=type, y=CV, fill=year)) + 
+  geom_violin(trim=FALSE, alpha = .5) +
+  geom_point(position = position_jitter(0.05)) +
+  geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
+#  scale_fill_manual(values = c("#ffa544", "#2b299b", "gray65")) +
+  theme_cowplot()
+
+ ggplot(t_QHI_2018_2019_wavelength, aes(x = wavelength, y = CV, group = plot_unique, color = type_year)) + 
+    geom_line(alpha = 0.7, size=1.) + 
+    guides(colour = guide_legend(override.aes = list(size=5))) +
+    #scale_color_manual(values = c("#FF4500", "#FF8C00", "#D15FEE", "#63B8FF", "grey")) +
+    labs(x = "Wavelength (mm)", y = "Reflectance") +
+    theme_cowplot()+
+    theme(legend.position = "right")
+
+
+# Visible spectrum
+t_spec_bio_sum_vis <- t_QHI_2018_2019_small %>% 
+  group_by(plot_unique) %>%
+  mutate(cv.refl = sd(spec_mean)/mean(spec_mean)) %>%
+  dplyr::select(2:10, cv.refl) %>% distinct()
+
+
+pec_bio_sum_vis <- spec_bio %>% 
+  filter(Wavelength < 680) %>%
+  group_by(sub_site) %>%
+  mutate(cv.refl = sd(Reflectance_mean)/mean(Reflectance_mean)) %>%
+  dplyr::select(2:10, cv.refl) %>% distinct()
+
+ggplot(spec_bio_sum_vis, aes(x=site, y=cv.refl, fill=site)) + 
+  geom_violin(trim=FALSE, alpha = .5) +
+  geom_point(position = position_jitter(0.05)) +
+  geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
+  scale_fill_manual(values = c("#ffa544", "#2b299b", "gray65")) +
+  theme_cowplot()
+
+
+# alison beamish spectral data import
+# Load in spectral data
+
+
+### subset to 3x3 grid sampling method in long-term plots ###
+het <- spectra_040818[spectra_040818$type == "target",]
+het1 <- subset(het, method == "point")
+het2 <- subset(het1, site !="Moss")
+het2b <- subset(het2, plot !="H20")
+het2c <- subset(het2b, measurement !="bad")
+
+het2c$Reflectance <- ifelse(het2c$Wavelength>= 1800 & het2c$Wavelength <= 2000, NA,
+                            ifelse(het2c$Wavelength >= 2400,NA,het2c$Reflectance))
+
+het2c <- droplevels(het2c)
+het2c$site <- factor(het2c$site, levels = c("Herschel", "komukuk"), labels = c("HE", "KO"))
+het2c$plot <- factor(het2c$plot, levels = c("LT1","LT2","LT3","LT4","LT5","LT6"), labels = c("1","2","3","4","5","6"))
+het2c <- droplevels(het2c)
+het2c$sub_site <- paste0("QHI:",het2c$site,het2c$plot)
+
+t <- het2c %>% filter(between(Wavelength, 400, 1000))
+
+(p_ali_spec <- ggplot()+
+    geom_line(data = t, aes(x = Wavelength, y = Reflectance, col = site, group = measurement))+
+    #geom_line(data = spec_2018, aes(x = wavelength, y = reflectance, col = plot, group = id)) +
+    #scale_color_manual(values = c("#ffa544", "#2b299b"))+
+    facet_wrap(~sub_site, ncol = 3)+
+   # ylim(0,0.7)+
+    ylab("Reflectance\n")+
+    xlab("\nWavelength (nm)")+
+    theme_spectra() +
+  guides(col = F, linetype = F))
+
+(p_my_spec <- ggplot()+
+  geom_line(data = spec_2018, aes(x = wavelength, y = reflectance, col = plot, group = id)) + 
+  facet_wrap(~plot, ncol = 3) +
+  theme_spectra())
+  
+grid.arrange(p_ali_spec, p_my_spec)
+# they are the same
+
+
+# Summary table
+
+spec_bio <- read_csv("data/spec_bio.csv")
+colnames(spec_bio)[5:10] <- ""
+
+# Visible spectrum
+spec_bio_sum_vis <- spec_bio %>% 
+  filter(Wavelength < 680) %>%
+  group_by(sub_site) %>%
+  mutate(cv.refl = sd(Reflectance_mean)/mean(Reflectance_mean)) %>%
+  dplyr::select(2:10, cv.refl) %>% distinct()
+
+spec_bio_sum_vis_long <- spec_bio_sum_vis %>%
+ gather("metric", "value", 4:9)
+
+ggplot(spec_bio_sum_vis, aes(x=site, y=cv.refl, fill=site)) + 
+  geom_violin(trim=FALSE, alpha = .5) +
+  geom_point(position = position_jitter(0.05)) +
+  geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
+  scale_fill_manual(values = c("#ffa544", "#2b299b", "gray65")) +
+  theme_cowplot()
+
+ ggplot(spec_bio_sum_vis_long, 
+                                 aes(x = value, y = cv.refl,
+                                     colour = site)) +
+    geom_point() +
+    theme_spectra() +
+    scale_color_manual(values = c("#ffa544", "#2b299b")) +
+    guides(colour = F) +
+    theme(strip.background = element_rect(fill = "white"),
+          axis.line.x = element_line(),
+          axis.line.y = element_line()) +
+    labs(x = NULL, y = "Spectral heterogeneity\n") +
+    geom_quantile(quantiles = 0.5) +
+    #geom_quantile(method = "rqss") +
+    facet_grid(~metric, scales = "free")
+
 
 # H2 Plot data ----
 
