@@ -243,7 +243,7 @@ list_of_files <- list.files(path = "~/Documents/university work/Dissertation/loc
                             full.names = TRUE)
 
 # Read all the files and create a FileName column to store filenames
-QHI <- list_of_files %>%
+spec_2019 <- list_of_files %>%
   purrr::set_names(.) %>%
   map_df(read.csv2, header = FALSE, sep = "", .id = "FileName") %>%
   mutate(FileName = str_remove_all(FileName, "/Users/shawn/Documents/university work/Dissertation/local/QHI_fieldspec/fieldspec_sorted_sas//gr080119"),
@@ -256,16 +256,19 @@ QHI <- list_of_files %>%
          plot = case_when(grepl("HE|KO|PS2", FileName)   ~ 
                             stringr::str_extract(FileName, "HE\\d*|KO\\d*|PS2")))
 
-names(QHI) <- c("name", "wavelength", "reference", "target", "reflectance", "id", "type", "plot")
+names(spec_2019) <- c("name", "wavelength", "reference", "target", "reflectance", "id", "type", "plot")
 
-QHI <- QHI %>%
+spec_2019 <- spec_2019 %>%
   mutate(wavelength = parse_number(as.character(wavelength))/100,
-         reflectance = parse_number(as.character(reflectance))/100,
+         # divide by 10000 to make reflectance between 0 and 1
+         reflectance = parse_number(as.character(reflectance))/10000,
          reference = parse_number(as.character(reference))/100,
          target = parse_number(as.character(target))/100,
          type = as.factor(type),
          type =  fct_explicit_na(type, na_level = "mixed"),
-         year = "2019") %>%
+         year = "2019",
+         plot_unique = paste(plot, year, sep="_"),
+         type_year = paste(type, year, sep="_")) %>%
   drop_na(reflectance) %>% 
   drop_na(wavelength) %>%
   drop_na(reference) %>%
@@ -276,56 +279,45 @@ QHI <- QHI %>%
          !id %in% c(148:171, 196, 210:211, 250:259))
 
 # which id hace reflectance>100
-QHI %>% filter(reflectance>100) %>%
+spec_2019 %>% filter(reflectance>1) %>%
   dplyr::count(id)
 
 #filter(wavelength %in% ISI_band_selection$wavelength) %>%
 
 # remove measuments with reflectance values over 100
-QHI <- QHI %>%
+spec_2019 <- spec_2019 %>%
   filter(!id %in% c(100, 104, 106, 147, 172, 207, 208))
 
-t_QHI_2018_2019_wavelength <- QHI_2018_2019 %>%
-  mutate(plot_unique = paste(plot, year, sep="_"),
-         type_year = paste(type, year, sep="_")) %>%
+spec_2019_wavelength <- spec_2019 %>%
   group_by(year, type, plot, plot_unique, type_year, wavelength) %>%
   summarise(spec_mean = mean(reflectance),
             spec_SD = sd(reflectance),
             CV = sd(reflectance)/mean(reflectance))
 
-
-t_QHI_2018_2019_small <- t_QHI_2018_2019_wavelength %>%
+# group by id
+spec_2019_small <- spec_2019_wavelength %>%
   group_by(type, plot_unique, year) %>%
   summarise(CV = mean(CV),
             spec_mean = mean(spec_mean))
 
-# group by id
-QHI_small <- QHI %>%
-  group_by(year, type, plot, id) %>%
+head(spec_2019_small)
+
+# only collison spectral measurments
+collison_2019 <- spec_2019 %>%
+  filter(type != "mixed")
+
+collison_wavelength <- collison_2019 %>%
+  group_by(year, type, plot, plot_unique, type_year, wavelength) %>%
   summarise(spec_mean = mean(reflectance),
             spec_SD = sd(reflectance),
             CV = sd(reflectance)/mean(reflectance))
 
+collison_small <- collison_wavelength %>%
+  group_by(type, plot_unique, year) %>%
+  summarise(CV = mean(CV),
+            spec_mean = mean(spec_mean))
 
-head(QHI_small)
-
-
-# group by wavelength 
-QHI_2019_wavelength <- QHI %>%
-  group_by(type, plot, wavelength) %>%
-  summarise(spec_mean = mean(reflectance),
-            CV = mean(sd(reflectance)/mean(reflectance)))
-
-collison <- QHI %>%
-  filter(type != "mixed")
-
-# only 2019 collison data
-collison_small <- collison %>%
-  group_by(type, plot, id) %>%
-  summarise(spec_mean = mean(reflectance),
-            CV = mean(sd(reflectance)/mean(reflectance)))
-
-PS2 <- QHI %>%
+PS2 <- spec_2019 %>%
   filter(type == "mixed")
 
 ##### correction factros for 250-259 reflectance. but to small. need > 3. also dont know how to apply to refletance 
@@ -372,18 +364,25 @@ spec_2018 <- spectra_040818 %>%
   rename(reflectance = Reflectance,
          wavelength = Wavelength)
 
-
-# summarized by measurment spec 2018 data 
-spec_2018_small <- spec_2018 %>%
-  group_by(year, type, plot, id) %>%
+spec_2018_wavelength <- spec_2018 %>%
+  mutate(plot_unique = paste(plot, year, sep="_"),
+         type_year = paste(type, year, sep="_")) %>%
+  group_by(year, type, plot, plot_unique, type_year, wavelength) %>%
   summarise(spec_mean = mean(reflectance),
             spec_SD = sd(reflectance),
-            CV = mean(sd(reflectance)/mean(reflectance)))
+            CV = sd(reflectance)/mean(reflectance))
+
+
+spec_2018_small <- spec_2018_wavelength %>%
+  group_by(type, plot_unique, year) %>%
+  summarise(CV = mean(CV),
+            spec_mean = mean(spec_mean))
+
 
 # binding 2018 & 2019 spec data
 
 # df of spectra with "raw" wavelength grouping 
-QHI_2018_2019 <- bind_rows(QHI, spec_2018) %>%
+QHI_2018_2019 <- bind_rows(spec_2018, spec_2019) %>%
   ungroup() %>%
   # temporary colunm with only plot number 
   mutate(plot2 = str_remove_all(plot, "HE|KO"),
@@ -391,32 +390,25 @@ QHI_2018_2019 <- bind_rows(QHI, spec_2018) %>%
   # remove colunm
   select(-plot2)
 
-# df of spectra with plot grouping 
-QHI_2018_2019_small <- bind_rows(QHI_small, spec_2018_small) %>%
+QHI_2018_2019_wavelength <- QHI_2018_2019 %>%
   mutate(plot_unique = paste(plot, year, sep="_"),
-         type_year = paste(type, year, sep="_"))
-
-QHI_2018_2019_small <- QHI_2018_2019 %>%
-group_by(year, type, plot, id) %>%
+         type_year = paste(type, year, sep="_")) %>%
+  group_by(year, type, plot, plot_unique, type_year, wavelength) %>%
   summarise(spec_mean = mean(reflectance),
             spec_SD = sd(reflectance),
             CV = sd(reflectance)/mean(reflectance))
+
+QHI_2018_2019_small <- QHI_2018_2019_wavelength %>%
+  group_by(type, plot_unique, year) %>%
+  summarise(CV = mean(CV),
+            spec_mean = mean(spec_mean))
 
 
 collison_2018_2019_small <- QHI_2018_2019_small %>%
   filter(!type == "mixed")
 
-# df of spectra wuth plot and wavelength grouping
-QHI_2018_2019_wavelength <- QHI_2018_2019 %>%
-  filter(!type =="mixed") %>%
-  mutate(plot_unique = paste(plot, year, sep="_"),
-         type_year = paste(type, sep="_", year)) %>%
-  group_by(type, plot, wavelength, year, plot_unique, type_year) %>%
-  summarise(spec_mean = mean(reflectance),
-            CV = sd(reflectance)/mean(reflectance))
 
-
-# changed to just type year and wavelength
+# changed to just type_year and wavelength
 QHI_2018_2019_type_wavelength <- QHI_2018_2019 %>%
   mutate(type_year = paste(type, year, sep="_")) %>%
   group_by(type_year, wavelength) %>%
@@ -427,7 +419,7 @@ QHI_2018_2019_type_wavelength <- QHI_2018_2019 %>%
 ggplot(QHI_2018_2019_type_wavelength, aes(x = wavelength, y = spec_mean, group = type_year, color = type_year)) + 
   geom_line(size=1) + 
   theme_cowplot() +
-  labs(x = "Wavelength (mm)", y = "Mean CV") +
+  labs(x = "Wavelength (mm)", y = "Mean reflectance") +
   scale_color_manual(values = c("#FF4500", "#FF8C00", "#D15FEE", "#63B8FF", "grey")) +
   theme(legend.position = "right")
 
@@ -456,8 +448,8 @@ ggplot(spec_2018_wavelength, aes(x = wavelength, y = CV, group = type, color = t
 
 # trying violine via small df
 
-Wavelength + site + plot + sub_site
-
+###### temporaty (what I used to fix group cv)
+##### .
 t_QHI_2018_2019_wavelength <- QHI_2018_2019 %>%
   mutate(plot_unique = paste(plot, year, sep="_"),
          type_year = paste(type, year, sep="_")) %>%
@@ -465,7 +457,6 @@ t_QHI_2018_2019_wavelength <- QHI_2018_2019 %>%
   summarise(spec_mean = mean(reflectance),
             spec_SD = sd(reflectance),
             CV = sd(reflectance)/mean(reflectance))
-
 
 t_QHI_2018_2019_small <- t_QHI_2018_2019_wavelength %>%
   group_by(type, plot_unique, year) %>%
@@ -496,6 +487,7 @@ ggplot(t_QHI_2018_2019_small, aes(x=type, y=CV, fill=year)) +
     theme_cowplot()+
     theme(legend.position = "right")
 
+ 
 
 # Visible spectrum
 t_spec_bio_sum_vis <- t_QHI_2018_2019_small %>% 
@@ -503,6 +495,8 @@ t_spec_bio_sum_vis <- t_QHI_2018_2019_small %>%
   mutate(cv.refl = sd(spec_mean)/mean(spec_mean)) %>%
   dplyr::select(2:10, cv.refl) %>% distinct()
 
+###### temporaty (what I used to fix group cv)
+##### .
 
 pec_bio_sum_vis <- spec_bio %>% 
   filter(Wavelength < 680) %>%
