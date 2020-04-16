@@ -285,7 +285,7 @@ head(QHI_SZU, n=5)
 
 # reduced dimentionality; product of ISI band selection
 QHI_lowD <- spec_2018_2019 %>%
-  # need to sound so that 2019 correspond with selection wavebands 
+  # need to round so that 2019 correspond with selection wavebands 
   mutate(wavelength = round(wavelength, digits = 0)) %>%
   filter(wavelength %in% QHI_ISI_band_selection$wavelength) %>%
   group_by(year, type, plot, plot_unique, type_year, wavelength) %>%
