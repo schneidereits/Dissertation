@@ -60,16 +60,16 @@ theme_cowplot <- function(){
 
 
 
-theme_rgb_mean <- list( annotate("rect", xmin = 400, xmax = 500, ymin = 0.5,
-                                 ymax = 100, alpha = .15, fill = "blue"),
-                        annotate("rect", xmin = 500, xmax = 600, ymin = 0.5, 
-                                 ymax = 100, alpha = .15, fill = "green"), 
-                        annotate("rect", xmin = 600, xmax = 680, ymin = 0.5, 
-                                 ymax = 100, alpha = .15, fill = "red"), 
-                        annotate("rect", xmin = 680, xmax = 800, ymin = 0.5, 
-                                 ymax = 100, alpha = .15, fill = "tomato"),
-                        annotate("rect", xmin = 800, xmax = 985, ymin = 0.5, 
-                                 ymax = 100, alpha = .15, fill = "darkgrey"),
+theme_rgb_mean <- list( annotate("rect", xmin = 400, xmax = 500, ymin = 0.,
+                                 ymax = 1, alpha = .15, fill = "blue"),
+                        annotate("rect", xmin = 500, xmax = 600, ymin = 0., 
+                                 ymax = 1, alpha = .15, fill = "green"), 
+                        annotate("rect", xmin = 600, xmax = 680, ymin = 0., 
+                                 ymax = 1, alpha = .15, fill = "red"), 
+                        annotate("rect", xmin = 680, xmax = 800, ymin = 0., 
+                                 ymax = 1, alpha = .15, fill = "tomato"),
+                        annotate("rect", xmin = 800, xmax = 985, ymin = 0., 
+                                 ymax = 1, alpha = .15, fill = "darkgrey"),
                         scale_y_continuous(expand = expand_scale(mult = c(0, .1))),
                         scale_x_continuous(expand = expand_scale(mult = c(0, .1))))
 
@@ -86,7 +86,7 @@ theme_rgb_CV <- list(annotate("rect", xmin = 400, xmax = 500, ymin = 0, ymax = 0
                      scale_y_continuous(expand = expand_scale(mult = c(0, .1))),
                      scale_x_continuous(expand = expand_scale(mult = c(0, .1))))
 
-scale_color_QHI <- list(scale_color_manual(values = c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FF8247", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF", "#A8A8A8")))
+scale_color_QHI <- list(scale_color_manual(values = c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FF8247", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF", "#A8A8A8", "#A8A8A8", "#A8A8A8", "#A8A8A8", "#A8A8A8")))
 scale_color_collison <- list(scale_color_manual(values = c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FF8247", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF")))
 
 
@@ -254,7 +254,7 @@ spec_2019 <- list_of_files %>%
                             stringr::str_extract(FileName, "HE|KO")),
          # might need to split to just number...
          plot = case_when(grepl("HE|KO|PS2", FileName)   ~ 
-                            stringr::str_extract(FileName, "HE\\d*|KO\\d*|PS2")))
+                            stringr::str_extract(FileName, "HE\\d*|KO\\d*|PS2_\\d*")))
 
 names(spec_2019) <- c("name", "wavelength", "reference", "target", "reflectance", "id", "type", "plot")
 
@@ -622,3 +622,4 @@ collison_spec_plot_small <- left_join(QHI_2018_2019, QHI_plotdata, value = "plot
             CV = mean(sd(reflectance)/mean(reflectance)))
 
 head(QHI_2018_2019)
+

@@ -6,18 +6,18 @@
 #  QHI vis -------
 
 # for subsets of measurements (was used for data sorting of specific measurments)
-(ggplot(subset(QHI ,id %in% c(100, 104, 106, 147, 172, 207, 208))) +
+(ggplot(subset(spec_2019 ,id %in% c(60:50))) +
    aes(x = wavelength, y = reflectance, group = id, color = id)) + 
   geom_line(alpha = 0.9) + 
   theme_cowplot() +
-  labs(x = "\nWavelength (mm)", y = "Reflectance\n") #+
-geom_hline( yintercept= c(50,70), color = "red") #+
+  labs(x = "\nWavelength (mm)", y = "Reflectance\n") +
+geom_hline( yintercept= c(.50,.70), color = "red") +
 facet_wrap(.~id) 
 
 
 #####  2019 data
 # single wavelengths VT (2019)
-(p_QHI <-  ggplot(QHI, aes(x = wavelength, y = reflectance, group = id, color = type)) + 
+(p_QHI <-  ggplot(spec_2019, aes(x = wavelength, y = reflectance, group = id, color = type)) + 
     geom_line(alpha = 0.3) + 
     theme_cowplot() +
     labs(x = "\nWavelength (mm)", y = "Reflectance\n")+ 
@@ -28,7 +28,7 @@ facet_wrap(.~id)
 #ggsave(p_QHI, path = "figures", filename = "spec_sig.png", height = 10, width = 12)
 
 # single wavelengths at plot level (2019)
-(p_QHI <-  ggplot(QHI, aes(x = wavelength, y = reflectance, group = id, color = plot)) + 
+(p_QHI <-  ggplot(spec_2019, aes(x = wavelength, y = reflectance, group = id, color = plot)) + 
     geom_line(alpha = 0.2) + 
     theme_cowplot() +
     labs(x = "\nWavelength (mm)", y = "reflectance\n")+ 
@@ -38,7 +38,7 @@ facet_wrap(.~id)
 #ggsave(p_test_3, path = "figures", filename = "spec_sig.png", height = 8, width = 10)
 
 # violin of mean by vegtype
-ggplot(QHI_small, aes(x=type, y=spec_mean, fill=type)) + 
+ggplot(spec_2019_small, aes(x=type, y=spec_mean, fill=type)) + 
   geom_violin(trim=FALSE, alpha = .5, aes(fill = type)) +
   geom_point(position = position_jitter(0.05)) +
   geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
@@ -47,20 +47,20 @@ ggplot(QHI_small, aes(x=type, y=spec_mean, fill=type)) +
 
 # cloud of mean by vegetation type
 
-(p_QHI_cloud_mean <- ggplot(QHI_small, aes(x=type, y=spec_mean, fill=type)) +
-    geom_flat_violin(position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = QHI_small, aes(x=type, y=spec_mean, colour=plot),
+(p_QHI_cloud_mean <- ggplot(spec_2019_small, aes(x=type, y=spec_mean, fill=type)) +
+    geom_flat_violin(position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8, trim = F ) +
+    geom_point(data = spec_2019_small, aes(x=type, y=spec_mean, colour=plot_unique),
                position = position_jitter(width = .15), size = 2) +
     geom_boxplot(width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_fill_manual(values = c("#ffa544", "#2b299b", "gray65")) +
-    scale_color_QHI +
+  #  scale_color_QHI +
     theme_cowplot() +
     labs(y = "Reflectance") +
     theme(legend.position = "none"))
 #ggsave(p_QHI, path = "figures", filename = "cloud_specmean.png", height = 8, width = 10)
 
 # violin of cv by vegtation type
-ggplot(QHI_small, aes(x=type, y=CV, fill=type)) + 
+ggplot(spec_2019_small, aes(x=type, y=CV, fill=type)) + 
   geom_violin(trim=FALSE, alpha = .5) +
   geom_point(position = position_jitter(0.05)) +
   geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
@@ -69,9 +69,9 @@ ggplot(QHI_small, aes(x=type, y=CV, fill=type)) +
 
 # cloud of cv by vegtation type
 (p_QHI_cloud_cv <- ggplot() +
-    geom_flat_violin(data = QHI_small, aes(x=type, y=CV, fill=type),
-                     position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = QHI_small, aes(x=type, y=CV, colour=plot),
+    geom_flat_violin(data = spec_2019_small, aes(x=type, y=CV, fill=type),
+                     position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8, trim = F ) +
+    geom_point(data = spec_2019_small, aes(x=type, y=CV, colour=plot_unique),
                position = position_jitter(width = .15), size = 2) +
     geom_boxplot(data = QHI_small, aes(x=type, y=CV),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
@@ -84,7 +84,7 @@ ggplot(QHI_small, aes(x=type, y=CV, fill=type)) +
 
 # GD advice: split full spec into regions (via background colors) and make seperate raincloud plot at each spec_region. (for full snazzyness add color of spec_region to backround)
 # plot spectral mean by plot
-(p_QHI_specmean <- ggplot(QHI_2019_wavelength, aes(x = wavelength, y = spec_mean, group = plot, color = plot)) + 
+(p_QHI_specmean <- ggplot(spec_2019_wavelength, aes(x = wavelength, y = spec_mean, group = plot, color = plot)) + 
     geom_line(alpha = 0.7, size=1.) + 
     guides(colour = guide_legend(override.aes = list(size=5))) +
     labs(x = "Wavelength (mm)", y = "Reflectance") +
@@ -94,7 +94,7 @@ ggplot(QHI_small, aes(x=type, y=CV, fill=type)) +
     theme_rgb_mean)
 
 # plot CV by plot
-(p_QHI_CV <- ggplot(QHI_2019_wavelength, aes(x = wavelength, y = CV, group = plot, color = plot)) + 
+(p_QHI_CV <- ggplot(spec_2019_wavelength, aes(x = wavelength, y = CV, group = plot, color = plot)) + 
     geom_line(alpha = 0.7, size=1) + 
     theme_cowplot() +
     theme(legend.position = "none") +
@@ -142,7 +142,7 @@ ggplot(spec_2018_small, aes(x=type, y=CV, fill=type)) +
 
 ##### 2018 + 2019
 # spectral signatures by type 2018 + 2019
-(p_QHI <-  ggplot(QHI_2018_2019, aes(x = wavelength, y = reflectance, group = id, color = type)) + 
+(p_QHI <-  ggplot(spec_2018_2019, aes(x = wavelength, y = reflectance, group = id, color = type)) + 
     geom_line(alpha = 0.3) + 
     theme_cowplot() +
     labs(x = "\nWavelength (mm)", y = "Reflectance\n")+ 
@@ -167,7 +167,6 @@ ggplot(spec_2018_small, aes(x=type, y=CV, fill=type)) +
 
 (p_QHI_2018_2019_mean <- ggplot(QHI_2018_2019_wavelength, aes(x = wavelength, y = spec_mean, group = plot_unique, color = type_year)) + 
     geom_line(alpha = 0.7, size=1.) + 
-    geom_quantile(quantiles = 0.5) +
     guides(colour = guide_legend(override.aes = list(size=5))) +
     labs(x = "Wavelength (mm)", y = "Reflectance") +
     theme_cowplot() +
@@ -201,7 +200,7 @@ ggplot(spec_2018_small, aes(x=type, y=CV, fill=type)) +
 # cloud of spec mean 2018+2019
 (p_QHI_cloud_mean <- ggplot() + 
     geom_flat_violin(data = QHI_2018_2019_small, aes(x=type, y=spec_mean, fill=type),
-                     position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
+                     position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8, trim=F) +
     geom_point(data = QHI_2018_2019_small, aes(x=type, y=spec_mean, colour=year),
                position = position_jitter(width = .15), size = 2) +
     geom_boxplot(data = QHI_2018_2019_small, aes(x=type, y=spec_mean),
@@ -215,13 +214,14 @@ ggsave(p_QHI, path = "figures", filename = "cloud_spec_mean_2018_2019.png", heig
 # cloud of spec diversity 2018 + 2019
 (p_QHI_cloud_cv <- ggplot() +
     geom_flat_violin(data = QHI_2018_2019_small, aes(x=type, y=CV, fill=type),
-                     position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
+                     position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8, trim=F) +
     geom_point(data = QHI_2018_2019_small, aes(x=type, y=CV, colour=year),
                position = position_jitter(width = .15), size = 2) +
     geom_boxplot(data = QHI_2018_2019_small, aes(x=type, y=CV),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_fill_manual(values = c("#ffa544", "#2b299b", "gray65")) +
     scale_color_brewer(palette = "Dark2") +
+    ylim(0,0.4) +
     theme_cowplot())
 #ggsave(p_QHI, path = "figures", filename = "cloud_CV.png", height = 8, width = 10)
 
@@ -249,27 +249,39 @@ ggsave(p_QHI, path = "figures", filename = "cloud_spec_mean_2018_2019.png", heig
 
 #ggsave(p_QHI, path = "figures", filename = "spec_sig_plot.png", height = 8, width = 10)
 
-## SMOOTHING NOT CORRECT
-(p_QHI_specmean <- ggplot(QHI_2018_2019_wavelength, 
-                          aes(x = wavelength, y = spec_mean, group=type_year, color = type_year)) + 
-    geom_smooth(alpha = 0.2, se=TRUE) +
-    # scale_color_manual(values = c("#ffa544", "#2b299b", "gray65")) +
-    theme_cowplot() +
-    labs(x = "Wavelength (mm)", y = "Mean Reflectance") +
-    theme(legend.position = c(0.05,0.7)) +
-    scale_color_manual(values = c("#FF4500", "#FF8C00", "#D15FEE", "#63B8FF", "grey")) +
-    theme_rgb_mean)
-#ggsave(p_QHI, path = "figures", filename = "CV_plot.png", height = 8, width = 10)
 
-# SMOOTHING NOT CORRECT
-(p_QHI_CV <- ggplot(QHI_2018_2019_wavelength, aes(x = wavelength, y = CV, group=type_year, color = type_year)) + 
-    geom_smooth(alpha = 0.2, se=TRUE) + 
+# just 2018 2019 by vegtype
+spec_2018_2019_wavelength_plot <- QHI_2018_2019 %>%
+  mutate(type_year = paste(type, year, sep="_")) %>%
+  group_by(type, wavelength, year, type_year) %>%
+  summarise(spec_mean = mean(reflectance),
+            spec_SD = sd(reflectance),
+            CV = sd(reflectance)/mean(reflectance))
+
+# spectral sig of mean reflectance
+(p_QHI_specmean <- ggplot(spec_2018_2019_wavelength_plot, 
+                          aes(x = wavelength, y = spec_mean, 
+                              group = type_year, color = type_year)) + 
+    geom_line() + 
     theme_cowplot() +
     labs(x = "Wavelength (mm)", y = "Mean CV") +
-    scale_color_manual(values = c("#ffa544", "#2b299b", "gray65")) +
+    # scale_color_manual(values = c("#ffa544", "#2b299b", "gray65")) +
     scale_color_manual(values = c("#FF4500", "#FF8C00", "#D15FEE", "#63B8FF", "grey")) +
-    theme_rgb_CV +
-    theme(legend.position = "right"))
+    theme_rgb_mean +
+    theme(legend.position = c(0.05,0.7)))
+
+#ggsave(p_QHI, path = "figures", filename = "CV_plot.png", height = 8, width = 10)
+
+# spectral sig of mean spectral diversity 
+(p_QHI_CV <- ggplot(spec_2018_2019_wavelength_plot, 
+                    aes(x = wavelength, y = CV, 
+                        group = type_year, color = type_year)) + 
+    geom_line() + 
+    theme_cowplot() +
+    labs(x = "Wavelength (mm)", y = "Mean CV") +
+    # scale_color_manual(values = c("#ffa544", "#2b299b", "gray65")) +
+    scale_color_manual(values = c("#FF4500", "#FF8C00", "#D15FEE", "#63B8FF", "grey")) +
+    theme_rgb_CV)
 
 #H1 figure ----
 
