@@ -382,7 +382,7 @@ spec_2018_small <- spec_2018_wavelength %>%
 # binding 2018 & 2019 spec data
 
 # df of spectra with "raw" wavelength grouping 
-QHI_2018_2019 <- bind_rows(spec_2018, spec_2019) %>%
+spec_2018_2019 <- bind_rows(spec_2018, spec_2019) %>%
   ungroup() %>%
   # temporary colunm with only plot number 
   mutate(plot2 = str_remove_all(plot, "HE|KO"),
@@ -391,7 +391,7 @@ QHI_2018_2019 <- bind_rows(spec_2018, spec_2019) %>%
   # remove colunm
   select(-plot2)
 
-QHI_2018_2019_wavelength <- QHI_2018_2019 %>%
+spec_2018_2019_wavelength <- spec_2018_2019 %>%
   mutate(plot_unique = paste(plot, year, sep="_"),
          type_year = paste(type, year, sep="_")) %>%
   group_by(year, type, plot, plot_unique, type_year, wavelength) %>%
@@ -399,32 +399,36 @@ QHI_2018_2019_wavelength <- QHI_2018_2019 %>%
             spec_SD = sd(reflectance),
             CV = sd(reflectance)/mean(reflectance))
 
-QHI_2018_2019_small <- QHI_2018_2019_wavelength %>%
+spec_2018_2019_small <- spec_2018_2019_wavelength %>%
   group_by(type, plot_unique, year, type_year) %>%
   summarise(CV = mean(CV),
             spec_mean = mean(spec_mean))
 
+# just collison
 
-collison_2018_2019_small <- QHI_2018_2019_small %>%
+collison_2018_2019 <- spec_2018_2019 %>%
+  filter(!type == "mixed")
+
+collison_2018_2019_small <- spec_2018_2019_small %>%
   filter(!type == "mixed")
 
 
 # changed to just type_year and wavelength
-QHI_2018_2019_type_wavelength <- QHI_2018_2019 %>%
+spec_2018_2019_type_wavelength <- spec_2018_2019 %>%
   mutate(type_year = paste(type, year, sep="_")) %>%
   group_by(type_year, wavelength) %>%
   summarise(spec_mean = mean(reflectance),
             CV = sd(reflectance)/mean(reflectance))
 
 
-ggplot(QHI_2018_2019_type_wavelength, aes(x = wavelength, y = spec_mean, group = type_year, color = type_year)) + 
+ggplot(spec_2018_2019_type_wavelength, aes(x = wavelength, y = spec_mean, group = type_year, color = type_year)) + 
   geom_line(size=1) + 
   theme_cowplot() +
   labs(x = "Wavelength (mm)", y = "Mean reflectance") +
   scale_color_manual(values = c("#FF4500", "#FF8C00", "#D15FEE", "#63B8FF", "grey")) +
   theme(legend.position = "right")
 
-ggplot(QHI_2018_2019_type_wavelength, aes(x = wavelength, y = CV, group = type_year, color = type_year)) + 
+ggplot(spec_2018_2019_type_wavelength, aes(x = wavelength, y = CV, group = type_year, color = type_year)) + 
   geom_line(size=1) + 
   theme_cowplot() +
   labs(x = "Wavelength (mm)", y = "Mean CV") +
@@ -451,7 +455,7 @@ ggplot(spec_2018_wavelength, aes(x = wavelength, y = CV, group = type, color = t
 
 ###### temporaty (what I used to fix group cv)
 ##### .
-t_QHI_2018_2019_wavelength <- QHI_2018_2019 %>%
+t_spec_2018_2019_wavelength <- spec_2018_2019 %>%
   mutate(plot_unique = paste(plot, year, sep="_"),
          type_year = paste(type, year, sep="_")) %>%
   group_by(year, type, plot, plot_unique, type_year, wavelength) %>%
@@ -459,13 +463,13 @@ t_QHI_2018_2019_wavelength <- QHI_2018_2019 %>%
             spec_SD = sd(reflectance),
             CV = sd(reflectance)/mean(reflectance))
 
-t_QHI_2018_2019_small <- t_QHI_2018_2019_wavelength %>%
+t_spec_2018_2019_small <- t_spec_2018_2019_wavelength %>%
   group_by(type, plot_unique, year) %>%
   summarise(CV = mean(CV),
             spec_mean = mean(spec_mean))
 
 # violin with cv per wavelength
-ggplot(t_QHI_2018_2019_wavelength, aes(x=type, y=CV, fill=year)) + 
+ggplot(t_spec_2018_2019_wavelength, aes(x=type, y=CV, fill=year)) + 
   geom_violin(trim=FALSE, alpha = .5) +
   geom_point(position = position_jitter(0.05)) +
   geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
@@ -473,14 +477,14 @@ ggplot(t_QHI_2018_2019_wavelength, aes(x=type, y=CV, fill=year)) +
   theme_cowplot()
 
 # violin with cv per plot (mixed no violin as the is only one plot)
-ggplot(t_QHI_2018_2019_small, aes(x=type, y=CV, fill=year)) + 
+ggplot(t_spec_2018_2019_small, aes(x=type, y=CV, fill=year)) + 
   geom_violin(trim=FALSE, alpha = .5) +
   geom_point(position = position_jitter(0.05)) +
   geom_boxplot(width=0.2, fill="white", alpha = 0.3) +
 #  scale_fill_manual(values = c("#ffa544", "#2b299b", "gray65")) +
   theme_cowplot()
 
- ggplot(t_QHI_2018_2019_wavelength, aes(x = wavelength, y = CV, group = plot_unique, color = type_year)) + 
+ ggplot(t_spec_2018_2019_wavelength, aes(x = wavelength, y = CV, group = plot_unique, color = type_year)) + 
     geom_line(alpha = 0.7, size=1.) + 
     guides(colour = guide_legend(override.aes = list(size=5))) +
     #scale_color_manual(values = c("#FF4500", "#FF8C00", "#D15FEE", "#63B8FF", "grey")) +
@@ -491,7 +495,7 @@ ggplot(t_QHI_2018_2019_small, aes(x=type, y=CV, fill=year)) +
  
 
 # Visible spectrum
-t_spec_bio_sum_vis <- t_QHI_2018_2019_small %>% 
+t_spec_bio_sum_vis <- t_spec_2018_2019_small %>% 
   group_by(plot_unique) %>%
   mutate(cv.refl = sd(spec_mean)/mean(spec_mean)) %>%
   dplyr::select(2:10, cv.refl) %>% distinct()
@@ -612,9 +616,9 @@ QHI_plotdata <- read_csv("data/QHI_biodiversity/QHI_plotdata_2018_2019_sas.csv",
 
 
 # 2018+2019 QHI spectral and plot data
-QHI_spec_plot <- left_join(QHI_2018_2019, QHI_plotdata, value = "plot_unique") 
+QHI_spec_plot <- left_join(spec_2018_2019, QHI_plotdata, value = "plot_unique") 
 
-collison_spec_plot_small <- left_join(QHI_2018_2019, QHI_plotdata, value = "plot_unique") %>%
+collison_spec_plot_small <- left_join(spec_2018_2019, QHI_plotdata, value = "plot_unique") %>%
   filter(!plot == "PS2") %>%
   group_by(id, type, plot, year, plot_unique, richness, shannon,
            simpson, evenness, bareground, dead,
@@ -622,5 +626,5 @@ collison_spec_plot_small <- left_join(QHI_2018_2019, QHI_plotdata, value = "plot
   summarise(spec_mean = mean(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance)))
 
-head(QHI_2018_2019)
+head(spec_2018_2019)
 

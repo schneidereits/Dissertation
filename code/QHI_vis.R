@@ -153,7 +153,7 @@ ggplot(spec_2018_small, aes(x=type, y=CV, fill=type)) +
 #ggsave(p_QHI, path = "figures", filename = "spec_sig.png", height = 10, width = 12)
 
 # spectral signatures by plot 2018 + 2019
-(p_QHI <-  ggplot(QHI_2018_2019, aes(x = wavelength, y = reflectance, group = id, color = plot)) + 
+(p_QHI <-  ggplot(spec_2018_2019, aes(x = wavelength, y = reflectance, group = id, color = plot)) + 
     geom_line(alpha = 0.2) + 
     theme_cowplot() +
     labs(x = "\nWavelength (mm)", y = "reflectance\n")+ 
@@ -165,7 +165,7 @@ ggplot(spec_2018_small, aes(x=type, y=CV, fill=type)) +
 
 # spectral signatures of mean reflectance by group and year (2018 2019)
 
-(p_QHI_2018_2019_mean <- ggplot(QHI_2018_2019_wavelength, aes(x = wavelength, y = spec_mean, group = plot_unique, color = type_year)) + 
+(p_spec_2018_2019_mean <- ggplot(spec_2018_2019_wavelength, aes(x = wavelength, y = spec_mean, group = plot_unique, color = type_year)) + 
     geom_line(alpha = 0.7, size=1.) + 
     guides(colour = guide_legend(override.aes = list(size=5))) +
     labs(x = "Wavelength (mm)", y = "Reflectance") +
@@ -175,7 +175,7 @@ ggplot(spec_2018_small, aes(x=type, y=CV, fill=type)) +
     theme_rgb_mean)
 
 # spectral signatures of CV by group and year (2018 2019)
-(p_QHI_2018_2019_cv <- ggplot(QHI_2018_2019_wavelength, 
+(p_spec_2018_2019_cv <- ggplot(spec_2018_2019_wavelength, 
                               aes(x = wavelength, y = CV, group = plot_unique, color = type_year)) + 
     geom_line(alpha = 0.7, size=1.) + 
     guides(colour = guide_legend(override.aes = list(size=5))) +
@@ -186,7 +186,7 @@ ggplot(spec_2018_small, aes(x=type, y=CV, fill=type)) +
     theme_rgb_CV)
 
 # spectral signatures of CV by group and year (2018 2019)
-(p_QHI_2018_2019_cv <- ggplot(QHI_2018_2019_wavelength, 
+(p_spec_2018_2019_cv <- ggplot(spec_2018_2019_wavelength, 
                               aes(x = wavelength, y = CV, group = plot_unique, color = type_year)) + 
     geom_line(alpha = 0.7, size=1.) + 
     guides(colour = guide_legend(override.aes = list(size=5))) +
@@ -199,11 +199,11 @@ ggplot(spec_2018_small, aes(x=type, y=CV, fill=type)) +
 
 # cloud of spec mean 2018+2019
 (p_QHI_cloud_mean <- ggplot() + 
-    geom_flat_violin(data = QHI_2018_2019_small, aes(x=type, y=spec_mean, fill=type_year),
+    geom_flat_violin(data = spec_2018_2019_small, aes(x=type, y=spec_mean, fill=type_year),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8, trim=F) +
-    geom_point(data = QHI_2018_2019_small, aes(x=type, y=spec_mean, colour=year),
+    geom_point(data = spec_2018_2019_small, aes(x=type, y=spec_mean, colour=year),
                position = position_jitter(width = .15), size = 2) +
-    geom_boxplot(data = QHI_2018_2019_small, aes(x=type, y=spec_mean),
+    geom_boxplot(data = spec_2018_2019_small, aes(x=type, y=spec_mean),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_fill_manual(values = c("#FF4500", "#FF8C00", "#D15FEE", "#63B8FF", "grey")) +
     scale_color_brewer(palette = "Dark2") +
@@ -215,11 +215,11 @@ ggsave(p_QHI, path = "figures", filename = "cloud_spec_mean_2018_2019.png", heig
 
 # cloud of spec diversity 2018 + 2019
 (p_QHI_cloud_cv <- ggplot() +
-    geom_flat_violin(data = QHI_2018_2019_small, aes(x=type, y=CV, fill=type_year),
+    geom_flat_violin(data = spec_2018_2019_small, aes(x=type, y=CV, fill=type_year),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8, trim=F) +
-    geom_point(data = QHI_2018_2019_small, aes(x=type, y=CV, colour=year),
+    geom_point(data = spec_2018_2019_small, aes(x=type, y=CV, colour=year),
                position = position_jitter(width = .15), size = 2) +
-    geom_boxplot(data = QHI_2018_2019_small, aes(x=type, y=CV),
+    geom_boxplot(data = spec_2018_2019_small, aes(x=type, y=CV),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_fill_manual(values = c("#FF4500", "#FF8C00", "#D15FEE", "#63B8FF", "grey")) +
     scale_color_brewer(palette = "Dark2") +
@@ -235,7 +235,7 @@ ggsave(p_QHI, path = "figures", filename = "cloud_spec_mean_2018_2019.png", heig
 
 
 # just 2018 2019 by vegtype
-spec_2018_2019_wavelength_plot <- QHI_2018_2019 %>%
+spec_2018_2019_wavelength_plot <- spec_2018_2019 %>%
   mutate(type_year = paste(type, year, sep="_")) %>%
   group_by(type, wavelength, year, type_year) %>%
   summarise(spec_mean = mean(reflectance),
@@ -401,7 +401,7 @@ ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=type, color = type
 #  collison facet plot ----
 #  spectral mean and CV violin plots by region ----
 
-spec_2018_2019_region <- QHI_2018_2019 %>%	
+spec_2018_2019_region <- spec_2018_2019 %>%	
   #remove mixed veg
   filter(!type == "mixed") %>%
   group_by(type, plot, wavelength, year) %>%		
