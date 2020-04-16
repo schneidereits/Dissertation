@@ -199,52 +199,36 @@ ggplot(spec_2018_small, aes(x=type, y=CV, fill=type)) +
 
 # cloud of spec mean 2018+2019
 (p_QHI_cloud_mean <- ggplot() + 
-    geom_flat_violin(data = QHI_2018_2019_small, aes(x=type, y=spec_mean, fill=type),
+    geom_flat_violin(data = QHI_2018_2019_small, aes(x=type, y=spec_mean, fill=type_year),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8, trim=F) +
     geom_point(data = QHI_2018_2019_small, aes(x=type, y=spec_mean, colour=year),
                position = position_jitter(width = .15), size = 2) +
     geom_boxplot(data = QHI_2018_2019_small, aes(x=type, y=spec_mean),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
-    scale_fill_manual(values = c("#ffa544", "#2b299b", "gray65")) +
+    scale_fill_manual(values = c("#FF4500", "#FF8C00", "#D15FEE", "#63B8FF", "grey")) +
     scale_color_brewer(palette = "Dark2") +
-    theme_cowplot())
+    theme_cowplot() +
+theme(legend.position = c(1,0.8)))
+  
 ggsave(p_QHI, path = "figures", filename = "cloud_spec_mean_2018_2019.png", height = 8, width = 10)
 
 
 # cloud of spec diversity 2018 + 2019
 (p_QHI_cloud_cv <- ggplot() +
-    geom_flat_violin(data = QHI_2018_2019_small, aes(x=type, y=CV, fill=type),
+    geom_flat_violin(data = QHI_2018_2019_small, aes(x=type, y=CV, fill=type_year),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8, trim=F) +
     geom_point(data = QHI_2018_2019_small, aes(x=type, y=CV, colour=year),
                position = position_jitter(width = .15), size = 2) +
     geom_boxplot(data = QHI_2018_2019_small, aes(x=type, y=CV),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
-    scale_fill_manual(values = c("#ffa544", "#2b299b", "gray65")) +
+    scale_fill_manual(values = c("#FF4500", "#FF8C00", "#D15FEE", "#63B8FF", "grey")) +
     scale_color_brewer(palette = "Dark2") +
     ylim(0,0.4) +
-    theme_cowplot())
+    theme_cowplot()+ 
+    theme(legend.position = "none"))
 #ggsave(p_QHI, path = "figures", filename = "cloud_CV.png", height = 8, width = 10)
 
 
-#plot spectral mean 2018+2019
-(p_QHI <- ggplot(QHI_2018_2019_wavelength, aes(x = wavelength, y = spec_mean, group = plot_unique, color = type_year)) + 
-    geom_line(alpha = 0.7, size=1.) + 
-    guides(colour = guide_legend(override.aes = list(size=5))) +
-    scale_color_manual(values = c("#FF4500", "#FF8C00", "#D15FEE", "#63B8FF", "grey")) +
-    labs(x = "Wavelength (mm)", y = "Reflectance") +
-    theme_cowplot()+
-    theme(legend.position = "right") +
-    theme_rgb_mean)
-
-#plot spectral CV 2018+2019
-(p_QHI <- ggplot(QHI_2018_2019_wavelength, aes(x = wavelength, y = CV, group = plot_unique, color = year)) + 
-    geom_line(alpha = 0.7, size=1.) + 
-    guides(colour = guide_legend(override.aes = list(size=5))) +
-    #scale_color_manual(values = c("#FF4500", "#FF8C00", "#D15FEE", "#63B8FF", "grey")) +
-    labs(x = "Wavelength (mm)", y = "CV") +
-    theme_cowplot()+
-    theme(legend.position = "right") +
-    theme_rgb_CV)
 
 
 #ggsave(p_QHI, path = "figures", filename = "spec_sig_plot.png", height = 8, width = 10)
@@ -268,7 +252,7 @@ spec_2018_2019_wavelength_plot <- QHI_2018_2019 %>%
     # scale_color_manual(values = c("#ffa544", "#2b299b", "gray65")) +
     scale_color_manual(values = c("#FF4500", "#FF8C00", "#D15FEE", "#63B8FF", "grey")) +
     theme_rgb_mean +
-    theme(legend.position = c(0.05,0.7)))
+    theme(legend.position = "none" )) #c(0.05,0.7)
 
 #ggsave(p_QHI, path = "figures", filename = "CV_plot.png", height = 8, width = 10)
 
@@ -281,7 +265,8 @@ spec_2018_2019_wavelength_plot <- QHI_2018_2019 %>%
     labs(x = "Wavelength (mm)", y = "Mean CV") +
     # scale_color_manual(values = c("#ffa544", "#2b299b", "gray65")) +
     scale_color_manual(values = c("#FF4500", "#FF8C00", "#D15FEE", "#63B8FF", "grey")) +
-    theme_rgb_CV)
+    theme_rgb_CV +
+    theme(legend.position = "none" )) #c(0.05,0.7))
 
 #H1 figure ----
 
@@ -416,8 +401,10 @@ ggplot(collison_wavelength, aes(x = wavelength, y = CV, group=type, color = type
 #  collison facet plot ----
 #  spectral mean and CV violin plots by region ----
 
-collison_wavelength <- collison %>%		
-  group_by(type, plot, wavelength) %>%		
+spec_2018_2019_region <- QHI_2018_2019 %>%	
+  #remove mixed veg
+  filter(!type == "mixed") %>%
+  group_by(type, plot, wavelength, year) %>%		
   summarise(spec_mean = mean(reflectance),		
             CV = mean(sd(reflectance)/mean(reflectance))) %>%		
   mutate(region = case_when(between(wavelength, 400, 500) ~ "blue",		
@@ -428,36 +415,37 @@ collison_wavelength <- collison %>%
 
 # blue mean
 (p_blue_mean <- ggplot() +
-    geom_flat_violin(data = subset(collison_wavelength, region %in% c("blue")), 
+    geom_flat_violin(data = subset(spec_2018_2019_region, region %in% c("blue")), 
                      aes(x=type, y=spec_mean, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = subset(collison_wavelength, region %in% c("blue")),
-               aes(x=type, y=spec_mean, colour=plot),
+    geom_point(data = subset(spec_2018_2019_region, region %in% c("blue")),
+               aes(x=type, y=spec_mean, colour=year),
                position = position_jitter(width = .1), size = 1, alpha =0.5) +
-    geom_boxplot(data = subset(collison_wavelength, region %in% c("blue")),
+    geom_boxplot(data = subset(spec_2018_2019_region, region %in% c("blue")),
                  aes(x=type, y=spec_mean),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
+    scale_color_brewer(palette = "Dark2") +
     theme_spectra() +
-    scale_color_collison +
+    ylim(0, 0.8) +
+  #  scale_color_collison +
     ylab("Reflectance") +
-    ylim(0, 85) +
     theme(panel.background =  element_rect(fill = "white"),
           plot.background = element_rect(color = "#cfe2fd")))
 
 # blue CV
 (p_blue_CV <- ggplot() +
-    geom_flat_violin(data = subset(collison_wavelength, region %in% c("blue")), 
+    geom_flat_violin(data = subset(spec_2018_2019_region, region %in% c("blue")), 
                      aes(x=type, y=CV, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = subset(collison_wavelength, region %in% c("blue")),
-               aes(x=type, y=CV, colour=plot),
+    geom_point(data = subset(spec_2018_2019_region, region %in% c("blue")),
+               aes(x=type, y=CV, colour=year),
                position = position_jitter(width = .1), size = 1, alpha =0.5) +
-    geom_boxplot(data = subset(collison_wavelength, region %in% c("blue")),
+    geom_boxplot(data = subset(spec_2018_2019_region, region %in% c("blue")),
                  aes(x=type, y=CV),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
-    scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
+    scale_color_brewer(palette = "Dark2") +
     theme_spectra() +
     ylim(0.1, 0.4) +
     ylab("Spectral diversity (CV)") +
@@ -466,36 +454,36 @@ collison_wavelength <- collison %>%
 
 # green mean
 (p_green_mean <- ggplot() +
-    geom_flat_violin(data = subset(collison_wavelength, region %in% c("green")), 
+    geom_flat_violin(data = subset(spec_2018_2019_region, region %in% c("green")), 
                      aes(x=type, y=spec_mean, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = subset(collison_wavelength, region %in% c("green")),
-               aes(x=type, y=spec_mean, colour=plot),
+    geom_point(data = subset(spec_2018_2019_region, region %in% c("green")),
+               aes(x=type, y=spec_mean, colour=year),
                position = position_jitter(width = .1), size = 1, alpha =0.5) +
-    geom_boxplot(data = subset(collison_wavelength, region %in% c("green")),
+    geom_boxplot(data = subset(spec_2018_2019_region, region %in% c("green")),
                  aes(x=type, y=spec_mean),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
-    scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
+    scale_color_brewer(palette = "Dark2") +
     theme_spectra() +
-    ylim(0, 85) +
+    ylim(0, 0.8) +
     theme(panel.background =  element_rect(fill = "white"),
           plot.background = element_rect(color = "lightgreen")))
 
 
 # green CV
 (p_green_CV <- ggplot() +
-    geom_flat_violin(data = subset(collison_wavelength, region %in% c("green")), 
+    geom_flat_violin(data = subset(spec_2018_2019_region, region %in% c("green")), 
                      aes(x=type, y=CV, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = subset(collison_wavelength, region %in% c("green")),
-               aes(x=type, y=CV, colour=plot),
+    geom_point(data = subset(spec_2018_2019_region, region %in% c("green")),
+               aes(x=type, y=CV, colour=year),
                position = position_jitter(width = .1), size = 1, alpha =0.5) +
-    geom_boxplot(data = subset(collison_wavelength, region %in% c("green")),
+    geom_boxplot(data = subset(spec_2018_2019_region, region %in% c("green")),
                  aes(x=type, y=CV),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
-    scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
+    scale_color_brewer(palette = "Dark2") +
     theme_spectra() +
     ylim(0.1, 0.4) +
     theme(panel.background =  element_rect(fill = "white"),
@@ -503,36 +491,36 @@ collison_wavelength <- collison %>%
 
 # red mean
 (p_red_mean <- ggplot() +
-    geom_flat_violin(data = subset(collison_wavelength, region %in% c("red")), 
+    geom_flat_violin(data = subset(spec_2018_2019_region, region %in% c("red")), 
                      aes(x=type, y=spec_mean, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = subset(collison_wavelength, region %in% c("red")),
-               aes(x=type, y=spec_mean, colour=plot),
+    geom_point(data = subset(spec_2018_2019_region, region %in% c("red")),
+               aes(x=type, y=spec_mean, colour=year),
                position = position_jitter(width = .1), size = 1, alpha =0.5) +
-    geom_boxplot(data = subset(collison_wavelength, region %in% c("red")),
+    geom_boxplot(data = subset(spec_2018_2019_region, region %in% c("red")),
                  aes(x=type, y=spec_mean),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
-    scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
+    scale_color_brewer(palette = "Dark2") +
     theme_spectra() +
-    ylim(0, 85) +
+    ylim(0, 0.8) +
     theme(panel.background =  element_rect(fill = "white"),
           plot.background = element_rect(color = "red")))
 
 
 # red CV
 (p_red_CV <- ggplot() +
-    geom_flat_violin(data = subset(collison_wavelength, region %in% c("red")), 
+    geom_flat_violin(data = subset(spec_2018_2019_region, region %in% c("red")), 
                      aes(x=type, y=CV, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = subset(collison_wavelength, region %in% c("red")),
-               aes(x=type, y=CV, colour=plot),
+    geom_point(data = subset(spec_2018_2019_region, region %in% c("red")),
+               aes(x=type, y=CV, colour=year),
                position = position_jitter(width = .1), size = 1, alpha =0.5) +
-    geom_boxplot(data = subset(collison_wavelength, region %in% c("red")),
+    geom_boxplot(data = subset(spec_2018_2019_region, region %in% c("red")),
                  aes(x=type, y=CV),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
-    scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
+    scale_color_brewer(palette = "Dark2") +
     theme_spectra() +
     ylim(0.1, 0.4) +
     theme(panel.background =  element_rect(fill = "white"),
@@ -540,36 +528,36 @@ collison_wavelength <- collison %>%
 
 # NIR mean
 (p_NIR_mean <- ggplot() +
-    geom_flat_violin(data = subset(collison_wavelength, region %in% c("NIR")), 
+    geom_flat_violin(data = subset(spec_2018_2019_region, region %in% c("NIR")), 
                      aes(x=type, y=spec_mean, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = subset(collison_wavelength, region %in% c("NIR")),
-               aes(x=type, y=spec_mean, colour=plot),
+    geom_point(data = subset(spec_2018_2019_region, region %in% c("NIR")),
+               aes(x=type, y=spec_mean, colour=year),
                position = position_jitter(width = .1), size = 1, alpha =0.5) +
-    geom_boxplot(data = subset(collison_wavelength, region %in% c("NIR")),
+    geom_boxplot(data = subset(spec_2018_2019_region, region %in% c("NIR")),
                  aes(x=type, y=spec_mean),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
-    scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
+    scale_color_brewer(palette = "Dark2") +
     theme_spectra() +
-    ylim(0, 85) +
+    ylim(0, 0.8) +
     theme(panel.background =  element_rect(fill = "white"),
           plot.background = element_rect(color = "tomato")))
 
 
 # NIR CV
 (p_NIR_CV <- ggplot() +
-    geom_flat_violin(data = subset(collison_wavelength, region %in% c("NIR")), 
+    geom_flat_violin(data = subset(spec_2018_2019_region, region %in% c("NIR")), 
                      aes(x=type, y=CV, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = subset(collison_wavelength, region %in% c("NIR")),
-               aes(x=type, y=CV, colour=plot),
+    geom_point(data = subset(spec_2018_2019_region, region %in% c("NIR")),
+               aes(x=type, y=CV, colour=year),
                position = position_jitter(width = .1), size = 1, alpha =0.5) +
-    geom_boxplot(data = subset(collison_wavelength, region %in% c("NIR")),
+    geom_boxplot(data = subset(spec_2018_2019_region, region %in% c("NIR")),
                  aes(x=type, y=CV),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
-    scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
+    scale_color_brewer(palette = "Dark2") +
     theme_spectra() +
     ylim(0.1, 0.4) +
     theme(panel.background =  element_rect(fill = "white"),
@@ -577,36 +565,36 @@ collison_wavelength <- collison %>%
 
 # IR mean
 (p_IR_mean <- ggplot() +
-    geom_flat_violin(data = subset(collison_wavelength, region %in% c("IR")), 
+    geom_flat_violin(data = subset(spec_2018_2019_region, region %in% c("IR")), 
                      aes(x=type, y=spec_mean, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = subset(collison_wavelength, region %in% c("IR")),
-               aes(x=type, y=spec_mean, colour=plot),
+    geom_point(data = subset(spec_2018_2019_region, region %in% c("IR")),
+               aes(x=type, y=spec_mean, colour=year),
                position = position_jitter(width = .1), size = 1, alpha =0.5) +
-    geom_boxplot(data = subset(collison_wavelength, region %in% c("IR")),
+    geom_boxplot(data = subset(spec_2018_2019_region, region %in% c("IR")),
                  aes(x=type, y=spec_mean),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
-    scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
+    scale_color_brewer(palette = "Dark2") +
     theme_spectra() +
-    ylim(0, 85) +
+    ylim(0, 0.8) +
     theme(panel.background =  element_rect(fill = "white"),
           plot.background = element_rect(color = "darkgrey")))
 
 
 # IR CV
 (p_IR_CV <- ggplot() +
-    geom_flat_violin(data = subset(collison_wavelength, region %in% c("IR")), 
+    geom_flat_violin(data = subset(spec_2018_2019_region, region %in% c("IR")), 
                      aes(x=type, y=CV, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = subset(collison_wavelength, region %in% c("IR")),
-               aes(x=type, y=CV, colour=plot),
+    geom_point(data = subset(spec_2018_2019_region, region %in% c("IR")),
+               aes(x=type, y=CV, colour=year),
                position = position_jitter(width = .1), size = 1, alpha =0.5) +
-    geom_boxplot(data = subset(collison_wavelength, region %in% c("IR")),
+    geom_boxplot(data = subset(spec_2018_2019_region, region %in% c("IR")),
                  aes(x=type, y=CV),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
-    scale_color_collison +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
+    scale_color_brewer(palette = "Dark2") +
     theme_spectra() +
     ylim(0.1, 0.4) +
     theme(panel.background =  element_rect(fill = "white"),
@@ -621,15 +609,15 @@ collison_wavelength <- collison %>%
 grid.newpage()        
 
 # Create layout : nrow = 3, ncol = 2
-pushViewport(viewport(layout = grid.layout(nrow = 3, ncol = 5)))
+pushViewport(viewport(layout = grid.layout(nrow = 4, ncol = 5)))
 
 # Arrange the plots
-print(p_col_mean, vp = define_region(row = 1:2, col = 1:5))   # Span over two columns
-print(p_blue_mean + rremove("legend") + rremove("xlab"), vp = define_region(row = 3, col = 1))
-print(p_green_mean + rremove("legend") + rremove("xylab"), vp = define_region(row = 3, col = 2))
-print(p_red_mean + rremove("legend") +  rremove("xylab"), vp = define_region(row = 3, col = 3))
-print(p_NIR_mean + rremove("legend") + rremove("xylab"), vp = define_region(row = 3, col = 4))
-print(p_IR_mean + rremove("legend")  + rremove("xylab"), vp = define_region(row = 3, col = 5))
+print(p_QHI_specmean, vp = define_region(row = 1:2, col = 1:5))   # Span over two columns
+print(p_blue_mean + rremove("legend") + rremove("xlab"), vp = define_region(row = 3:4, col = 1))
+print(p_green_mean + rremove("legend") + rremove("xylab"), vp = define_region(row = 3:4, col = 2))
+print(p_red_mean + rremove("legend") +  rremove("xylab"), vp = define_region(row = 3:4, col = 3))
+print(p_NIR_mean + rremove("legend") + rremove("xylab"), vp = define_region(row = 3:4, col = 4))
+print(p_IR_mean + rremove("legend")  + rremove("xylab"), vp = define_region(row = 3:4, col = 5))
 
 
 # facet plot for spectral CV
@@ -641,7 +629,7 @@ grid.newpage()
 pushViewport(viewport(layout = grid.layout(nrow = 3, ncol = 5)))
 
 # arranging plots
-print(p_col_CV, vp = define_region(row = 1:2, col = 1:5))
+print(p_QHI_CV, vp = define_region(row = 1:2, col = 1:5))
 print(p_blue_CV + rremove("legend") + rremove("xlab"), vp = define_region(row = 3, col = 1))
 print(p_green_CV + rremove("legend") + rremove("xylab"), vp = define_region(row = 3, col = 2))
 print(p_red_CV + rremove("legend") +  rremove("xylab"), vp = define_region(row = 3, col = 3))

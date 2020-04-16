@@ -386,7 +386,8 @@ QHI_2018_2019 <- bind_rows(spec_2018, spec_2019) %>%
   ungroup() %>%
   # temporary colunm with only plot number 
   mutate(plot2 = str_remove_all(plot, "HE|KO"),
-         plot_unique = paste(type,plot2,year,sep="_")) %>%
+         plot_unique = paste(type,plot2,year,sep="_"),
+         type_year = paste(type, year, sep="_")) %>%
   # remove colunm
   select(-plot2)
 
@@ -399,7 +400,7 @@ QHI_2018_2019_wavelength <- QHI_2018_2019 %>%
             CV = sd(reflectance)/mean(reflectance))
 
 QHI_2018_2019_small <- QHI_2018_2019_wavelength %>%
-  group_by(type, plot_unique, year) %>%
+  group_by(type, plot_unique, year, type_year) %>%
   summarise(CV = mean(CV),
             spec_mean = mean(spec_mean))
 
