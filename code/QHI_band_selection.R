@@ -16,42 +16,47 @@ supervised_band_selection <- tibble(wavelength =
                                         seq(745, 755, by = 0.01), # End of red-edge transition
                                         seq(920, 985, by = 0.01)))# Vascular plant structures & H20 
 
-supervised_band_selection <- QHI_2018_2019 %>%
+supervised_band_selection <- spec_2018_2019 %>%
   #filter(!type == "mixed") %>% 
   filter(wavelength %in% supervised_band_selection$wavelength) %>%
-  group_by(type, plot, id, year) %>%
+  group_by(year, type, plot, plot_unique, type_year, wavelength) %>%
   summarise(spec_mean = mean(reflectance),
-            CV = mean(sd(reflectance)/mean(reflectance))) 
+            spec_SD = sd(reflectance),
+            CV = sd(reflectance)/mean(reflectance)) %>%
+  # MIGHT WHAT TO IMPROVE BUT I KNOW THIS WORKS...
+  group_by(type, plot_unique, year) %>%
+  summarise(CV = mean(CV),
+            spec_mean = mean(spec_mean))
   
 
 # visual representaiton of supervised  selected areas 
- ggplot(QHI_2018_2019, aes(x = wavelength, y = reflectance)) + 
-    geom_smooth(alpha = 0.2, se=FALSE, color = "black") +
+ ggplot(spec_2018_2019, aes(x = wavelength, y = reflectance)) + 
+   #geom_line(data= spec_2018_2019, aes( x=wavelength, y=reflectance)) + 
     # scale_color_manual(values = c("#ffa544", "#2b299b", "gray65")) +
     theme_cowplot() +
     labs(x = "Wavelength (mm)", y = "Mean Reflectance") +
     theme(legend.position = c(0.05,0.7)) +
-   ylim(0,50) +
+   ylim(0,.5) +
    xlim(400,1000) +
-  coord_cartesian(ylim =c(3,50)) +
+  coord_cartesian(ylim =c(0.03, .5)) +
     scale_color_manual(values = c("#FF4500", "#FF8C00", "#D15FEE", "#63B8FF", "grey")) +
     annotate("rect", xmin = 430, xmax = 450, alpha = .15,ymin = 0,
-              ymax = 50, fill = "blue") + 
+              ymax = .5, fill = "blue") + 
    annotate("rect", xmin = 545, xmax = 555, ymin = 0, 
-            ymax = 50, alpha = .15, fill = "green") +
+            ymax = .5, alpha = .15, fill = "green") +
    annotate("rect", xmin = 660, xmax =680 , ymin = 0, 
-            ymax = 50, alpha = .25, fill = "red") + 
+            ymax = .5, alpha = .25, fill = "red") + 
    annotate("rect", xmin = 700, xmax = 725, ymin = 0, 
-            ymax = 50, alpha = .15, fill = "tomato") +
+            ymax = .5, alpha = .15, fill = "tomato") +
    annotate("rect", xmin = 745, xmax = 755, ymin = 0, 
-            ymax = 50, alpha = .15, fill = "tomato") +
+            ymax = .5, alpha = .15, fill = "tomato") +
    annotate("rect", xmin = 920, xmax = 985, ymin = 0, 
-            ymax = 50, alpha = .15, fill = "darkgrey")
+            ymax = .5, alpha = .15, fill = "darkgrey")
  
  
  
  # visual representaiton of ISI  selected wavebands
- ggplot(QHI_2018_2019, aes(x = wavelength, y = reflectance)) + 
+ ggplot(spec_2018_2019, aes(x = wavelength, y = reflectance)) + 
    geom_smooth(alpha = 0.2, se=FALSE, color = "black") +
    # scale_color_manual(values = c("#ffa544", "#2b299b", "gray65")) +
    theme_cowplot() +
@@ -73,7 +78,7 @@ supervised_band_selection <- QHI_2018_2019 %>%
    scale_color_manual(values = c("blue", "green", "grey", "tomato", "red")) +
    theme(legend.position = "none")
    
- ggplot(QHI_2018_2019, aes(x = wavelength, y = reflectance)) + 
+ ggplot(spec_2018_2019, aes(x = wavelength, y = reflectance)) + 
    geom_smooth(alpha = 0.2, se=FALSE, color = "black") +
    # scale_color_manual(values = c("#ffa544", "#2b299b", "gray65")) +
    theme_cowplot() +
@@ -87,7 +92,7 @@ supervised_band_selection <- QHI_2018_2019 %>%
  
  
  
-# ISI band selection and SZU 
+# ISI band selection and SZU 0NLY 2019
 
 collison_ISI <- collison %>%
   filter(type %in% c("KO" , "HE")) %>%
@@ -153,7 +158,7 @@ SZU <- collison_ISI %>%
 head(SZU, n=5)
 
 # reduced dimentionality; product of ISI band selection
-lowD <- QHI_2018_2019 %>%
+lowD <- spec_2018_2019 %>%
   filter(wavelength %in% ISI_band_selection$wavelength) %>%
   group_by(type, plot, id, year) %>%
   summarise(spec_mean = mean(reflectance),
@@ -194,18 +199,18 @@ lowD <- QHI_2018_2019 %>%
 #ggsave(p_SZU, path = "figures", filename = "SZU.png", height = 10, width = 12)
 
 
-############# QHI ISI band selection and SZU 
+############# 2018 2019 ISI band selection and SZU 
 
 # inelegant solution to selecting only 2018 wavebands that have a matching 2019 evivalent 
 # # # REASON: (2018 has a higher resolution that breaks selection algorythem)
 # first filter only 2019 
 # then round (as 2018 has no significant digits)
-# finally filter QHI_2018_2019 for band in  (next chunk)
-wavelengths_2019_rounded <- QHI_2018_2019 %>%
+# finally filter spec_2018_2019 for band in  (next chunk)
+wavelengths_2019_rounded <- spec_2018_2019 %>%
   filter(year =="2019") %>%
   mutate(wavelength = round(wavelength, digits = 0)) 
 
-QHI_ISI <- QHI_2018_2019 %>%
+QHI_ISI <- spec_2018_2019 %>%
   filter(type %in% c("KO" , "HE")) %>% # alothough later the selected wavebands get applied to PS2 data you only selected wavebands with known vegtypes
   mutate(wavelength = round(wavelength, digits = 0)) %>%
   filter(wavelength %in% wavelengths_2019_rounded$wavelength) %>%
@@ -263,8 +268,6 @@ QHI_ISI_tbl <- QHI_ISI_band_selection %>%
 QHI_ISI_tbl <- QHI_ISI_tbl[c("region", "ISI", "relative_ISI",  "wavebands_selected", "selected_ISI")]
 
 
-
-
 QHI_SZU <- QHI_ISI %>%
   arrange(ISI) %>%
   mutate(ISI = as.numeric(ISI),
@@ -279,21 +282,21 @@ QHI_SZU <- QHI_ISI %>%
 head(QHI_SZU, n=5)
 
 
-# reduced dimentionality; product of ISI band selection
-lowD <- QHI_2018_2019 %>%
-  filter(wavelength %in% ISI_band_selection$wavelength) %>%
-  group_by(type, plot, id, year) %>%
-  summarise(spec_mean = mean(reflectance),
-            CV = mean(sd(reflectance)/mean(reflectance)))
 
 # reduced dimentionality; product of ISI band selection
-QHI_lowD <- QHI_2018_2019 %>%
+QHI_lowD <- spec_2018_2019 %>%
   # need to sound so that 2019 correspond with selection wavebands 
   mutate(wavelength = round(wavelength, digits = 0)) %>%
   filter(wavelength %in% QHI_ISI_band_selection$wavelength) %>%
-  group_by(type, plot, id, year) %>%
+  group_by(year, type, plot, plot_unique, type_year, wavelength) %>%
   summarise(spec_mean = mean(reflectance),
-            CV = mean(sd(reflectance)/mean(reflectance)))
+            spec_SD = sd(reflectance),
+            CV = sd(reflectance)/mean(reflectance)) %>%
+  # MIGHT WHAT TO IMPROVE BUT I KNOW THIS WORKS...
+  group_by(type, plot_unique, year) %>%
+  summarise(CV = mean(CV),
+            spec_mean = mean(spec_mean))
+
 
 head(QHI_lowD)
 
