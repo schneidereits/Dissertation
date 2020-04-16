@@ -167,6 +167,7 @@ ggplot(spec_2018_small, aes(x=type, y=CV, fill=type)) +
 
 (p_QHI_2018_2019_mean <- ggplot(QHI_2018_2019_wavelength, aes(x = wavelength, y = spec_mean, group = plot_unique, color = type_year)) + 
     geom_line(alpha = 0.7, size=1.) + 
+    geom_quantile(quantiles = 0.5) +
     guides(colour = guide_legend(override.aes = list(size=5))) +
     labs(x = "Wavelength (mm)", y = "Reflectance") +
     theme_cowplot() +
@@ -175,7 +176,19 @@ ggplot(spec_2018_small, aes(x=type, y=CV, fill=type)) +
     theme_rgb_mean)
 
 # spectral signatures of CV by group and year (2018 2019)
-(p_QHI_2018_2019_cv <- ggplot(QHI_2018_2019_wavelength, aes(x = wavelength, y = CV, group = plot_unique, color = type_year)) + 
+(p_QHI_2018_2019_cv <- ggplot(QHI_2018_2019_wavelength, 
+                              aes(x = wavelength, y = CV, group = plot_unique, color = type_year)) + 
+    geom_line(alpha = 0.7, size=1.) + 
+    guides(colour = guide_legend(override.aes = list(size=5))) +
+    labs(x = "Wavelength (mm)", y = "CV") +
+    theme_cowplot() +
+    theme(legend.position = "bottom") +
+    scale_color_manual(values = c("#FF4500", "#FF8C00", "#D15FEE", "#63B8FF", "grey")) +
+    theme_rgb_CV)
+
+# spectral signatures of CV by group and year (2018 2019)
+(p_QHI_2018_2019_cv <- ggplot(QHI_2018_2019_wavelength, 
+                              aes(x = wavelength, y = CV, group = plot_unique, color = type_year)) + 
     geom_line(alpha = 0.7, size=1.) + 
     guides(colour = guide_legend(override.aes = list(size=5))) +
     labs(x = "Wavelength (mm)", y = "Reflectance") +
@@ -223,15 +236,26 @@ ggsave(p_QHI, path = "figures", filename = "cloud_spec_mean_2018_2019.png", heig
     theme(legend.position = "right") +
     theme_rgb_mean)
 
+#plot spectral CV 2018+2019
+(p_QHI <- ggplot(QHI_2018_2019_wavelength, aes(x = wavelength, y = CV, group = plot_unique, color = year)) + 
+    geom_line(alpha = 0.7, size=1.) + 
+    guides(colour = guide_legend(override.aes = list(size=5))) +
+    #scale_color_manual(values = c("#FF4500", "#FF8C00", "#D15FEE", "#63B8FF", "grey")) +
+    labs(x = "Wavelength (mm)", y = "CV") +
+    theme_cowplot()+
+    theme(legend.position = "right") +
+    theme_rgb_CV)
+
 
 #ggsave(p_QHI, path = "figures", filename = "spec_sig_plot.png", height = 8, width = 10)
 
 ## SMOOTHING NOT CORRECT
-(p_QHI_specmean <- ggplot(QHI_2018_2019_wavelength, aes(x = wavelength, y = spec_mean, group=type_year, color = type_year)) + 
+(p_QHI_specmean <- ggplot(QHI_2018_2019_wavelength, 
+                          aes(x = wavelength, y = spec_mean, group=type_year, color = type_year)) + 
     geom_smooth(alpha = 0.2, se=TRUE) +
     # scale_color_manual(values = c("#ffa544", "#2b299b", "gray65")) +
     theme_cowplot() +
-    labs(x = "Wavelength (mm)", y = "Reflectance") +
+    labs(x = "Wavelength (mm)", y = "Mean Reflectance") +
     theme(legend.position = c(0.05,0.7)) +
     scale_color_manual(values = c("#FF4500", "#FF8C00", "#D15FEE", "#63B8FF", "grey")) +
     theme_rgb_mean)
@@ -241,11 +265,11 @@ ggsave(p_QHI, path = "figures", filename = "cloud_spec_mean_2018_2019.png", heig
 (p_QHI_CV <- ggplot(QHI_2018_2019_wavelength, aes(x = wavelength, y = CV, group=type_year, color = type_year)) + 
     geom_smooth(alpha = 0.2, se=TRUE) + 
     theme_cowplot() +
-    labs(x = "Wavelength (mm)", y = "CV") +
+    labs(x = "Wavelength (mm)", y = "Mean CV") +
     scale_color_manual(values = c("#ffa544", "#2b299b", "gray65")) +
     scale_color_manual(values = c("#FF4500", "#FF8C00", "#D15FEE", "#63B8FF", "grey")) +
     theme_rgb_CV +
-    theme(legend.position = "none"))
+    theme(legend.position = "right"))
 
 #H1 figure ----
 
