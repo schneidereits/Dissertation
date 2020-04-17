@@ -178,7 +178,7 @@ ggsave(p_pca, path = "figures", filename = "QHI_lowD_biplot.png", height = 10, w
                                 palette = c( "tomato", "#ffa544", "purple", "#2b299b", "gray65"),
                                 addEllipses = TRUE, # Concentration ellipses
                                 # ellipse.type = "confidence",
-                                ellipse.level = 0.95, # confidence level specification
+                                ellipse.level = 0.90, # confidence level specification
                                 mean.point = TRUE, # braycenter mean point
                                 legend.title = "Groups",
                                 axes.linetype = "dashed",
@@ -377,6 +377,7 @@ t <- collison_spec_plot_small %>%
 (p_pca <- fviz_pca_biplot(res.pca_H2_2018_2019,
                           geom.ind = "point", # show points only (nbut not "text")
                           fill.ind = t$site, # color by groups
+                          color.ind = "black",
                           pointshape = 21, 
                           #  palette = c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FF4500", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF"),
                           addEllipses = TRUE, # Concentration ellipses
@@ -388,13 +389,29 @@ t <- collison_spec_plot_small %>%
                           col.var = factor(c("spectral", "spectral", "diversity", "diversity",
                                              "environmenal", "environmenal", "environmenal", 
                                              "environmenal", "environmenal")),
-                          gradient.cols = c("#00AFBB", "#00AFBB", "#FC4E07", "#FC4E07",
+                         pallette = c("#00AFBB", "#00AFBB", "#FC4E07", "#FC4E07",
                                             "#E7B800",  "#E7B800",  "#E7B800",  "#E7B800",  "#E7B800"),
                           # col.var = "cos2",
                           # gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
                           # alternate color gradient gradient.cols = c("blue", "yellow", "red")
                           legend.title = list(fill = "Sites", color = "cos2"),
                           axes.linetype = "dashed",
-                          xlab = "PC1", ylab = "PC2")) +
+                          xlab = "PC1", ylab = "PC2",
+                         ggtheme = theme_cowplot())) +
   ggpubr::color_palette("Dark2")  +    # Variable colors
   ggpubr::fill_palette(c("#FF4500", "#FF8C00", "#D15FEE", "#63B8FF"))     # Indiviual fill color
+
+(p_pca <- fviz_pca_ind(res.pca_QHI_2018_2019,
+                       geom.ind = "point", # show points only (nbut not "text")
+                       pointshape = 21,
+                       col.ind = "black",
+                       fill.ind = QHI_2018_2019_small$type, # color by groups
+                       palette = c("#ffa544", "#2b299b", "gray65"),
+                       addEllipses = TRUE, # Concentration ellipses
+                       # ellipse.type = "confidence",
+                       ellipse.level = 0.95, # confidence level specification
+                       mean.point = TRUE, # braycenter mean point
+                       legend.title = "Groups",
+                       axes.linetype = "dashed",
+                       xlab = "PC1", ylab = "PC2", 
+                       ggtheme = theme_cowplot()))
