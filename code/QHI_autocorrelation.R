@@ -7,7 +7,7 @@
 
 # spatial variogram
 
-QHI_spatial <- collison_small %>% 
+QHI_spatial <- collison_spec_plot_small_2019 %>% 
   ungroup() %>%
   #filter(type == "HE") %>%
   mutate(x = as.numeric(group_indices(., plot)),
