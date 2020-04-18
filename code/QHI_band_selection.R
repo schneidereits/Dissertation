@@ -66,15 +66,15 @@ supervised_band_selection <- spec_2018_2019 %>%
    xlim(400,1000) +
    coord_cartesian(ylim =c(3,50)) +
    geom_vline(data =subset(ISI_band_selection, region %in% c("blue")), 
-             aes(xintercept= wavelength , color = region, alpha = .15, size=.5))  +
+             aes(xintercept= wavelength , color = region, alpha = .1, size=.5))  +
    geom_vline(data =subset(ISI_band_selection, region %in% c("green")), 
-              aes(xintercept= wavelength , color = region, alpha = .15,size=.5)) +
+              aes(xintercept= wavelength , color = region, alpha = .1,size=.5)) +
    geom_vline(data =subset(ISI_band_selection, region %in% c("red")), 
-              aes(xintercept= wavelength , color = region, alpha = .15, size=.6)) +
+              aes(xintercept= wavelength , color = region, alpha = .1, size=.6)) +
    geom_vline(data =subset(ISI_band_selection, region %in% c("NIR")), 
-              aes(xintercept= wavelength , color = region, alpha = .15, size=.5)) +
+              aes(xintercept= wavelength , color = region, alpha = .1, size=.5)) +
    geom_vline(data =subset(ISI_band_selection, region %in% c("IR")), 
-              aes(xintercept= wavelength , color = region, alpha = .15, size=.5)) +
+              aes(xintercept= wavelength , color = region, alpha = .1, size=.5)) +
    scale_color_manual(values = c("blue", "green", "grey", "tomato", "red")) +
    theme(legend.position = "none")
    
