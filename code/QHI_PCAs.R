@@ -374,6 +374,9 @@ t <- collison_spec_plot_small %>%
   # add site variable 
   unite(site, c(type,year))
 
+var <- get_pca_var(t)
+head(var$coord)
+
 (p_pca <- fviz_pca_biplot(res.pca_H2_2018_2019,
                           geom.ind = "point", # show points only (nbut not "text")
                           fill.ind = t$site, # color by groups
@@ -386,9 +389,10 @@ t <- collison_spec_plot_small %>%
                           ellipse.level = 0.95, # confidence level specification
                           mean.point = TRUE, # braycenter mean point
                           # to color arrow by variable type
-                          col.var = factor(c("spectral", "spectral", "diversity", "diversity",
+                          col.var = factor(c("diversity", "diversity",
                                              "environmenal", "environmenal", "environmenal", 
-                                             "environmenal", "environmenal")),
+                                             "environmenal", "environmenal", 
+                                             "spectral", "spectral")),
                          pallette = c("#00AFBB", "#00AFBB", "#FC4E07", "#FC4E07",
                                             "#E7B800",  "#E7B800",  "#E7B800",  "#E7B800",  "#E7B800"),
                           # col.var = "cos2",
