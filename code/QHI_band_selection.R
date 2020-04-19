@@ -132,15 +132,14 @@ ggplot(QHI_ISI, aes(x=wavelength, y=ISI)) +
 # ISI by region
 QHI_ISI_tbl <- QHI_ISI %>%
   group_by(region) %>%
-  summarise(ISI = sum(ISI))
+  summarise(mean_ISI = mean(ISI),
+            ISI = sum(ISI))
 
 # number relative ISI (as groups include differnt numbers of wavebands)
 QHI_ISI_tbl <- QHI_ISI %>%
   group_by(region) %>%
   count(region) %>%
-  left_join(QHI_ISI_tbl) %>%
-  # relative ISI colunm (ISI* portotional size of region)
-  mutate(relative_ISI = ISI/(n/122)) # NEED TO HARDCODE VALUE TO CORREPOND WITH THE LARGEST N VALUE IN QHI_ISI_tbl
+  left_join(QHI_ISI_tbl)
 
 # number wavebands selected 
 QHI_ISI_tbl <- QHI_ISI_band_selection %>%
@@ -155,7 +154,7 @@ QHI_ISI_tbl <- QHI_ISI_band_selection %>%
   summarise(selected_ISI = sum(ISI)) %>%
   left_join(QHI_ISI_tbl) 
 
-QHI_ISI_tbl <- QHI_ISI_tbl[c("region", "ISI", "relative_ISI",  "wavebands_selected", "selected_ISI")]
+QHI_ISI_tbl <- QHI_ISI_tbl[c("region", "ISI", "mean_ISI",  "wavebands_selected", "selected_ISI")]
 
 
 QHI_SZU <- QHI_ISI %>%
