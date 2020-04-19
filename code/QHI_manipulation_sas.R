@@ -631,5 +631,14 @@ collison_spec_plot_small <- left_join(spec_2018_2019, QHI_plotdata, value = "plo
   summarise(CV = mean(CV),
             spec_mean = mean(spec_mean))
 
-head(spec_2018_2019)
+head(QHI_spec_plot)
 
+collison_spec_plot_small %>% group_by(type) %>% summarise(richness = mean(richness), 
+                                                          shannon= mean(shannon),
+                                                          simpson= mean(simpson),
+                                                          evenness= mean(evenness), 
+                                                          bareground= mean(bareground),
+                                                          dead= mean(dead),
+                                                          reproductive_tissue= mean(reproductive_tissue),
+                                                          total_cover= mean(total_cover), 
+                                                          gram_shrub_ratio= mean(gram_shrub_ratio))

@@ -199,7 +199,8 @@ ggplot(QHI_ISI, aes(x=wavelength, y=ISI)) +
   geom_rug(data = QHI_ISI_band_selection, sides = "b" ) +
   #stat_valleys(span = 3, shape = 1, size = 2, color = "black", fill = NA) +
   scale_y_continuous(expand = expand_scale(mult = c(0, .1))) +
-  scale_x_continuous(expand = expand_scale(mult = c(0, .1))) +
+  scale_x_continuous(expand = expand_scale(mult = c(0, .1)),
+                     breaks=seq(400, 1000, 100)) +
   annotate("rect", xmin = 400, xmax = 500, ymin = 15,
            ymax = 21, alpha = .15, fill = "blue") + 
   annotate("rect", xmin = 500, xmax = 600, ymin = 15, 

@@ -512,7 +512,7 @@ collison_spec_plot_small$bareground <- scale(collison_spec_plot_small$bareground
 str(collison_spec_plot_small)
 
 m_H2a <- lm(data = collison_spec_plot_small,
-              spec_mean ~ (type-1) * (type*richness) + (type*evenness) + (type*bareground))
+              spec_mean ~ (type-1) + year + (type*richness) + (type*evenness) + (type*bareground))
 
 
 summary(m_H2a)
@@ -597,7 +597,7 @@ grid.arrange(p_H2a_rich, p_H2a_even, p_H2a_ground, nrow = 1)
     theme_classic())
 
 m_H2b <- lm(data = collison_spec_plot_small, 
-              CV ~ (type-1) + (type*richness) + (type*evenness) + (type*bareground))
+              CV ~ (type-1) + year + (type*richness) + (type*evenness) + (type*bareground))
 
 summary(m_H2b)
 
