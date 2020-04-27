@@ -399,6 +399,14 @@ spec_2018_2019_wavelength <- spec_2018_2019 %>%
             spec_SD = sd(reflectance),
             CV = sd(reflectance)/mean(reflectance))
 
+spec_2018_2019_id <- spec_2018_2019 %>%
+  mutate(plot_unique = paste(plot, year, sep="_"),
+         type_year = paste(type, year, sep="_")) %>%
+  group_by(year, type, plot, plot_unique, type_year, id) %>%
+  summarise(spec_mean = mean(reflectance),
+            spec_SD = sd(reflectance),
+            CV = sd(reflectance)/mean(reflectance))
+
 spec_2018_2019_small <- spec_2018_2019_wavelength %>%
   group_by(type, plot_unique, year, type_year) %>%
   summarise(CV = mean(CV),
@@ -613,7 +621,8 @@ QHI_plotdata <- read_csv("data/QHI_biodiversity/QHI_plotdata_2018_2019_sas.csv",
 #         plot = str_remove_all(plot, "_"),
 #         # differnet methods, maybe nor great pratice, but it works...
 #         year = substring(plot_unique,6,9))
-
+ 
+ 
 
 # 2018+2019 QHI spectral and plot data
 QHI_spec_plot <- left_join(spec_2018_2019, QHI_plotdata, value = "plot_unique") 
@@ -622,17 +631,18 @@ collison_spec_plot_small <- left_join(spec_2018_2019, QHI_plotdata, value = "plo
   filter(!type == "mixed") %>%
   group_by(wavelength, type, plot, year, plot_unique, richness, shannon,
            simpson, evenness, bareground, dead,
-           reproductive_tissue, total_cover, gram_shrub_ratio) %>%
+           reproductive_tissue, total_cover, graminoid, shrub) %>%
   summarise(spec_mean = mean(reflectance),
             CV = mean(sd(reflectance)/mean(reflectance))) %>%
   group_by(type, plot, year, plot_unique, richness, shannon,
            simpson, evenness, bareground, dead,
-           reproductive_tissue, total_cover, gram_shrub_ratio) %>%
+           reproductive_tissue, total_cover, graminoid, shrub) %>%
   summarise(CV = mean(CV),
             spec_mean = mean(spec_mean))
 
 head(QHI_spec_plot)
 
+# quick by type summary
 collison_spec_plot_small %>% group_by(type) %>% summarise(richness = mean(richness), 
                                                           shannon= mean(shannon),
                                                           simpson= mean(simpson),
@@ -641,4 +651,81 @@ collison_spec_plot_small %>% group_by(type) %>% summarise(richness = mean(richne
                                                           dead= mean(dead),
                                                           reproductive_tissue= mean(reproductive_tissue),
                                                           total_cover= mean(total_cover), 
-                                                          gram_shrub_ratio= mean(gram_shrub_ratio))
+                                                          graminoid= mean(graminoid),
+                                                          shrub = mean(shrub))
+
+
+collison_spec_plot_small_visable <- left_join(spec_2018_2019, QHI_plotdata, value = "plot_unique") %>%
+  filter(!type == "mixed",
+         between(wavelength, 400, 680)) %>%
+  group_by(wavelength, type, plot, year, plot_unique, richness, shannon,
+           simpson, evenness, bareground, dead,
+           reproductive_tissue, total_cover, graminoid, shrub) %>%
+  summarise(spec_mean = mean(reflectance),
+            CV = mean(sd(reflectance)/mean(reflectance))) %>%
+  group_by(type, plot, year, plot_unique, richness, shannon,
+           simpson, evenness, bareground, dead,
+           reproductive_tissue, total_cover, graminoid, shrub) %>%
+  summarise(CV = mean(CV),
+            spec_mean = mean(spec_mean))
+
+
+
+# plot correction... not correct
+
+
+QHI_plotdata_corr <- QHI_plotdata %>%
+  mutate(plot_unique = case_when(plot_unique == "KO_1_2018"  ~ "KO_6_2018",
+                                  plot_unique == "KO_2_2018"  ~ "KO_5_2018",
+                                  plot_unique == "KO_3_2018"  ~ "KO_4_2018",
+                                  plot_unique == "KO_4_2018"  ~ "KO_3_2018",
+                                  plot_unique == "KO_5_2018"  ~ "KO_2_2018",
+                                  plot_unique == "KO_6_2018"  ~ "KO_1_2018",
+                                  plot_unique == "KO_1_2019"  ~ "KO_6_2019",
+                                  plot_unique == "KO_2_2019"  ~ "KO_5_2019",
+                                  plot_unique == "KO_3_2019"  ~ "KO_4_2019",
+                                  plot_unique == "KO_4_2019"  ~ "KO_3_2019",
+                                  plot_unique == "KO_5_2019"  ~ "KO_2_2019",
+                                  plot_unique == "KO_6_2019"  ~ "KO_1_2019",
+                                  plot_unique == "HE_1_2018"  ~ "HE_1_2018",
+                                  plot_unique == "HE_2_2018"  ~ "HE_2_2018",
+                                  plot_unique == "HE_3_2018"  ~ "HE_3_2018",
+                                  plot_unique == "HE_4_2018"  ~ "HE_4_2018",
+                                  plot_unique == "HE_5_2018"  ~ "HE_5_2018",
+                                  plot_unique == "HE_6_2018"  ~ "HE_6_2018",
+                                  plot_unique == "HE_1_2019"  ~ "HE_1_2019",
+                                  plot_unique == "HE_2_2019"  ~ "HE_2_2019",
+                                  plot_unique == "HE_3_2019"  ~ "HE_3_2019",
+                                  plot_unique == "HE_4_2019"  ~ "HE_4_2019",
+                                  plot_unique == "HE_5_2019"  ~ "HE_5_2019",
+                                  plot_unique == "HE_6_2019"  ~ "HE_6_2019"))
+
+# 2018+2019 QHI spectral and plot data
+QHI_spec_plot_corr <- left_join(spec_2018_2019, QHI_plotdata_corr, value = "plot_unique") 
+
+collison_spec_plot_small_corr <- left_join(spec_2018_2019, QHI_plotdata_corr, value = "plot_unique") %>%
+  filter(!type == "mixed") %>%
+  group_by(wavelength, type, plot, year, plot_unique, richness, shannon,
+           simpson, evenness, bareground, dead,
+           reproductive_tissue, total_cover, graminoid, shrub) %>%
+  summarise(spec_mean = mean(reflectance),
+            CV = sd(reflectance)/mean(reflectance)) %>%
+  group_by(type, plot, year, plot_unique, richness, shannon,
+           simpson, evenness, bareground, dead,
+           reproductive_tissue, total_cover, graminoid, shrub) %>%
+  summarise(CV = mean(CV),
+            spec_mean = mean(spec_mean))
+
+head(QHI_spec_plot)
+
+collison_spec_plot_small_corr %>% group_by(type) %>% summarise(richness = mean(richness), 
+                                                          shannon= mean(shannon),
+                                                          simpson= mean(simpson),
+                                                          evenness= mean(evenness), 
+                                                          bareground= mean(bareground),
+                                                          dead= mean(dead),
+                                                          reproductive_tissue= mean(reproductive_tissue),
+                                                          total_cover= mean(total_cover), 
+                                                          graminoid= mean(graminoid),
+                                                          shrub = mean(shrub))
+
