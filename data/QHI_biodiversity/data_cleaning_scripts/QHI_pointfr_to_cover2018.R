@@ -5,7 +5,7 @@
 # Note - make sure the species names are consistent!
 
 # Import Data -------------------------------------------------------------------
-abundance <- read.csv("scripts/users/gdaskalova/Herschel_ITEXdata_1999-2018.csv", stringsAsFactors = FALSE, strip.white = TRUE)
+abundance <- read.csv("~/Documents/university work/Dissertation/Dissertation/data/QHI_biodiversity/Herschel_ITEXdata_1999-2018_updated.csv", stringsAsFactors = FALSE, strip.white = TRUE)
 head(abundance)
 
 # Note that depending on how the data has been entered, species names may not be in a usable format. For the Herschel data abbreviations have been used so it requires an additional step later to convert these into species names. If data is entered electronically in the future this step can be bypassed.
