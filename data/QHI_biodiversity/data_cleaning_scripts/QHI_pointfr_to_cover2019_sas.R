@@ -5,7 +5,7 @@
 # Note - make sure the species names are consistent!
 
 # Import Data -------------------------------------------------------------------
-abundance <- read.csv("Dissertation/data/QHI_biodiversity/pointfr_1999-2019.csv", stringsAsFactors = FALSE, strip.white = TRUE)
+abundance <- read.csv("data/QHI_biodiversity/pointfr_1999-2019_sas.csv", stringsAsFactors = FALSE, strip.white = TRUE)
 head(abundance)
 
 
@@ -70,3 +70,4 @@ QHI_cover_1999_2019_sas <- cover[,c(7:11,1,12,13,5,14,15,16)]
 
 #Write csv if required-------------------
 write.csv(QHI_cover_1999_2019_sas, file="~/Documents/university work/Dissertation/Dissertation/data/QHI_biodiversity/QHI_cover_1999_2019_sas.csv")
+
