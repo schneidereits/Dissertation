@@ -207,10 +207,11 @@ ggplot(spec_2018_small, aes(x=type, y=CV, fill=type)) +
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_fill_manual(values = c("#FF4500", "#FF8C00", "#D15FEE", "#63B8FF", "grey")) +
     scale_color_brewer(palette = "Dark2") +
+    labs(y = "Mean Reflectance") +
     theme_cowplot() +
-theme(legend.position = c(1,0.8)))
+theme(legend.position = c(.11,0.6)))
   
-ggsave(p_QHI, path = "figures", filename = "cloud_spec_mean_2018_2019.png", height = 8, width = 10)
+#ggsave(p_QHI, path = "figures", filename = "cloud_spec_mean_2018_2019.png", height = 8, width = 10)
 
 
 # cloud of spec diversity 2018 + 2019
@@ -223,6 +224,7 @@ ggsave(p_QHI, path = "figures", filename = "cloud_spec_mean_2018_2019.png", heig
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_fill_manual(values = c("#FF4500", "#FF8C00", "#D15FEE", "#63B8FF", "grey")) +
     scale_color_brewer(palette = "Dark2") +
+    labs(y = "Spectral Diversity  \n (CV)") +
     ylim(0,0.4) +
     theme_cowplot()+ 
     theme(legend.position = "none"))
@@ -246,9 +248,9 @@ spec_2018_2019_wavelength_plot <- spec_2018_2019 %>%
 (p_QHI_specmean <- ggplot(spec_2018_2019_wavelength_plot, 
                           aes(x = wavelength, y = spec_mean, 
                               group = type_year, color = type_year)) + 
-    geom_line() + 
+    geom_line(size=1) + 
     theme_cowplot() +
-    labs(x = "Wavelength (mm)", y = "Mean CV") +
+    labs(x = "Wavelength (mm)", y = "Mean Reflectance") +
     # scale_color_manual(values = c("#ffa544", "#2b299b", "gray65")) +
     scale_color_manual(values = c("#FF4500", "#FF8C00", "#D15FEE", "#63B8FF", "grey")) +
     theme_rgb_mean +
@@ -260,9 +262,9 @@ spec_2018_2019_wavelength_plot <- spec_2018_2019 %>%
 (p_QHI_CV <- ggplot(spec_2018_2019_wavelength_plot, 
                     aes(x = wavelength, y = CV, 
                         group = type_year, color = type_year)) + 
-    geom_line() + 
+    geom_line(size=1) + 
     theme_cowplot() +
-    labs(x = "Wavelength (mm)", y = "Mean CV") +
+    labs(x = "Wavelength (mm)", y = "Spectral Diversity  \n (CV)") +
     # scale_color_manual(values = c("#ffa544", "#2b299b", "gray65")) +
     scale_color_manual(values = c("#FF4500", "#FF8C00", "#D15FEE", "#63B8FF", "grey")) +
     theme_rgb_CV +
@@ -274,14 +276,29 @@ spec_2018_2019_wavelength_plot <- spec_2018_2019 %>%
 grid.newpage()        
 
 # Create layout : nrow = 3, ncol = 2
-pushViewport(viewport(layout = grid.layout(nrow = 4, ncol = 2)))
+pushViewport(viewport(layout = grid.layout(nrow = 2, ncol = 2)))
 
 # Arrange the plots
 print(p_QHI_cloud_mean + rremove("legend"), vp = define_region(row = 1, col = 1))   
 print(p_QHI_cloud_cv, vp = define_region(row = 1, col = 2))
 print(p_QHI_specmean , vp = define_region(row = 2, col = 1))
 print(p_QHI_CV + rremove("legend"), vp = define_region(row = 2, col = 2))
-print(p_pca_veg_year , vp = define_region(row = 3:4, col = 1:2))
+
+
+
+# old figure with PCA
+# Move to a new page
+grid.newpage()        
+
+# Create layout : nrow = 3, ncol = 2
+pushViewport(viewport(layout = grid.layout(nrow = 7, ncol = 2)))
+
+# Arrange the plots
+print(p_QHI_cloud_mean + rremove("legend"), vp = define_region(row = 1:2, col = 1))   
+print(p_QHI_cloud_cv, vp = define_region(row = 1:2, col = 2))
+print(p_QHI_specmean , vp = define_region(row = 3:4, col = 1))
+print(p_QHI_CV + rremove("legend"), vp = define_region(row = 3:4, col = 2))
+print(p_pca_veg_year , vp = define_region(row = 5:7, col = 1:2))
 
 #  collison head vis (2019) -------
 
@@ -419,13 +436,13 @@ spec_2018_2019_region <- spec_2018_2019 %>%
                      aes(x=type, y=spec_mean, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = subset(spec_2018_2019_region, region %in% c("blue")),
-               aes(x=type, y=spec_mean, colour=year),
+               aes(x=type, y=spec_mean, colour=type),
                position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(spec_2018_2019_region, region %in% c("blue")),
                  aes(x=type, y=spec_mean),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
-    scale_color_brewer(palette = "Dark2") +
+    scale_color_manual(values = c("#ffa544", "#2b299b")) +
     theme_spectra() +
     ylim(0, 0.8) +
   #  scale_color_collison +
@@ -439,13 +456,13 @@ spec_2018_2019_region <- spec_2018_2019 %>%
                      aes(x=type, y=CV, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = subset(spec_2018_2019_region, region %in% c("blue")),
-               aes(x=type, y=CV, colour=year),
+               aes(x=type, y=CV, colour=type),
                position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(spec_2018_2019_region, region %in% c("blue")),
                  aes(x=type, y=CV),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
-    scale_color_brewer(palette = "Dark2") +
+    scale_color_manual(values = c("#ffa544", "#2b299b")) +
     theme_spectra() +
     ylim(0.1, 0.4) +
     ylab("Spectral diversity (CV)") +
@@ -458,13 +475,13 @@ spec_2018_2019_region <- spec_2018_2019 %>%
                      aes(x=type, y=spec_mean, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = subset(spec_2018_2019_region, region %in% c("green")),
-               aes(x=type, y=spec_mean, colour=year),
+               aes(x=type, y=spec_mean, colour=type),
                position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(spec_2018_2019_region, region %in% c("green")),
                  aes(x=type, y=spec_mean),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
-    scale_color_brewer(palette = "Dark2") +
+    scale_color_manual(values = c("#ffa544", "#2b299b")) +
     theme_spectra() +
     ylim(0, 0.8) +
     theme(panel.background =  element_rect(fill = "white"),
@@ -477,13 +494,13 @@ spec_2018_2019_region <- spec_2018_2019 %>%
                      aes(x=type, y=CV, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = subset(spec_2018_2019_region, region %in% c("green")),
-               aes(x=type, y=CV, colour=year),
+               aes(x=type, y=CV, colour=type),
                position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(spec_2018_2019_region, region %in% c("green")),
                  aes(x=type, y=CV),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
-    scale_color_brewer(palette = "Dark2") +
+    scale_color_manual(values = c("#ffa544", "#2b299b")) +
     theme_spectra() +
     ylim(0.1, 0.4) +
     theme(panel.background =  element_rect(fill = "white"),
@@ -495,13 +512,13 @@ spec_2018_2019_region <- spec_2018_2019 %>%
                      aes(x=type, y=spec_mean, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = subset(spec_2018_2019_region, region %in% c("red")),
-               aes(x=type, y=spec_mean, colour=year),
+               aes(x=type, y=spec_mean, colour=type),
                position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(spec_2018_2019_region, region %in% c("red")),
                  aes(x=type, y=spec_mean),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
-    scale_color_brewer(palette = "Dark2") +
+    scale_color_manual(values = c("#ffa544", "#2b299b")) +
     theme_spectra() +
     ylim(0, 0.8) +
     theme(panel.background =  element_rect(fill = "white"),
@@ -514,13 +531,13 @@ spec_2018_2019_region <- spec_2018_2019 %>%
                      aes(x=type, y=CV, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = subset(spec_2018_2019_region, region %in% c("red")),
-               aes(x=type, y=CV, colour=year),
+               aes(x=type, y=CV, colour=type),
                position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(spec_2018_2019_region, region %in% c("red")),
                  aes(x=type, y=CV),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
-    scale_color_brewer(palette = "Dark2") +
+    scale_color_manual(values = c("#ffa544", "#2b299b")) +
     theme_spectra() +
     ylim(0.1, 0.4) +
     theme(panel.background =  element_rect(fill = "white"),
@@ -532,13 +549,13 @@ spec_2018_2019_region <- spec_2018_2019 %>%
                      aes(x=type, y=spec_mean, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = subset(spec_2018_2019_region, region %in% c("NIR")),
-               aes(x=type, y=spec_mean, colour=year),
+               aes(x=type, y=spec_mean, colour=type),
                position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(spec_2018_2019_region, region %in% c("NIR")),
                  aes(x=type, y=spec_mean),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
-    scale_color_brewer(palette = "Dark2") +
+    scale_color_manual(values = c("#ffa544", "#2b299b")) +
     theme_spectra() +
     ylim(0, 0.8) +
     theme(panel.background =  element_rect(fill = "white"),
@@ -551,13 +568,13 @@ spec_2018_2019_region <- spec_2018_2019 %>%
                      aes(x=type, y=CV, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = subset(spec_2018_2019_region, region %in% c("NIR")),
-               aes(x=type, y=CV, colour=year),
+               aes(x=type, y=CV, colour=type),
                position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(spec_2018_2019_region, region %in% c("NIR")),
                  aes(x=type, y=CV),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
-    scale_color_brewer(palette = "Dark2") +
+    scale_color_manual(values = c("#ffa544", "#2b299b")) +
     theme_spectra() +
     ylim(0.1, 0.4) +
     theme(panel.background =  element_rect(fill = "white"),
@@ -569,18 +586,18 @@ spec_2018_2019_region <- spec_2018_2019 %>%
                      aes(x=type, y=spec_mean, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = subset(spec_2018_2019_region, region %in% c("IR")),
-               aes(x=type, y=spec_mean, colour=year),
+               aes(x=type, y=spec_mean, colour=type),
                position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(spec_2018_2019_region, region %in% c("IR")),
                  aes(x=type, y=spec_mean),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
-    scale_color_brewer(palette = "Dark2") +
-    theme_spectra() +
+    scale_color_manual(values = c("#ffa544", "#2b299b")) +
+   
     ylim(0, 0.8) +
+    theme_spectra() +
     theme(panel.background =  element_rect(fill = "white"),
           plot.background = element_rect(color = "darkgrey")))
-
 
 # IR CV
 (p_IR_CV <- ggplot() +
@@ -588,13 +605,13 @@ spec_2018_2019_region <- spec_2018_2019 %>%
                      aes(x=type, y=CV, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
     geom_point(data = subset(spec_2018_2019_region, region %in% c("IR")),
-               aes(x=type, y=CV, colour=year),
+               aes(x=type, y=CV, colour=type),
                position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(spec_2018_2019_region, region %in% c("IR")),
                  aes(x=type, y=CV),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
-    scale_color_brewer(palette = "Dark2") +
+    scale_color_manual(values = c("#ffa544", "#2b299b")) +
     theme_spectra() +
     ylim(0.1, 0.4) +
     theme(panel.background =  element_rect(fill = "white"),
