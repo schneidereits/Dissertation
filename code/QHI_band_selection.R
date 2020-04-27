@@ -54,6 +54,7 @@ supervised_band_selection <- spec_2018_2019 %>%
             ymax = .5, alpha = .15, fill = "darkgrey")
  
  
+   
  
  # visual representaiton of ISI  selected wavebands
  ggplot(spec_2018_2019, aes(x = wavelength, y = reflectance)) + 
@@ -194,8 +195,9 @@ head(QHI_lowD)
 ggplot(QHI_ISI, aes(x=wavelength, y=ISI)) +
   geom_line() +
   theme_cowplot() +
-  geom_point(data = QHI_ISI_band_selection, shape = 1) +
+  geom_point(data = QHI_ISI_band_selection, shape = 1, size =2.6) +
   geom_rug(data = QHI_ISI_band_selection, sides = "b" ) +
+  labs(y="InStability Index \n (ISI)") +
   #stat_valleys(span = 3, shape = 1, size = 2, color = "black", fill = NA) +
   scale_y_continuous(expand = expand_scale(mult = c(0, .1))) +
   scale_x_continuous(expand = expand_scale(mult = c(0, .1)),
@@ -257,7 +259,8 @@ ISI_band_selection <- collison_ISI %>%
 # ISI by region
 ISI_tbl <- collison_ISI %>%
   group_by(region) %>%
-  summarise(ISI = sum(ISI))
+  summarise(mean_ISI = mean(ISI),
+            ISI = sum(ISI))
 
 # number relative ISI (as groups include differnt numbers of wavebands)
 ISI_tbl <- collison_ISI %>%
@@ -313,7 +316,9 @@ lowD_2019selection <- spec_2018_2019 %>%
 (p_ISI <-  ggplot(collison_ISI, aes(x=wavelength, y=ISI)) +
     geom_line() +
     theme_cowplot() +
-    geom_point(data = ISI_band_selection) +
+    geom_point(data = ISI_band_selection, shape = 1, size =2.6) +
+    geom_rug(data = ISI_band_selection, sides = "b" ) +
+    labs(y="InStability Index \n (ISI)") +
     #stat_valleys(span = 3, shape = 1, size = 2, color = "black", fill = NA) +
     scale_y_continuous(expand = expand_scale(mult = c(0, .1))) +
     scale_x_continuous(expand = expand_scale(mult = c(0, .1))) +
@@ -343,3 +348,135 @@ lowD_2019selection <- spec_2018_2019 %>%
 #ggsave(p_SZU, path = "figures", filename = "SZU.png", height = 10, width = 12)
 
 
+# H2 model compiarison figure
+
+
+# full spectrum 
+(p_full <- ggplot(collison_wavelength, aes(x = wavelength, y = spec_mean, group=type, color = type)) + 
+  geom_smooth(alpha = 0.2, se=F) + 
+  theme_cowplot() +
+  coord_cartesian(ylim =c(0.04, .85)) +
+  scale_color_manual(values = c("#ffa544", "#2b299b")) +
+  labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n") +
+    theme(legend.position = c(0.2,0.7))) 
+
+
+# manual selection no color
+(p_manual <- ggplot(collison_wavelength, aes(x = wavelength, y = spec_mean, group=type, color = type)) + 
+  geom_smooth(alpha = 0.2, se=F) + 
+  theme_cowplot() +
+  coord_cartesian(ylim =c(0.04, .8)) +
+  scale_color_manual(values = c("#ffa544", "#2b299b")) +
+  labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n") +
+    theme(legend.position = "none") +
+  annotate("rect", xmin = 400, xmax = 430, alpha = 1,ymin = 0,
+           ymax = .85, fill = "white") +
+  annotate("rect", xmin = 450, xmax = 545, alpha = 1,ymin = 0,
+           ymax = .85, fill = "white") + 
+  annotate("rect", xmin = 555, xmax = 660, alpha = 1,ymin = 0,
+           ymax = .85, fill = "white") + 
+  annotate("rect", xmin = 680, xmax = 700, alpha = 1,ymin = 0,
+           ymax = .85, fill = "white") +
+  annotate("rect", xmin = 725, xmax = 745, alpha = 1,ymin = 0,
+           ymax = .85, fill = "white") + 
+  annotate("rect", xmin = 755, xmax = 920, alpha = 1,ymin = 0,
+           ymax = .85, fill = "white"))
+
+# automatic selection no color
+(p_automatic <- ggplot(collison_wavelength, aes(x = wavelength, y = spec_mean, group=type, color = type)) + 
+    geom_smooth(alpha = 0.2, se=F) + 
+    theme_cowplot() +
+    coord_cartesian(ylim =c(0.04, .8)) +
+    scale_color_manual(values = c("#ffa544", "#2b299b")) +
+    labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n") +
+    theme(legend.position = "none") +
+    annotate("rect", xmin = 400, xmax = 402, alpha = 1,ymin = 0,
+             ymax = .85, fill = "white") +
+    annotate("rect", xmin = 407, xmax = 418, alpha = 1,ymin = 0,
+             ymax = .85, fill = "white") + 
+    annotate("rect", xmin = 422.78, xmax = 440, alpha = 1,ymin = 0,
+             ymax = .85, fill = "white") + 
+    annotate("rect", xmin = 444.27, xmax = 460, alpha = 1,ymin = 0,
+             ymax = .85, fill = "white") +
+    annotate("rect", xmin = 464.01, xmax = 478, alpha = 1,ymin = 0,
+             ymax = .85, fill = "white") + 
+    annotate("rect", xmin = 483.68, xmax = 490, alpha = 1,ymin = 0,
+             ymax = .85, fill = "white")+
+    annotate("rect", xmin = 496.75, xmax = 500, alpha = 1,ymin = 0,
+             ymax = .85, fill = "white") +
+    annotate("rect", xmin = 506.55, xmax = 561, alpha = 1,ymin = 0,
+             ymax = .85, fill = "white") + 
+    annotate("rect", xmin = 568.34, xmax = 672, alpha = 1,ymin = 0,
+             ymax = .85, fill = "white") + 
+    annotate("rect", xmin = 677.48, xmax = 701, alpha = 1,ymin = 0,
+             ymax = .85, fill = "white") +
+    annotate("rect", xmin = 707.47, xmax = 713, alpha = 1,ymin = 0,
+             ymax = .85, fill = "white") +
+    annotate("rect", xmin = 719, xmax = 749, alpha = 1,ymin = 0,
+             ymax = .85, fill = "white") +
+    annotate("rect", xmin = 755, xmax = 779, alpha = 1,ymin = 0,
+             ymax = .85, fill = "white") + 
+    annotate("rect", xmin = 785, xmax = 811, alpha = 1,ymin = 0,
+             ymax = .85, fill = "white") + 
+    annotate("rect", xmin = 816, xmax = 826, alpha = 1,ymin = 0,
+             ymax = .85, fill = "white") +
+    annotate("rect", xmin = 832, xmax = 847, alpha = 1,ymin = 0,
+             ymax = .85, fill = "white") + 
+    annotate("rect", xmin = 853, xmax = 860, alpha = 1,ymin = 0,
+             ymax = .85, fill = "white") +
+    annotate("rect", xmin = 866, xmax = 874, alpha = 1,ymin = 0,
+             ymax = .85, fill = "white") +
+    annotate("rect", xmin = 880, xmax = 908, alpha = 1,ymin = 0,
+             ymax = .85, fill = "white") +
+    annotate("rect", xmin = 914, xmax = 915, alpha = 1,ymin = 0,
+             ymax = .85, fill = "white") + 
+    annotate("rect", xmin = 921, xmax = 924, alpha = 1,ymin = 0,
+             ymax = .85, fill = "white") + 
+    annotate("rect", xmin = 929, xmax = 941, alpha = 1,ymin = 0,
+             ymax = .85, fill = "white") +
+    annotate("rect", xmin = 926, xmax = 951, alpha = 1,ymin = 0,
+             ymax = .85, fill = "white") + 
+    annotate("rect", xmin = 956, xmax = 960, alpha = 1,ymin = 0,
+             ymax = .85, fill = "white")+ 
+    annotate("rect", xmin = 965, xmax = 985, alpha = 1,ymin = 0,
+             ymax = .85, fill = "white"))
+
+grid.arrange(p_full, p_manual, p_automatic,
+             p_H1a, p_H3a, p_H3e, 
+             p_H1b, p_H3b, p_H3f, nrow=3)
+
+
+
+
+# manual selection with color
+(p_manual_c <- ggplot(collison_wavelength, aes(x = wavelength, y = spec_mean, group=type, color = type)) + 
+    geom_smooth(alpha = 0.2, se=F) + 
+    theme_cowplot() +
+    coord_cartesian(ylim =c(0.04, .8)) +
+    scale_color_manual(values = c("#ffa544", "#2b299b")) +
+    labs(x = "\nWavelength (mm)", y = "Mean Reflectance\n") +
+    theme(legend.position = "none") +
+    annotate("rect", xmin = 400, xmax = 430, alpha = 1,ymin = 0,
+             ymax = .85, fill = "white") + 
+    annotate("rect", xmin = 430, xmax = 450, alpha = .15,ymin = 0,
+             ymax = .85, fill = "blue") + 
+    annotate("rect", xmin = 450, xmax = 545, alpha = 1,ymin = 0,
+             ymax = .85, fill = "white") + 
+    annotate("rect", xmin = 545, xmax = 555, ymin = 0, 
+             ymax = .85, alpha = .15, fill = "green") +
+    annotate("rect", xmin = 555, xmax = 660, alpha = 1,ymin = 0,
+             ymax = .85, fill = "white") + 
+    annotate("rect", xmin = 660, xmax =680 , ymin = 0, 
+             ymax = .85, alpha = .25, fill = "red") + 
+    annotate("rect", xmin = 680, xmax = 700, alpha = 1,ymin = 0,
+             ymax = .85, fill = "white") + 
+    annotate("rect", xmin = 700, xmax = 725, ymin = 0, 
+             ymax = .85, alpha = .15, fill = "tomato") +
+    annotate("rect", xmin = 725, xmax = 745, alpha = 1,ymin = 0,
+             ymax = .85, fill = "white") + 
+    annotate("rect", xmin = 745, xmax = 755, ymin = 0, 
+             ymax = .85, alpha = .15, fill = "tomato") +
+    annotate("rect", xmin = 755, xmax = 920, alpha = 1,ymin = 0,
+             ymax = .85, fill = "white") + 
+    annotate("rect", xmin = 920, xmax = 985, ymin = 0, 
+             ymax = .85, alpha = .15, fill = "darkgrey"))
