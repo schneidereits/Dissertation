@@ -10,6 +10,12 @@
 
 spec_2018_2019_small$year <- as.factor(spec_2018_2019_small$year)
 
+
+# histogram of reflectance measurments
+(hist <- ggplot(spec_2018_2019_id, aes(x = spec_mean)) +
+    geom_histogram() +
+    theme_classic())
+
 # histogram 
 (hist <- ggplot(spec_2018_2019_small, aes(x = spec_mean)) +
    geom_histogram() +
@@ -34,9 +40,11 @@ m_H1a <- (lmer(data = QHI_2018_2019_small, spec_mean ~ type + year + (1|plot))) 
 
 summary(m_H1a)
 
+starg
+
 plot(m_H1a)
 qqnorm(resid(m_H1a))
-qqline(resid(m_H1a))  # points fall nicely onto the line - good!
+qqline(resid(m_H1a)) 
 
 # Visualises random effects 
 (re.effects <- plot_model(m_H1a, type = "re", show.values = TRUE))
@@ -279,12 +287,12 @@ grid.arrange(p_H3a, p_H3b)
 # https://strengejacke.github.io/ggeffects/reference/ggpredict.html
 
 ggpredict(m_H3a, terms = c("type"), type = "fe") %>% 
-  plot(rawdata = TRUE) +
+  plot(rawdata = F) +
   #scale_color_manual(values = c("#ffa544", "#2b299b")) +
   theme_cowplot()
 
-ggpredict(m_H3b, terms = c("type", "year"), type = "fe") %>% 
-  plot(rawdata = TRUE) +
+ggpredict(m_H3b, terms = c("type" ), type = "fe") %>% 
+  plot(rawdata = F) +
   #scale_color_manual(values = c("#ffa544", "#2b299b")) +
   theme_cowplot()
 
@@ -300,41 +308,48 @@ ggplot(H3a, aes(type, predicted, colour = group)) +
 
 
 
-(p_H1a <- ggpredict(m_H1a, terms = c("type"), type = "fe") %>% 
-    plot(rawdata = TRUE) +
-    scale_color_manual(values = c("#ffa544", "#2b299b", "grey")) +
+(p_H1a <- ggpredict(m_H1a, terms = c("type[HE,KO]"), type = "fe", title = "") %>% 
+    plot(rawdata = F, colors = c("#ffa544", "#2b299b")) +
+    ylim(0.1,0.4) +
+    labs(y= "Mean reflectance") +
     theme_cowplot())
 
 
-(p_H3a <- ggpredict(m_H3a, terms = c("type"), type = "fe") %>% 
-    plot(rawdata = TRUE) +
+(p_H3a <- ggpredict(m_H3a, terms = c("type[HE,KO]"), type = "fe", show.title = F) %>% 
+    plot(rawdata = F) +
     #scale_color_manual(values = c("#ffa544", "#2b299b")) +
-    ylim(0,0.6) +
+    ylim(0.1,0.4) +
+    labs(y= "Mean reflectance") +
     theme_cowplot())
 
-(p_H3e <- ggpredict(m_H3e, terms = c("type"), type = "fe") %>% 
-    plot(rawdata = TRUE) +
+(p_H3e <- ggpredict(m_H3e, terms = c("type[HE,KO]"), type = "fe", show.title = F) %>% 
+    plot(rawdata = F) +
     #scale_color_manual(values = c("#ffa544", "#2b299b")) +
+    ylim(0.1,0.4) +
+    labs(y= "Mean reflectance") +
     theme_cowplot())
 
 # CV predicitons
-(p_H1b <- ggpredict(m_H1b, terms = c("type"), type = "fe") %>% 
-    plot(rawdata = FALSE) +
+(p_H1b <- ggpredict(m_H1b, terms = c("type[HE,KO]"), type = "fe",  show.title = F ) %>% 
+    plot(rawdata = F) +
     scale_color_manual(values = c("#ffa544", "#2b299b", "grey")) +
-    ylim(-0.05,0.4) +
+    ylim(0,0.2) +
+    labs(y= "spectral diversity") +
     theme_cowplot())
 
 
-(p_H3b <- ggpredict(m_H3b, terms = c("type", "year"), type = "fe") %>% 
-    plot(rawdata = TRUE) +
+(p_H3b <- ggpredict(m_H3b, terms = c("type[KO,HE]"), type = "fe", show.title = F) %>% 
+    plot(rawdata = F) +
     #scale_color_manual(values = c("#ffa544", "#2b299b")) ++
-    ylim(-0.05,0.4) +
+    ylim(0,0.2) +
+    labs(y= "spectral diversity") +
     theme_cowplot())
 
-(p_H3f <- ggpredict(m_H3f, terms = c("type"), type = "fe") %>% 
-    plot(rawdata = TRUE) +
+(p_H3f <- ggpredict(m_H3f, terms = c("type[HE,KO]"), type = "fe", show.title = F) %>% 
+    plot(rawdata = F) +
     #scale_color_manual(values = c("#ffa544", "#2b299b")) +
-    ylim(-0.05,0.4) +
+    ylim(0,0.2) +
+    labs(y= "spectral divrsity") +
     theme_cowplot())
 
 grid.arrange(p_H1a, p_H3a, p_H3e, 
@@ -466,10 +481,11 @@ grid.arrange(p_H3a, p_H3b)
 # H2 model ----
 
 # correlation plot full
+library(corrplot)
 
-correlation <- cor(collison_spec_plot_small[,c(5, 8:15)])
+correlation <- cor(collison_spec_plot_small[,c(5, 9:16)])
 
-print(collison_spec_plot_small)
+print(collison_spec_plot_small) 
 
 
 (p_corr <- corrplot(correlation, method="circle", type="upper", #order="hclust",
@@ -477,7 +493,7 @@ print(collison_spec_plot_small)
 
 # correlation plot for model
 
-correlation_small <- cor(collison_spec_plot_small[,c(5, 8:9, 14:15)])
+correlation_small <- cor(collison_spec_plot_small[,c(5, 8:9, 15:16)])
 
 (p_corr <- corrplot(correlation_small, method="circle", type="upper", #order="hclust",
                     tl.srt=45, tl.col="black", diag = FALSE, col=brewer.pal(n=10, name="RdYlBu")))
@@ -486,8 +502,7 @@ correlation_small <- cor(collison_spec_plot_small[,c(5, 8:9, 14:15)])
 # ugly alternative 
 #install.packages("PerformanceAnalytics")
 #library("PerformanceAnalytics")
-
-chart.Correlation(correlation, histogram=TRUE, pch=19)
+#chart.Correlation(correlation, histogram=TRUE, pch=19)
 
 
 # spectral mean 
@@ -498,108 +513,51 @@ chart.Correlation(correlation, histogram=TRUE, pch=19)
 
 # linear model for H2 2018 2019
 
-# spectral mean
 
-#collison_spec_plot_small_2019 <- collison_spec_plot_small %>% filter(year == 2019) #%>%
-# to normalize evenness
-#mutate(evenness = (evenness- min(evenness))/(max(evenness)-min(evenness)))
+
+library(scales)
+
+collison_spec_plot_small_model <- collison_spec_plot_small_visable# %>% filter(year==2018)
+
 
 # to scale all continous varibales
-collison_spec_plot_small$richness <- scale(collison_spec_plot_small$richness)
-collison_spec_plot_small$evenness <- scale(collison_spec_plot_small$evenness)
-collison_spec_plot_small$bareground <- scale(collison_spec_plot_small$bareground)
+collison_spec_plot_small_model$richness <- c(scale(collison_spec_plot_small$richness, center = TRUE, scale = TRUE))
+collison_spec_plot_small_model$evenness <- c(scale(collison_spec_plot_small$evenness, center = TRUE, scale = TRUE))
+collison_spec_plot_small_model$bareground <- c(scale(collison_spec_plot_small$bareground, center = TRUE, scale = TRUE))
+collison_spec_plot_small_model$year <- as.factor(collison_spec_plot_small$year)
 
-str(collison_spec_plot_small)
-
-m_H2a <- lm(data = collison_spec_plot_small,
-              spec_mean ~ (type-1) + year + (type*richness) + (type*evenness) + (type*bareground))
-
-
-summary(m_H2a)
-
-plot(m_H2a)
-qqnorm(resid(m_H2a))
-qqline(resid(m_H2a)) 
-
-
-p_H2a_base <- allEffects(m_H2a)
-print(p_H2a_base)
-
-plot(p_H2a_base)
-
-
-
-
-
-# Visualises random effects 
-(re.effects <- plot_model(m_H2a, type = "re", show.values = TRUE))
-# visulise fixed effect
-(fe.effects <- plot_model(m_H2a, show.values = TRUE))
-
-
-# attempting to visulize model output
-ggpredict(data = m_H2a, c("type", "richness")) %>% plot()
-
-
-ggplot(e.df$`type:richness`, aes(x=richness, y=fit, color=type, ymin=lower, ymax=upper)) + 
-  geom_pointrange(position=position_dodge(width=.1), mapping = NULL) + 
-  geom_ribbon(data = e.df$`type:richness`, aes(x = richness, ymin = lower, ymax = upper, 
-                                               fill = type), alpha = 0.2) +
-  geom_line(data = e.df$`type:richness`, aes(x = richness, y = fit)) +
-  xlab("Richness") + 
-  ylab("Spectral mean") +
-  scale_color_manual(values = c("#ffa544", "#2b299b")) +
-  theme_cowplot()
-
-geom_ribbon(aes(x = x, ymin = predicted - std.error, ymax = predicted + std.error), 
-            fill = "lightgrey", alpha = 0.5) +  # error band
-  geom_line(aes(x = x, y = predicted + 25.5348)) +          # slope
-  
-  
-  geom_ribbon(data = e.df$`type:richness`, aes(x = year + 1998, ymin = lower, ymax = upper), 
-              fill = "#ffa544", alpha = 0.2) +
-  geom_line(data = biomass_HE_preds_df, aes(x = year + 1998, y = mean), colour = "#ffa544") +
-  geom_ribbon(data = biomass_KO_preds_df, aes(x = year + 1998, ymin = lower, ymax = upper), 
-              fill = "#2b299b", alpha = 0.2) +
-  geom_line(data = biomass_KO_preds_df, aes(x = year + 1998, y = mean), colour = "#2b299b") +
-  
-  
-  
-  ggpredict(m_H2a, terms = c("type"), type = "fe") %>% 
-  plot(rawdata = TRUE) +
-  scale_color_manual(values = c("#ffa544", "#2b299b")) +
-  theme_cowplot()
-
-(p_H2a_rich <- ggpredict(m_H2a, terms = c("richness", "type"), type = "fe") %>% 
-    plot(rawdata = TRUE) +
-    scale_color_manual(values = c("#ffa544", "#2b299b")) +
-    theme_cowplot())
-
-(p_H2a_even <- ggpredict(m_H2a, terms = c("evenness", "type"), type = "fe") %>% 
-    plot(rawdata = TRUE) +
-    scale_color_manual(values = c("#ffa544", "#2b299b")) +
-    theme_cowplot())
-
-(p_H2a_ground <- ggpredict(m_H2a, terms = c("bareground", "type"), type = "fe" ) %>% 
-    plot(rawdata = TRUE) +
-    scale_color_manual(values = c("#ffa544", "#2b299b")) +
-    theme_cowplot())
-
-
-grid.arrange(p_H2a_rich, p_H2a_even, p_H2a_ground, nrow = 1)
-
+# attemt to create alternate original scale predicition
+# Scale cars data:
+scars <- scale(cars)
+# Save scaled attibutes:
+scaleList <- list(scale = attr(collison_spec_plot_small, "scaled:scale"),
+                  center = attr(collison_spec_plot_small, "scaled:center"))
+# scars is a matrix, make it a data frame like cars for modeling:
+smod <- lm(data = collison_spec_plot_small_model, 
+           CV ~ (type-1)  + year + (type*richness) + (type*evenness) + (type*bareground))
+# Predictions on scaled data:
+sp <- predict(smod, collison_spec_plot_small_model)
+# Fit the same model to the original cars data:
+omod <- lm(data = collison_spec_plot_small, 
+               CV ~ (type-1)  + year + (type*richness) + (type*evenness) + (type*bareground))
+op <- predict(omod, collison_spec_plot_small)
+# Convert scaled prediction to original data scale:
+usp <- sp * scaleList$scale["richness"] + scaleList$center["richness"]
+# Compare predictions:
+all.equal(op, usp)
 
 
 # CV 2018 2019
 
-(hist <- ggplot(collison_spec_plot_small, aes(x = CV)) +
+(hist <- ggplot(collison_spec_plot_small_model, aes(x = CV)) +
     geom_histogram() +
     theme_classic())
 
-m_H2b <- lm(data = collison_spec_plot_small, 
-              CV ~ (type-1) + year + (type*richness) + (type*evenness) + (type*bareground))
+m_H2b <- lm(data = collison_spec_plot_small_model, 
+              CV ~ (type-1)  + year + (type*richness) + (type*evenness) + (type*bareground))
 
 summary(m_H2b)
+
 
 plot(m_H2b)
 qqnorm(resid(m_H2b))
@@ -616,9 +574,6 @@ plot(p_H2b_base)
 arrange(p_H2a_base, p_H2b_base)
 
 
-
-# Visualises random effects 
-(re.effects <- plot_model(m_H2b, type = "re", show.values = TRUE))
 # visulise fixed effect
 (fe.effects <- plot_model(m_H2b, show.values = TRUE))
 
@@ -626,26 +581,40 @@ arrange(p_H2a_base, p_H2b_base)
 ggpredict(m_H2b, terms = c("type"), type = "fe") %>% 
   plot(rawdata = TRUE) +
   scale_color_manual(values = c("#ffa544", "#2b299b")) +
+  scale_fill_manual(values = c("#ffa544", "#2b299b")) +
   theme_cowplot()
 
+
+ # doesnt work trying to rescale to original values
+ #m_H2b$coefficients[richness] <- scales::rescale(m_H2b$coefficients[richness], to=c(10,14))
+
 (p_H2b_rich <- ggpredict(m_H2b, terms = c("richness", "type"), type = "fe") %>% 
-    plot(rawdata = TRUE) +
+    plot(rawdata = TRUE, show.title = F) +
     scale_color_manual(values = c("#ffa544", "#2b299b")) +
-    ylim(0.3,1) +
+    scale_fill_manual(values = c("#ffa544", "#2b299b")) +
+   # coord_cartesian(ylim = c(0.01,0.4), xlim= c(-2,2)) +
     theme_cowplot())
+
 
 (p_H2b_even <- ggpredict(m_H2b, terms = c("evenness", "type"), type = "fe") %>% 
-    plot(rawdata = TRUE) +
+    plot(rawdata = TRUE, show.title = F) +
     scale_color_manual(values = c("#ffa544", "#2b299b")) +
-    theme_cowplot())
+    scale_fill_manual(values = c("#ffa544", "#2b299b")) +
+   # coord_cartesian(ylim = c(0.01,0.4), xlim = c(-2,2)) +
+    theme_cowplot()+ 
+    theme(legend.position = "none"))
 
 (p_H2b_ground <- ggpredict(m_H2b, terms = c("bareground", "type"), type = "fe") %>% 
-    plot(rawdata = TRUE) +
+    plot(rawdata = TRUE, show.title = F) +
     scale_color_manual(values = c("#ffa544", "#2b299b")) +
-    theme_cowplot())
+    scale_fill_manual(values = c("#ffa544", "#2b299b")) +
+    theme_cowplot()+
+   # coord_cartesian(ylim = c(0.01,0.4), xlim = c(-2,2)) +
+    theme(legend.position = "none"))
 
-grid.arrange(p_H2a_rich, p_H2a_even, p_H2a_ground, 
-             p_H2b_rich, p_H2b_even, p_H2b_ground, nrow = 2)
+grid.arrange(p_H2b_rich, p_H2b_even, p_H2b_ground, nrow=1)
+
+
 
 # alternative with interaction terms (base r)
 
@@ -816,3 +785,355 @@ p_H2b_base <- allEffects(m_H2b)
 
 print(p_H2b_base)
 plot(p_H2b_base)
+
+
+
+
+
+
+
+# to scale all continous varibales
+collison_spec_plot_small_corr$richness <- c(scale(collison_spec_plot_small_corr$richness))
+collison_spec_plot_small_corr$evenness <- c(scale(collison_spec_plot_small_corr$evenness))
+collison_spec_plot_small_corr$bareground <- c(scale(collison_spec_plot_small_corr$bareground))
+collison_spec_plot_small_corr$year <- as.factor(collison_spec_plot_small_corr$year)
+
+str(collison_spec_plot_small)
+
+m_H2a <- lm(data = collison_spec_plot_small_corr,
+            spec_mean ~ (type-1) + year + (type*richness) + (type*evenness) + (type*bareground))
+
+
+summary(m_H2a)
+
+plot(m_H2a)
+qqnorm(resid(m_H2a))
+qqline(resid(m_H2a)) 
+
+
+p_H2a_base <- allEffects(m_H2a)
+print(p_H2a_base)
+
+plot(p_H2a_base)
+
+# predictions
+
+ggpredict(m_H2a, terms = c("type"), type = "fe") %>% 
+  plot(rawdata = TRUE) +
+  scale_color_manual(values = c("#ffa544", "#2b299b")) +
+  theme_cowplot()
+
+(p_H2a_rich <- ggpredict(m_H2a, terms = c("richness", "type"), type = "fe") %>% 
+    plot(rawdata = TRUE, show.title = F) +
+    scale_color_manual(values = c("#ffa544", "#2b299b")) +
+    coord_cartesian(ylim = c(0.015,0.6), xlim= c(-2,2)) +
+    theme_cowplot()+
+    theme(legend.position = "none"))
+
+(p_H2a_even <- ggpredict(m_H2a, terms = c("evenness", "type"), type = "fe") %>% 
+    plot(rawdata = TRUE, show.title = F) +
+    scale_color_manual(values = c("#ffa544", "#2b299b")) +
+    coord_cartesian(ylim = c(0.015,0.6), xlim= c(-2,2)) +
+    theme_cowplot()+
+    theme(legend.position = "none"))
+
+(p_H2a_ground <- ggpredict(m_H2a, terms = c("bareground", "type"), type = "fe" ) %>% 
+    plot(rawdata = TRUE, show.title = F) +
+    scale_color_manual(values = c("#ffa544", "#2b299b")) +
+    coord_cartesian(ylim = c(0.015,0.6), xlim= c(-2,2)) +
+    theme_cowplot()+
+    theme(legend.position = "none"))
+
+
+
+
+# marginal effects for all 4 interaction terms
+pr <- ggpredict(m_H2a, c( "richness", "type"))
+
+# use plot() method, easier than own ggplot-code from scratch
+plot(pr)
+
+
+# Visualises random effects 
+(re.effects <- plot_model(m_H2a, type = "re", show.values = TRUE))
+# visulise fixed effect
+(fe.effects <- plot_model(m_H2a, show.values = TRUE))
+
+
+# attempting to visulize model output
+ggpredict(data = m_H2a, c("type", "richness")) %>% plot()
+
+
+ggplot(e.df$`type:richness`, aes(x=richness, y=fit, color=type, ymin=lower, ymax=upper)) + 
+  geom_pointrange(position=position_dodge(width=.1), mapping = NULL) + 
+  geom_ribbon(data = e.df$`type:richness`, aes(x = richness, ymin = lower, ymax = upper, 
+                                               fill = type), alpha = 0.2) +
+  geom_line(data = e.df$`type:richness`, aes(x = richness, y = fit)) +
+  xlab("Richness") + 
+  ylab("Spectral mean") +
+  scale_color_manual(values = c("#ffa544", "#2b299b")) +
+  theme_cowplot()
+
+geom_ribbon(aes(x = x, ymin = predicted - std.error, ymax = predicted + std.error), 
+            fill = "lightgrey", alpha = 0.5) +  # error band
+  geom_line(aes(x = x, y = predicted + 25.5348)) +          # slope
+  
+  
+  geom_ribbon(data = e.df$`type:richness`, aes(x = year + 1998, ymin = lower, ymax = upper), 
+              fill = "#ffa544", alpha = 0.2) +
+  geom_line(data = biomass_HE_preds_df, aes(x = year + 1998, y = mean), colour = "#ffa544") +
+  geom_ribbon(data = biomass_KO_preds_df, aes(x = year + 1998, ymin = lower, ymax = upper), 
+              fill = "#2b299b", alpha = 0.2) +
+  geom_line(data = biomass_KO_preds_df, aes(x = year + 1998, y = mean), colour = "#2b299b") +
+  
+  
+  
+  ggpredict(m_H2a, terms = c("type"), type = "fe") %>% 
+  plot(rawdata = TRUE, show.title = F) +
+  scale_color_manual(values = c("#ffa544", "#2b299b")) +
+  theme_cowplot()
+
+(p_H2a_rich <- ggpredict(m_H2a, terms = c("richness", "type"), type = "fe") %>% 
+    plot(rawdata = TRUE, show.title = F) +
+    scale_color_manual(values = c("#ffa544", "#2b299b")) +
+    theme_cowplot())
+
+(p_H2a_even <- ggpredict(m_H2a, terms = c("evenness", "type"), type = "fe") %>% 
+    plot(rawdata = TRUE, show.title = F) +
+    scale_color_manual(values = c("#ffa544", "#2b299b")) +
+    theme_cowplot()+
+    theme(legend.position = "none"))
+
+(p_H2a_ground <- ggpredict(m_H2a, terms = c("bareground", "type"), type = "fe" ) %>% 
+    plot(rawdata = TRUE, show.title = F) +
+    scale_color_manual(values = c("#ffa544", "#2b299b")) +
+    theme_cowplot()+
+    theme(legend.position = "none"))
+
+
+grid.arrange(p_H2a_rich, p_H2a_even, p_H2a_ground, nrow = 1)
+
+
+
+# CV 2018 2019 correct
+
+
+
+collison_spec_plot_small_corr$richness <- c(scale(collison_spec_plot_small_corr$richness))
+collison_spec_plot_small_corr$evenness <- c(scale(collison_spec_plot_small_corr$evenness))
+collison_spec_plot_small_corr$bareground <- c(scale(collison_spec_plot_small_corr$bareground))
+collison_spec_plot_small_corr$year <- as.factor(collison_spec_plot_small_corr$year)
+
+
+(hist <- ggplot(collison_spec_plot_small, aes(x = CV)) +
+    geom_histogram() +
+    theme_classic())
+
+m_H2a_corr <- lm(data = collison_spec_plot_small_corr, 
+                 spec_mean ~ (type-1) + year + (type*richness) + (type*evenness) + (type*bareground))
+
+m_H2b_corr <- lm(data = collison_spec_plot_small_corr, 
+                 CV ~ (type-1) * year + (type*richness) + (type*evenness) + (type*bareground))
+
+
+
+summary(m_H2a_corr)
+summary(m_H2b_corr)
+
+plot(m_H2b)
+qqnorm(resid(m_H2b))
+qqline(resid(m_H2b)) 
+
+# spectral mean (richness, eveness, and bareground)
+p_H2b_base <- allEffects(m_H2b)
+
+print(p_H2b_base)
+plot(p_H2b_base)
+
+# specmean and cv outputs together
+
+arrange(p_H2a_base, p_H2b_base)
+
+
+(p_H2a_rich_corr <- ggpredict(m_H2a_corr, terms = c("richness", "type"), type = "fe") %>% 
+    plot(rawdata = TRUE, show.title = F) +
+    scale_color_manual(values = c("#ffa544", "#2b299b")) +
+    coord_cartesian(ylim = c(0.01,0.6), xlim= c(-2,2)) +
+    theme_cowplot())
+
+(p_H2a_even_corr <- ggpredict(m_H2a_corr, terms = c("evenness", "type"), type = "fe") %>% 
+    plot(rawdata = TRUE, show.title = F) +
+    scale_color_manual(values = c("#ffa544", "#2b299b")) +
+    coord_cartesian(ylim = c(0.01,0.6), xlim= c(-2,2)) +
+    theme_cowplot()+
+    theme(legend.position = "none"))
+
+(p_H2a_ground_corr <- ggpredict(m_H2a_corr, terms = c("bareground", "type"), type = "fe" ) %>% 
+    plot(rawdata = TRUE, show.title = F) +
+    scale_color_manual(values = c("#ffa544", "#2b299b")) +
+    coord_cartesian(ylim = c(0.01,0.6), xlim= c(-2,2)) +
+    theme_cowplot()+
+    theme(legend.position = "none"))
+
+
+
+ggpredict(m_H2b_corr, terms = c("type"), type = "fe") %>% 
+  plot(rawdata = TRUE) +
+  scale_color_manual(values = c("#ffa544", "#2b299b")) +
+  theme_cowplot()
+
+(p_H2b_rich_corr <- ggpredict(m_H2b_corr, terms = c("richness", "type"), type = "fe") %>% 
+    plot(rawdata = TRUE, show.title = F) +
+    scale_color_manual(values = c("#ffa544", "#2b299b")) +
+   coord_cartesian(ylim = c(0.01,0.4), xlim= c(-2,2)) +
+    theme_cowplot()+
+    theme(legend.position = "none"))
+
+(p_H2b_even_corr <- ggpredict(m_H2b_corr, terms = c("evenness", "type"), type = "fe") %>% 
+    plot(rawdata = TRUE, show.title = F) +
+    scale_color_manual(values = c("#ffa544", "#2b299b")) +
+    coord_cartesian(ylim = c(0.01,0.4), xlim = c(-2,2)) +
+    theme_cowplot()+ 
+    theme(legend.position = "none"))
+
+(p_H2b_ground_corr <- ggpredict(m_H2b_corr, terms = c("bareground", "type"), type = "fe") %>% 
+    plot(rawdata = TRUE, show.title = F) +
+    scale_color_manual(values = c("#ffa544", "#2b299b")) +
+    theme_cowplot()+
+    coord_cartesian(ylim = c(0.01,0.4), xlim = c(-2,2)) +
+    theme(legend.position = "none"))
+
+grid.arrange(p_H2a_rich_corr, p_H2a_even_corr, p_H2a_ground_corr, 
+             p_H2b_rich_corr, p_H2b_even_corr, p_H2b_ground_corr, nrow = 2)
+
+
+ggplot(collison_spec_plot_small_corr, aes(x = evenness, y = CV, color = type)) +
+  geom_point()
+
+
+# do not need
+# h3 spectral mean
+# spectral mean
+
+#collison_spec_plot_small_2019 <- collison_spec_plot_small %>% filter(year == 2019) #%>%
+# to normalize evenness
+#mutate(evenness = (evenness- min(evenness))/(max(evenness)-min(evenness)))
+
+# to scale all continous varibales
+collison_spec_plot_small$richness <- c(scale(collison_spec_plot_small$richness))
+collison_spec_plot_small$evenness <- c(scale(collison_spec_plot_small$evenness))
+collison_spec_plot_small$bareground <- c(scale(collison_spec_plot_small$bareground))
+collison_spec_plot_small$year <- as.factor(collison_spec_plot_small$year)
+
+str(collison_spec_plot_small)
+
+m_H2a <- lm(data = collison_spec_plot_small,
+            spec_mean ~ (type-1) + year + (type*richness) + (type*evenness) + (type*bareground))
+
+
+summary(m_H2a)
+
+plot(m_H2a)
+qqnorm(resid(m_H2a))
+qqline(resid(m_H2a)) 
+
+
+p_H2a_base <- allEffects(m_H2a)
+print(p_H2a_base)
+
+plot(p_H2a_base)
+
+# predictions
+
+ggpredict(m_H2a, terms = c("type"), type = "fe") %>% 
+  plot(rawdata = TRUE) +
+  scale_color_manual(values = c("#ffa544", "#2b299b")) +
+  theme_cowplot()
+
+(p_H2a_rich <- ggpredict(m_H2a, terms = c("richness", "type"), type = "fe") %>% 
+    plot(rawdata = TRUE, show.title = F) +
+    scale_color_manual(values = c("#ffa544", "#2b299b")) +
+    coord_cartesian(ylim = c(0.015,0.6), xlim= c(-2,2)) +
+    theme_cowplot()+
+    theme(legend.position = "none"))
+
+(p_H2a_even <- ggpredict(m_H2a, terms = c("evenness", "type"), type = "fe") %>% 
+    plot(rawdata = TRUE, show.title = F) +
+    scale_color_manual(values = c("#ffa544", "#2b299b")) +
+    coord_cartesian(ylim = c(0.015,0.6), xlim= c(-2,2)) +
+    theme_cowplot()+
+    theme(legend.position = "none"))
+
+(p_H2a_ground <- ggpredict(m_H2a, terms = c("bareground", "type"), type = "fe" ) %>% 
+    plot(rawdata = TRUE, show.title = F) +
+    scale_color_manual(values = c("#ffa544", "#2b299b")) +
+    coord_cartesian(ylim = c(0.015,0.6), xlim= c(-2,2)) +
+    theme_cowplot()+
+    theme(legend.position = "none"))
+
+
+
+
+# marginal effects for all 4 interaction terms
+pr <- ggpredict(m_H2a, c( "richness", "type"))
+
+# use plot() method, easier than own ggplot-code from scratch
+plot(pr)
+
+
+# Visualises random effects 
+(re.effects <- plot_model(m_H2a, type = "re", show.values = TRUE))
+# visulise fixed effect
+(fe.effects <- plot_model(m_H2a, show.values = TRUE))
+
+
+# attempting to visulize model output
+ggpredict(data = m_H2a, c("type", "richness")) %>% plot()
+
+
+ggplot(e.df$`type:richness`, aes(x=richness, y=fit, color=type, ymin=lower, ymax=upper)) + 
+  geom_pointrange(position=position_dodge(width=.1), mapping = NULL) + 
+  geom_ribbon(data = e.df$`type:richness`, aes(x = richness, ymin = lower, ymax = upper, 
+                                               fill = type), alpha = 0.2) +
+  geom_line(data = e.df$`type:richness`, aes(x = richness, y = fit)) +
+  xlab("Richness") + 
+  ylab("Spectral mean") +
+  scale_color_manual(values = c("#ffa544", "#2b299b")) +
+  theme_cowplot()
+
+geom_ribbon(aes(x = x, ymin = predicted - std.error, ymax = predicted + std.error), 
+            fill = "lightgrey", alpha = 0.5) +  # error band
+  geom_line(aes(x = x, y = predicted + 25.5348)) +          # slope
+  
+  
+  geom_ribbon(data = e.df$`type:richness`, aes(x = year + 1998, ymin = lower, ymax = upper), 
+              fill = "#ffa544", alpha = 0.2) +
+  geom_line(data = biomass_HE_preds_df, aes(x = year + 1998, y = mean), colour = "#ffa544") +
+  geom_ribbon(data = biomass_KO_preds_df, aes(x = year + 1998, ymin = lower, ymax = upper), 
+              fill = "#2b299b", alpha = 0.2) +
+  geom_line(data = biomass_KO_preds_df, aes(x = year + 1998, y = mean), colour = "#2b299b") +
+  
+  
+  
+  ggpredict(m_H2a, terms = c("type"), type = "fe") %>% 
+  plot(rawdata = TRUE, show.title = F) +
+  scale_color_manual(values = c("#ffa544", "#2b299b")) +
+  theme_cowplot()
+
+(p_H2a_rich <- ggpredict(m_H2a, terms = c("richness", "type"), type = "fe") %>% 
+    plot(rawdata = TRUE, show.title = F) +
+    scale_color_manual(values = c("#ffa544", "#2b299b")) +
+    theme_cowplot())
+
+(p_H2a_even <- ggpredict(m_H2a, terms = c("evenness", "type"), type = "fe") %>% 
+    plot(rawdata = TRUE, show.title = F) +
+    scale_color_manual(values = c("#ffa544", "#2b299b")) +
+    theme_cowplot())
+
+(p_H2a_ground <- ggpredict(m_H2a, terms = c("bareground", "type"), type = "fe" ) %>% 
+    plot(rawdata = TRUE, show.title = F) +
+    scale_color_manual(values = c("#ffa544", "#2b299b")) +
+    theme_cowplot())
+
+
+grid.arrange(p_H2a_rich, p_H2a_even, p_H2a_ground, nrow = 1)
