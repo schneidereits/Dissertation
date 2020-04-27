@@ -273,7 +273,7 @@ pca_H2_2018_2019 <- collison_spec_plot_small
 head(pca_H2)
 
 # ncp = 10 (10 variables)
-res.pca_H2_2018_2019 <- PCA(pca_H2_2018_2019[,c(5, 8:15)], scale.unit = TRUE, ncp = 9, graph = TRUE)
+res.pca_H2_2018_2019 <- PCA(pca_H2_2018_2019[,c(5, 8:16)], scale.unit = TRUE, ncp = 9, graph = TRUE)
 
 # eigen values
 
@@ -328,9 +328,10 @@ fviz_pca_var(res.pca_H2_2018_2019, col.var = "contrib",
                           ellipse.level = 0.95, # confidence level specification
                           mean.point = TRUE, # braycenter mean point
                           # to color arrow by variable type
-                          col.var = factor(c("spectral", "spectral", "diversity", "diversity",
+                          col.var = factor(c("diversity", "diversity",
                                              "environmenal", "environmenal", "environmenal", 
-                                             "environmenal", "environmenal")),
+                                             "environmenal", "environmenal", "environmenal",
+                                             "spectral", "spectral")),
                           gradient.cols = c("#00AFBB", "#00AFBB", "#FC4E07", "#FC4E07",
                                             "#E7B800",  "#E7B800",  "#E7B800",  "#E7B800",  "#E7B800"),
                           # col.var = "cos2",
@@ -348,16 +349,16 @@ fviz_pca_var(res.pca_H2_2018_2019, col.var = "contrib",
                           geom.ind = "point", # show points only (nbut not "text")
                           fill.ind = collison_spec_plot_small$type, # color by groups
                           pointshape = 21, 
-                          #  palette = c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FF4500", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF"),
+                          # palette = c("#FF4500", "#FF8C00", "#FF7256", "#CD1076", "#FF4500", "#00CED1", "#8470FF", "#D15FEE", "#63B8FF"),
                           addEllipses = TRUE, # Concentration ellipses
                           # ellipse.type = "confidence",
                           repel = TRUE,
                           ellipse.level = 0.95, # confidence level specification
                           mean.point = TRUE, # braycenter mean point
-                          # to color arrow by variable type
+                           #to color arrow by variable type
                           col.var = factor(c("spectral", "spectral", "diversity", "diversity",
                                              "environmenal", "environmenal", "environmenal", 
-                                             "environmenal", "environmenal")),
+                                        "environmenal", "environmenal")),
                           gradient.cols = c("#00AFBB", "#00AFBB", "#FC4E07", "#FC4E07",
                                             "#E7B800",  "#E7B800",  "#E7B800",  "#E7B800",  "#E7B800"),
                           # col.var = "cos2",
@@ -386,12 +387,12 @@ head(var$coord)
                           addEllipses = TRUE, # Concentration ellipses
                           # ellipse.type = "confidence",
                           repel = TRUE,
-                          ellipse.level = 0.95, # confidence level specification
+                          ellipse.level = 0.90, # confidence level specification
                           mean.point = TRUE, # braycenter mean point
                           # to color arrow by variable type
                           col.var = factor(c("diversity", "diversity",
                                              "environmenal", "environmenal", "environmenal", 
-                                             "environmenal", "environmenal", 
+                                             "environmenal", "environmenal", "environmenal", 
                                              "spectral", "spectral")),
                          pallette = c("#00AFBB", "#00AFBB", "#FC4E07", "#FC4E07",
                                             "#E7B800",  "#E7B800",  "#E7B800",  "#E7B800",  "#E7B800"),
