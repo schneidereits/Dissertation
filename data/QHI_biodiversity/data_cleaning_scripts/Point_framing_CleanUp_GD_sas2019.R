@@ -167,7 +167,7 @@ pointfr$SPP <- recode(pointfr$SPP, "Senecio atropurpureus " = "Senecio atropurpu
 
 # binding 2019 point framing to 1999-2018 data ----
 
-setwd("~/Documents/university work/Dissertation/Dissertation/data/QHI_biodiversity/")
+setwd("~/Documents/university work/Dissertation/Dissertation/")
 QHI_pointframe <- read.csv("data/QHI_biodiversity/Herschel_ITEXdata_1999-2018_updated.csv")
 head(QHI_pointframe)
 levels(QHI_pointframe$SPP) # Checking all spelling is correct
@@ -211,4 +211,4 @@ QHI_pointframe_full$SPP <- recode(QHI_pointframe_full$SPP, "Senecio atropurpureu
 # still need to confirm Cetraria spp that is brown" "Cladina (brown)" , "Poa ?",  "Cetraria spp"
 
 #  save .csv
-write.csv(QHI_cover_1999_2019_sas, file="~/Documents/university work/Dissertation/Dissertation/data/QHI_biodiversity/pointfr_1999-2019.csv")
+write.csv(QHI_pointframe_full, file="~/Documents/university work/Dissertation/Dissertation/data/QHI_biodiversity/pointfr_1999-2019_sas.csv")
