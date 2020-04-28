@@ -643,7 +643,7 @@ collison_spec_plot_small <- left_join(spec_2018_2019, QHI_plotdata, value = "plo
 head(QHI_spec_plot)
 
 # quick by type summary
-collison_spec_plot_small %>% group_by(type) %>% summarise(richness = mean(richness), 
+collison_spec_plot_small %>% group_by( year) %>% summarise(richness = mean(richness), 
                                                           shannon= mean(shannon),
                                                           simpson= mean(simpson),
                                                           evenness= mean(evenness), 
