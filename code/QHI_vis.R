@@ -435,9 +435,9 @@ spec_2018_2019_region <- spec_2018_2019 %>%
     geom_flat_violin(data = subset(spec_2018_2019_region, region %in% c("blue")), 
                      aes(x=type, y=spec_mean, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = subset(spec_2018_2019_region, region %in% c("blue")),
-               aes(x=type, y=spec_mean, colour=type),
-               position = position_jitter(width = .1), size = 1, alpha =0.5) +
+   # geom_point(data = subset(spec_2018_2019_region, region %in% c("blue")),
+   #            aes(x=type, y=spec_mean, colour=type),
+    #           position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(spec_2018_2019_region, region %in% c("blue")),
                  aes(x=type, y=spec_mean),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
@@ -455,9 +455,9 @@ spec_2018_2019_region <- spec_2018_2019 %>%
     geom_flat_violin(data = subset(spec_2018_2019_region, region %in% c("blue")), 
                      aes(x=type, y=CV, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = subset(spec_2018_2019_region, region %in% c("blue")),
-               aes(x=type, y=CV, colour=type),
-               position = position_jitter(width = .1), size = 1, alpha =0.5) +
+   # geom_point(data = subset(spec_2018_2019_region, region %in% c("blue")),
+  #             aes(x=type, y=CV, colour=type),
+   #            position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(spec_2018_2019_region, region %in% c("blue")),
                  aes(x=type, y=CV),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
@@ -474,9 +474,9 @@ spec_2018_2019_region <- spec_2018_2019 %>%
     geom_flat_violin(data = subset(spec_2018_2019_region, region %in% c("green")), 
                      aes(x=type, y=spec_mean, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = subset(spec_2018_2019_region, region %in% c("green")),
-               aes(x=type, y=spec_mean, colour=type),
-               position = position_jitter(width = .1), size = 1, alpha =0.5) +
+#    geom_point(data = subset(spec_2018_2019_region, region %in% c("green")),
+ #              aes(x=type, y=spec_mean, colour=type),
+  #             position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(spec_2018_2019_region, region %in% c("green")),
                  aes(x=type, y=spec_mean),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
@@ -493,9 +493,9 @@ spec_2018_2019_region <- spec_2018_2019 %>%
     geom_flat_violin(data = subset(spec_2018_2019_region, region %in% c("green")), 
                      aes(x=type, y=CV, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = subset(spec_2018_2019_region, region %in% c("green")),
-               aes(x=type, y=CV, colour=type),
-               position = position_jitter(width = .1), size = 1, alpha =0.5) +
+#    geom_point(data = subset(spec_2018_2019_region, region %in% c("green")),
+#               aes(x=type, y=CV, colour=type),
+#               position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(spec_2018_2019_region, region %in% c("green")),
                  aes(x=type, y=CV),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
@@ -511,9 +511,9 @@ spec_2018_2019_region <- spec_2018_2019 %>%
     geom_flat_violin(data = subset(spec_2018_2019_region, region %in% c("red")), 
                      aes(x=type, y=spec_mean, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = subset(spec_2018_2019_region, region %in% c("red")),
-               aes(x=type, y=spec_mean, colour=type),
-               position = position_jitter(width = .1), size = 1, alpha =0.5) +
+#    geom_point(data = subset(spec_2018_2019_region, region %in% c("red")),
+#               aes(x=type, y=spec_mean, colour=type),
+#               position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(spec_2018_2019_region, region %in% c("red")),
                  aes(x=type, y=spec_mean),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
@@ -530,9 +530,9 @@ spec_2018_2019_region <- spec_2018_2019 %>%
     geom_flat_violin(data = subset(spec_2018_2019_region, region %in% c("red")), 
                      aes(x=type, y=CV, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = subset(spec_2018_2019_region, region %in% c("red")),
-               aes(x=type, y=CV, colour=type),
-               position = position_jitter(width = .1), size = 1, alpha =0.5) +
+#    geom_point(data = subset(spec_2018_2019_region, region %in% c("red")),
+#               aes(x=type, y=CV, colour=type),
+#               position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(spec_2018_2019_region, region %in% c("red")),
                  aes(x=type, y=CV),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
@@ -548,9 +548,9 @@ spec_2018_2019_region <- spec_2018_2019 %>%
     geom_flat_violin(data = subset(spec_2018_2019_region, region %in% c("NIR")), 
                      aes(x=type, y=spec_mean, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = subset(spec_2018_2019_region, region %in% c("NIR")),
-               aes(x=type, y=spec_mean, colour=type),
-               position = position_jitter(width = .1), size = 1, alpha =0.5) +
+#    geom_point(data = subset(spec_2018_2019_region, region %in% c("NIR")),
+#               aes(x=type, y=spec_mean, colour=type),
+#               position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(spec_2018_2019_region, region %in% c("NIR")),
                  aes(x=type, y=spec_mean),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
@@ -567,9 +567,9 @@ spec_2018_2019_region <- spec_2018_2019 %>%
     geom_flat_violin(data = subset(spec_2018_2019_region, region %in% c("NIR")), 
                      aes(x=type, y=CV, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = subset(spec_2018_2019_region, region %in% c("NIR")),
-               aes(x=type, y=CV, colour=type),
-               position = position_jitter(width = .1), size = 1, alpha =0.5) +
+#    geom_point(data = subset(spec_2018_2019_region, region %in% c("NIR")),
+#               aes(x=type, y=CV, colour=type),
+#               position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(spec_2018_2019_region, region %in% c("NIR")),
                  aes(x=type, y=CV),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
@@ -585,9 +585,9 @@ spec_2018_2019_region <- spec_2018_2019 %>%
     geom_flat_violin(data = subset(spec_2018_2019_region, region %in% c("IR")), 
                      aes(x=type, y=spec_mean, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = subset(spec_2018_2019_region, region %in% c("IR")),
-               aes(x=type, y=spec_mean, colour=type),
-               position = position_jitter(width = .1), size = 1, alpha =0.5) +
+#    geom_point(data = subset(spec_2018_2019_region, region %in% c("IR")),
+#               aes(x=type, y=spec_mean, colour=type),
+#               position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(spec_2018_2019_region, region %in% c("IR")),
                  aes(x=type, y=spec_mean),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
@@ -604,9 +604,9 @@ spec_2018_2019_region <- spec_2018_2019 %>%
     geom_flat_violin(data = subset(spec_2018_2019_region, region %in% c("IR")), 
                      aes(x=type, y=CV, fill=type),
                      position = position_nudge(x = .2, y = 0), alpha=0.5, adjust = .8 ) +
-    geom_point(data = subset(spec_2018_2019_region, region %in% c("IR")),
-               aes(x=type, y=CV, colour=type),
-               position = position_jitter(width = .1), size = 1, alpha =0.5) +
+#    geom_point(data = subset(spec_2018_2019_region, region %in% c("IR")),
+#               aes(x=type, y=CV, colour=type),
+#               position = position_jitter(width = .1), size = 1, alpha =0.5) +
     geom_boxplot(data = subset(spec_2018_2019_region, region %in% c("IR")),
                  aes(x=type, y=CV),
                  width=0.2, fill="white", alpha = 0.3, outlier.shape=NA) +
@@ -643,13 +643,13 @@ print(p_IR_mean + rremove("legend")  + rremove("xylab"), vp = define_region(row 
 grid.newpage()
 
 # Create layout : nrow = 3, ncol = 2
-pushViewport(viewport(layout = grid.layout(nrow = 3, ncol = 5)))
+pushViewport(viewport(layout = grid.layout(nrow = 4, ncol = 5)))
 
 # arranging plots
 print(p_QHI_CV, vp = define_region(row = 1:2, col = 1:5))
-print(p_blue_CV + rremove("legend") + rremove("xlab"), vp = define_region(row = 3, col = 1))
-print(p_green_CV + rremove("legend") + rremove("xylab"), vp = define_region(row = 3, col = 2))
-print(p_red_CV + rremove("legend") +  rremove("xylab"), vp = define_region(row = 3, col = 3))
-print(p_NIR_CV + rremove("legend") + rremove("xylab"), vp = define_region(row = 3, col = 4))
-print(p_IR_CV + rremove("legend")  + rremove("xylab"), vp = define_region(row = 3, col = 5))
+print(p_blue_CV + rremove("legend") + rremove("xlab"), vp = define_region(row = 3:4, col = 1))
+print(p_green_CV + rremove("legend") + rremove("xylab"), vp = define_region(row = 3:4, col = 2))
+print(p_red_CV + rremove("legend") +  rremove("xylab"), vp = define_region(row = 3:4, col = 3))
+print(p_NIR_CV + rremove("legend") + rremove("xylab"), vp = define_region(row = 3:4, col = 4))
+print(p_IR_CV + rremove("legend")  + rremove("xylab"), vp = define_region(row = 3:4, col = 5))
 

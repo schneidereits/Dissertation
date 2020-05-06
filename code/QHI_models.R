@@ -2,43 +2,23 @@
 # shawn schneidereit edit
 # 5.3.2020
 
-#  H1 model----
+#  H1 model for spectral mean ----
 
 # spectral mean model
 
-# model 2018 + 2019 HE & KO and mixed
+# model 2018 + 2019 HE & KO 
 
-spec_2018_2019_small$year <- as.factor(spec_2018_2019_small$year)
-
-
-# histogram of reflectance measurments
-(hist <- ggplot(spec_2018_2019_id, aes(x = spec_mean)) +
-    geom_histogram() +
-    theme_classic())
-
-# histogram 
-(hist <- ggplot(spec_2018_2019_small, aes(x = spec_mean)) +
-   geom_histogram() +
-   theme_classic())
-
-# does not converge
-summary(lm(data = spec_2018_2019_small, spec_mean ~ type + year)) # does not converge
-
-# model only 2018+2019 only HE and KO
-
-(hist <- ggplot(spec_2018_2019_small, aes(x = spec_mean)) +
-    geom_histogram() +
-    theme_classic())
+collison_2018_2019_small$year <- as.factor(collison_2018_2019_small$year)
 
 # linear model for H1
 
-m_H1a <- (lm(data = spec_2018_2019_small, spec_mean ~ (type-1) +year)) # (type-1) changes intercpt to HE 
+m_H1a <- (lm(data = collison_2018_2019_small, spec_mean ~ (type-1) + year)) # (type-1) changes intercpt to HE 
 
-          # temporary additon of mixed
-m_H1a <- (lmer(data = QHI_2018_2019_small, spec_mean ~ type + year + (1|plot))) # (type-1) changes intercpt to HE 
 
 
 summary(m_H1a)
+summary(m_H1b)
+stargazer(m_H1a, type = "text")
 
 starg
 
@@ -46,8 +26,6 @@ plot(m_H1a)
 qqnorm(resid(m_H1a))
 qqline(resid(m_H1a)) 
 
-# Visualises random effects 
-(re.effects <- plot_model(m_H1a, type = "re", show.values = TRUE))
 # visulise fixed effect
 (fe.effects <- plot_model(m_H1a, show.values = TRUE))
 
@@ -57,90 +35,16 @@ qqline(resid(m_H1a))
   #scale_color_manual(values = c("#ffa544", "#2b299b")) +
   theme_cowplot())
 
-pred.mm <- ggpredict(m_H1a, terms = c("type")) %>%  # this gives overall predictions for the model
-  rename(type = x) %>%
-  mutate(type = as.character(type))
 
 
-H1a_prediction <- collison_wavelength %>%
-  group_by(type, wavelength) %>%
-  summarise(reflectance = mean(spec_mean))
+# h1 modle for CV ------
+#aka spectral diversity
 
-# attempt to visualize model prediciton (needs work and thinking)
-H1a_prediction <- left_join(H1a_prediction, pred.mm, by = "type") %>%
-  mutate(reflectance = case_when(type == "HE" ~reflectance,
-                                 type == "KO" ~reflectance + predicted))
-
-ggplot(H1a_prediction, aes(x = wavelength, y = reflectance, group = type, color = type)) + 
-  geom_line(alpha = 0.7, size=1.) + 
-  guides(colour = guide_legend(override.aes = list(size=5))) +
-  labs(x = "Wavelength (mm)", y = "Reflectance") +
-  theme_cowplot() +
-  theme(legend.position = "bottom") +
-  scale_color_manual(values = c("#ffa544", "#2b299b"))
-theme_rgb_mean
-
-
-biomass_KO_preds_df <- cbind.data.frame(lower = biomass_KO_preds_df[,1], 
-                                        mean = biomass_KO_preds_df[,2], upper = biomass_KO_preds_df[,3], year = seq(1:20))
-
-veg.cover <- ggplot() +
-  geom_point(data = biomass_hits, aes(x = YEAR, y = Biomass, colour = factor(SUBSITE)), alpha = 0.8, size = 4) +
-  scale_color_manual(values = c("#ffa544", "#2b299b"), name = "", labels = c("Her.", "Kom.")) +
-  scale_fill_manual(values = c("#ffa544","#2b299b")) +
-  scale_x_continuous(breaks = c(1999, 2004, 2009, 2013, 2017, 2018)) +
-  scale_y_continuous(breaks = c(0, 2.5, 5, 7.5, 10)) +
-  geom_ribbon(data = biomass_HE_preds_df, aes(x = year + 1998, ymin = lower, ymax = upper), 
-              fill = "#ffa544", alpha = 0.2) +
-  geom_line(data = biomass_HE_preds_df, aes(x = year + 1998, y = mean), colour = "#ffa544") +
-  geom_ribbon(data = biomass_KO_preds_df, aes(x = year + 1998, ymin = lower, ymax = upper), 
-              fill = "#2b299b", alpha = 0.2) +
-  geom_line(data = biomass_KO_preds_df, aes(x = year + 1998, y = mean), colour = "#2b299b") +
-  theme_QHI() +
-  theme(legend.position = c(0.1, 0.95), 
-        axis.line.x = element_line(color="black", size = 0.5),
-        axis.line.y = element_line(color="black", size = 0.5)) +
-  labs(x = "", y = "Vegetation cover index\n", title = "(a) Vegetation cover\n")
-
-# Plot the predictions 
-
-(ggplot(pred.mm) + 
-    geom_line(aes(x = x, y = predicted)) +          # slope
-    geom_ribbon(aes(x = x, ymin = predicted - std.error, ymax = predicted + std.error), 
-                fill = "lightgrey", alpha = 0.5) +  # error band
-    geom_line(aes(x = x, y = predicted + 25.5348)) +          # slope
-    geom_ribbon(aes(x = x, ymin = predicted + 25.5348 - std.error, ymax = predicted + 25.5348 + std.error), 
-                fill = "lightgrey", alpha = 0.5) +
-    geom_point(data = QHI_spec_plot_2019,                      # adding the raw data (scaled values)
-               aes(x = bareground, y = spec_mean, colour = type)) + 
-    
-    theme_cowplot()
-)
-
-
-# CV model
-
-# QHI 2018 + 2019 model
-(hist <- ggplot(spec_2018_2019_small, aes(x = CV)) +
-    geom_histogram() +
-    theme_classic())
-
-lmer(data = spec_2018_2019_small, CV ~ (type-1) + year + (1|plot))
-# does converge but for consistence should leave out
-
-
-# collison 2018 + 2019 model
-(hist <- ggplot(collison_2018_2019_small, aes(x = CV)) +
-    geom_histogram() +
-    theme_classic())
-
-m_H1b <- lm(data = spec_2018_2019_small, CV ~ type + year)
-
-# temporary addition of mixed
-m_H1b <- lmer(data = QHI_2018_2019_small, CV ~ type- + year + (1|plot))
-
+m_H1b <- (lm(data = collison_2018_2019_small, CV ~ (type-1) + year)) # (type-1) changes intercpt to HE 
 
 summary(m_H1b)
+
+plot(m_H1b)
 
 stargazer(m_H1b, type = "text")
 
@@ -149,8 +53,6 @@ plot(m_H1b)
 qqnorm(resid(m_H1b))
 qqline(resid(m_H1b)) 
 
-# Visualises random effects 
-(re.effects <- plot_model(m_H1b, type = "re", show.values = TRUE))
 # visulise fixed effect
 (fe.effects <- plot_model(m_H1b, show.values = TRUE))
 
@@ -161,53 +63,44 @@ ggpredict(m_H1b, terms = c("type"), type = "fe") %>%
   theme_cowplot()
 
 
-# H3 models (band selection) ----
+# H2 models (band selection) ----
 
 # linear model with supervised band selection 2018+2019
 supervised_band_selection$year <-  as.factor(supervised_band_selection$year)
 
+supervised_band_selection <- supervised_band_selection %>% filter(type=="mixed")
 
-m_H3a <- lm(data = supervised_band_selection, spec_mean ~ type + year)
+# linear model with manual band selection for spectral diversity
+m_H2a <- lm(data = supervised_band_selection, spec_mean ~ type + year)
 
-summary(m_H3a)
+summary(m_H2a)
 
-plot(m_H3a)
-qqnorm(resid(m_H3a))
-qqline(resid(m_H3a)) 
+plot(m_H2a)
+qqnorm(resid(m_H2a))
+qqline(resid(m_H2a)) 
 
-
-# Visualises random effects 
-(re.effects <- plot_model(m_H3a, type = "re", show.values = TRUE))
 # visulise fixed effect
-(fe.effects <- plot_model(m_H3a, show.values = TRUE))
+(fe.effects <- plot_model(m_H2a, show.values = TRUE))
 
 
-# CV
+# linear model with manual band selection for spectral diversity
 
-(hist <- ggplot(supervised_band_selection, aes(x = CV)) +
-    geom_histogram() +
-    theme_classic())
+m_H2b <- lm(data = supervised_band_selection, CV ~ type + year)
 
-# linear model with band selection
+summary(m_H2b)
 
-m_H3b <- lm(data = supervised_band_selection, CV ~ type + year)
-
-summary(m_H3b)
-
-plot(m_H3b)
-qqnorm(resid(m_H3b))
-qqline(resid(m_H3b)) 
+plot(m_H2b)
+qqnorm(resid(m_H2b))
+qqline(resid(m_H2b)) 
 
 
-# Visualises random effects 
-(re.effects <- plot_model(m_H3b, type = "re", show.values = TRUE))
 # visulise fixed effect
-(fe.effects <- plot_model(m_H3b, show.values = TRUE))
+(fe.effects <- plot_model(m_H2b, show.values = TRUE))
 
 
 
 
-############ ISI band selecrtion models
+############ ISI band selecrtion models ----
 
 (hist <- ggplot(lowD, aes(x = spec_mean)) +
     geom_histogram() +
@@ -217,48 +110,44 @@ qqline(resid(m_H3b))
 
 QHI_lowD$year <- as.factor(QHI_lowD$year)
 
-m_H3e <- lm(data = QHI_lowD, spec_mean ~ type + year)
+m_H2e <- lm(data = QHI_lowD, spec_mean ~ type + year)
 
-summary(m_H3e)
+summary(m_H2e)
 
-plot(m_H3e)
-qqnorm(resid(m_H3e))
-qqline(resid(m_H3e)) 
+plot(m_H2e)
+qqnorm(resid(m_H2e))
+qqline(resid(m_H2e)) 
 
 
 # Visualises random effects 
-(re.effects <- plot_model(m_H3e, type = "re", show.values = TRUE))
+(re.effects <- plot_model(m_H2e, type = "re", show.values = TRUE))
 # visulise fixed effect
-(fe.effects <- plot_model(m_H3e, show.values = TRUE))
+(fe.effects <- plot_model(m_H2e, show.values = TRUE))
 
 
 # CV
 
-(hist <- ggplot(QHI_lowD, aes(x = CV)) +
-    geom_histogram() +
-    theme_classic())
-
 # linear model with band selection
 
-m_H3f <- lm(data = QHI_lowD, CV ~ type + year)
+m_H2f <- lm(data = QHI_lowD, CV ~ type + year)
 
-summary(m_H3f)
+summary(m_H2f)
 
-plot(m_H3f)
-qqnorm(resid(m_H3f))
-qqline(resid(m_H3f)) 
+plot(m_H2f)
+qqnorm(resid(m_H2f))
+qqline(resid(m_H2f)) 
 
 
 # Visualises random effects 
-(re.effects <- plot_model(m_H3f, type = "re", show.values = TRUE))
+(re.effects <- plot_model(m_H2f, type = "re", show.values = TRUE))
 # visulise fixed effect
-(fe.effects <- plot_model(m_H3f, show.values = TRUE))
+(fe.effects <- plot_model(m_H2f, show.values = TRUE))
 
 
 # combined model vis
 
 # spectral mean
-(p_H3a <- dwplot(list(m_H1a, m_H3a, m_H3e), 
+(p_H2a <- dwplot(list(m_H1a, m_H2a, m_H2e), 
                  vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 1)) +
     theme_cowplot() +
     coord_flip() +
@@ -266,11 +155,11 @@ qqline(resid(m_H3f))
           legend.justification = c(0, 0),
           legend.title.align = .5))
 
-ggsave(p_H3a, path = "figures", filename = "H3_models_mean.png", height = 10, width = 12)
+ggsave(p_H2a, path = "figures", filename = "H2_models_mean.png", height = 10, width = 12)
 
 # CV
 # effect sizes and error dont seem to correspond with model summary...
-(p_H3b <-dwplot(list(m_H1b, m_H3b, m_H3f), 
+(p_H2b <-dwplot(list(m_H1b, m_H2b, m_H2f), 
                 vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 1)) +
     theme_cowplot() +
     coord_flip() +
@@ -278,26 +167,26 @@ ggsave(p_H3a, path = "figures", filename = "H3_models_mean.png", height = 10, wi
           legend.justification = c(0, 0),
           legend.title.align = .5))
 
-ggsave(p_H3b, path = "figures", filename = "H3_models_cv.png", height = 10, width = 12)
+ggsave(p_H2b, path = "figures", filename = "H2_models_cv.png", height = 10, width = 12)
 
-grid.arrange(p_H3a, p_H3b)  
+grid.arrange(p_H2a, p_H2b)  
 
 
 # If needed I could use ggpredict to creat boxplot of predicted spec_mean and cv by VT by Model (but might not be compatable with lme4)
 # https://strengejacke.github.io/ggeffects/reference/ggpredict.html
 
-ggpredict(m_H3a, terms = c("type"), type = "fe") %>% 
+ggpredict(m_H2a, terms = c("type"), type = "fe") %>% 
   plot(rawdata = F) +
   #scale_color_manual(values = c("#ffa544", "#2b299b")) +
   theme_cowplot()
 
-ggpredict(m_H3b, terms = c("type" ), type = "fe") %>% 
+ggpredict(m_H2b, terms = c("type" ), type = "fe") %>% 
   plot(rawdata = F) +
   #scale_color_manual(values = c("#ffa544", "#2b299b")) +
   theme_cowplot()
 
-dat <- ggpredict(H3a, terms = c("c172code", "c161sex"))
-ggplot(H3a, aes(type, predicted, colour = group)) +
+dat <- ggpredict(H2a, terms = c("c172code", "c161sex"))
+ggplot(H2a, aes(type, predicted, colour = group)) +
   geom_point(position = position_dodge(.1)) +
   geom_errorbar(
     aes(ymin = conf.low, ymax = conf.high),
@@ -315,14 +204,14 @@ ggplot(H3a, aes(type, predicted, colour = group)) +
     theme_cowplot())
 
 
-(p_H3a <- ggpredict(m_H3a, terms = c("type[HE,KO]"), type = "fe", show.title = F) %>% 
+(p_H2a <- ggpredict(m_H2a, terms = c("type[HE,KO]"), type = "fe", show.title = F) %>% 
     plot(rawdata = F) +
     #scale_color_manual(values = c("#ffa544", "#2b299b")) +
     ylim(0.1,0.4) +
     labs(y= "Mean reflectance") +
     theme_cowplot())
 
-(p_H3e <- ggpredict(m_H3e, terms = c("type[HE,KO]"), type = "fe", show.title = F) %>% 
+(p_H2e <- ggpredict(m_H2e, terms = c("type[HE,KO]"), type = "fe", show.title = F) %>% 
     plot(rawdata = F) +
     #scale_color_manual(values = c("#ffa544", "#2b299b")) +
     ylim(0.1,0.4) +
@@ -334,26 +223,26 @@ ggplot(H3a, aes(type, predicted, colour = group)) +
     plot(rawdata = F) +
     scale_color_manual(values = c("#ffa544", "#2b299b", "grey")) +
     ylim(0,0.2) +
-    labs(y= "spectral diversity") +
+    labs(y= "Spectral diversity") +
     theme_cowplot())
 
 
-(p_H3b <- ggpredict(m_H3b, terms = c("type[KO,HE]"), type = "fe", show.title = F) %>% 
+(p_H2b <- ggpredict(m_H2b, terms = c("type[HE,KO]"), type = "fe", show.title = F) %>% 
     plot(rawdata = F) +
     #scale_color_manual(values = c("#ffa544", "#2b299b")) ++
     ylim(0,0.2) +
-    labs(y= "spectral diversity") +
+    labs(y= "") +
     theme_cowplot())
 
-(p_H3f <- ggpredict(m_H3f, terms = c("type[HE,KO]"), type = "fe", show.title = F) %>% 
+(p_H2f <- ggpredict(m_H2f, terms = c("type[HE,KO]"), type = "fe", show.title = F) %>% 
     plot(rawdata = F) +
     #scale_color_manual(values = c("#ffa544", "#2b299b")) +
     ylim(0,0.2) +
-    labs(y= "spectral divrsity") +
+    labs(y= "") +
     theme_cowplot())
 
-grid.arrange(p_H1a, p_H3a, p_H3e, 
-             p_H1b, p_H3b, p_H3f, nrow=2) 
+grid.arrange(p_H1a, p_H2a, p_H2e, 
+             p_H1b, p_H2b, p_H2f, nrow=2) 
 
 
 #############.
@@ -363,19 +252,16 @@ grid.arrange(p_H1a, p_H3a, p_H3e,
 supervised_band_selection_2019 <- supervised_band_selection %>%
   filter(year == 2019)
 
-m_H3c <- lmer(data = supervised_band_selection_2019, spec_mean ~ type + (1|plot))
+m_H2c <- lmer(data = supervised_band_selection_2019, spec_mean ~ type + (1|plot))
 
-summary(m_H3c)
+summary(m_H2c)
 
-plot(m_H3c)
-qqnorm(resid(m_H3c))
-qqline(resid(m_H3c)) 
+plot(m_H2c)
+qqnorm(resid(m_H2c))
+qqline(resid(m_H2c)) 
 
-
-# Visualises random effects 
-(re.effects <- plot_model(m_H3c, type = "re", show.values = TRUE))
 # visulise fixed effect
-(fe.effects <- plot_model(m_H3c, show.values = TRUE))
+(fe.effects <- plot_model(m_H2c, show.values = TRUE))
 
 
 # CV
@@ -387,66 +273,54 @@ qqline(resid(m_H3c))
 
 # models with supervised band selection for dimention reduction 
 
-m_H3d <- lmer(data = supervised_band_selection_2019, CV ~ type + (1|plot))
+m_H2d <- lmer(data = supervised_band_selection_2019, CV ~ type + (1|plot))
 
-summary(m_H3d)
+summary(m_H2d)
 
-plot(m_H3d)
-qqnorm(resid(m_H3d))
-qqline(resid(m_H3d)) 
+plot(m_H2d)
+qqnorm(resid(m_H2d))
+qqline(resid(m_H2d)) 
 
-
-# Visualises random effects 
-(re.effects <- plot_model(m_H3d, type = "re", show.values = TRUE))
 # visulise fixed effect
-(fe.effects <- plot_model(m_H3d, show.values = TRUE))
+(fe.effects <- plot_model(m_H2d, show.values = TRUE))
 
 
 #  model with ISI band selection only 2019
 
 
-m_H3g <- lm(data = lowD_2019selection, spec_mean ~ type + year)
+m_H2g <- lm(data = lowD_2019selection, spec_mean ~ type + year)
 
-summary(m_H3g)
+summary(m_H2g)
 
-plot(m_H3g)
-qqnorm(resid(m_H3g))
-qqline(resid(m_H3g)) 
+plot(m_H2g)
+qqnorm(resid(m_H2g))
+qqline(resid(m_H2g)) 
 
 
-# Visualises random effects 
-(re.effects <- plot_model(m_H3g, type = "re", show.values = TRUE))
 # visulise fixed effect
-(fe.effects <- plot_model(m_H3g, show.values = TRUE))
+(fe.effects <- plot_model(m_H2g, show.values = TRUE))
 
 
-# CV
-
-(hist <- ggplot(supervised_band_selection_2019, aes(x = CV)) +
-    geom_histogram() +
-    theme_classic())
 
 
 # models with supervised band selection for dimention reduction 
 
-m_H3h <- lm(data = lowD_2019selection, CV ~ type +year)
+m_H2h <- lm(data = lowD_2019selection, CV ~ type +year)
 
-summary(m_H3h)
+summary(m_H2h)
 
-plot(m_H3h)
-qqnorm(resid(m_H3h))
-qqline(resid(m_H3h)) 
+plot(m_H2h)
+qqnorm(resid(m_H2h))
+qqline(resid(m_H2h)) 
 
 
-# Visualises random effects 
-(re.effects <- plot_model(m_H3h, type = "re", show.values = TRUE))
 # visulise fixed effect
-(fe.effects <- plot_model(m_H3h, show.values = TRUE))
+(fe.effects <- plot_model(m_H2h, show.values = TRUE))
 
 # combined model vis
 
 # spectral mean
-(p_H3a <- dwplot(list(m_H1a, m_H3a, m_H3e, m_H3g), 
+(p_H2a <- dwplot(list(m_H1a, m_H2a, m_H2e, m_H2g), 
                  vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 1)) +
     theme_cowplot() +
     coord_flip() +
@@ -454,11 +328,11 @@ qqline(resid(m_H3h))
           legend.justification = c(0, 0),
           legend.title.align = .5))
 
-ggsave(p_H3a, path = "figures", filename = "H3_models_mean.png", height = 10, width = 12)
+ggsave(p_H2a, path = "figures", filename = "H2_models_mean.png", height = 10, width = 12)
 
 # CV
 # effect sizes and error dont seem to correspond with model summary...
-(p_H3b <-dwplot(list(m_H1b, m_H3b, m_H3f, m_H3h), 
+(p_H2b <-dwplot(list(m_H1b, m_H2b, m_H2f, m_H2h), 
                 vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 1)) +
     theme_cowplot() +
     coord_flip() +
@@ -466,9 +340,9 @@ ggsave(p_H3a, path = "figures", filename = "H3_models_mean.png", height = 10, wi
           legend.justification = c(0, 0),
           legend.title.align = .5))
 
-ggsave(p_H3b, path = "figures", filename = "H3_models_cv.png", height = 10, width = 12)
+ggsave(p_H2b, path = "figures", filename = "H2_models_cv.png", height = 10, width = 12)
 
-grid.arrange(p_H3a, p_H3b)  
+grid.arrange(p_H2a, p_H2b)  
 
 
 
@@ -517,7 +391,7 @@ correlation_small <- cor(collison_spec_plot_small[,c(5, 8:9, 15:16)])
 
 library(scales)
 
-collison_spec_plot_small_model <- collison_spec_plot_small_visable# %>% filter(year==2018)
+collison_spec_plot_small_model <- collison_spec_plot_small_visable #%>% filter(year==2018)
 
 
 # to scale all continous varibales
@@ -526,27 +400,6 @@ collison_spec_plot_small_model$evenness <- c(scale(collison_spec_plot_small$even
 collison_spec_plot_small_model$bareground <- c(scale(collison_spec_plot_small$bareground, center = TRUE, scale = TRUE))
 collison_spec_plot_small_model$year <- as.factor(collison_spec_plot_small$year)
 
-# attemt to create alternate original scale predicition
-# Scale cars data:
-scars <- scale(cars)
-# Save scaled attibutes:
-scaleList <- list(scale = attr(collison_spec_plot_small, "scaled:scale"),
-                  center = attr(collison_spec_plot_small, "scaled:center"))
-# scars is a matrix, make it a data frame like cars for modeling:
-smod <- lm(data = collison_spec_plot_small_model, 
-           CV ~ (type-1)  + year + (type*richness) + (type*evenness) + (type*bareground))
-# Predictions on scaled data:
-sp <- predict(smod, collison_spec_plot_small_model)
-# Fit the same model to the original cars data:
-omod <- lm(data = collison_spec_plot_small, 
-               CV ~ (type-1)  + year + (type*richness) + (type*evenness) + (type*bareground))
-op <- predict(omod, collison_spec_plot_small)
-# Convert scaled prediction to original data scale:
-usp <- sp * scaleList$scale["richness"] + scaleList$center["richness"]
-# Compare predictions:
-all.equal(op, usp)
-
-
 # CV 2018 2019
 
 (hist <- ggplot(collison_spec_plot_small_model, aes(x = CV)) +
@@ -554,9 +407,10 @@ all.equal(op, usp)
     theme_classic())
 
 m_H2b <- lm(data = collison_spec_plot_small_model, 
-              CV ~ (type-1)  + year + (type*richness) + (type*evenness) + (type*bareground))
+              CV ~ (type-1) + year + (type*richness) + (type*evenness) + (type*bareground))
 
 summary(m_H2b)
+stargazer(m_H2b, type="text")
 
 
 plot(m_H2b)
@@ -592,6 +446,7 @@ ggpredict(m_H2b, terms = c("type"), type = "fe") %>%
     plot(rawdata = TRUE, show.title = F) +
     scale_color_manual(values = c("#ffa544", "#2b299b")) +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
+    xlab("Richness")+
    # coord_cartesian(ylim = c(0.01,0.4), xlim= c(-2,2)) +
     theme_cowplot())
 
@@ -602,6 +457,7 @@ ggpredict(m_H2b, terms = c("type"), type = "fe") %>%
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
    # coord_cartesian(ylim = c(0.01,0.4), xlim = c(-2,2)) +
     theme_cowplot()+ 
+    xlab("Evenness")+
     theme(legend.position = "none"))
 
 (p_H2b_ground <- ggpredict(m_H2b, terms = c("bareground", "type"), type = "fe") %>% 
@@ -609,10 +465,13 @@ ggpredict(m_H2b, terms = c("type"), type = "fe") %>%
     scale_color_manual(values = c("#ffa544", "#2b299b")) +
     scale_fill_manual(values = c("#ffa544", "#2b299b")) +
     theme_cowplot()+
+    xlab("Bare ground")+
    # coord_cartesian(ylim = c(0.01,0.4), xlim = c(-2,2)) +
     theme(legend.position = "none"))
 
-grid.arrange(p_H2b_rich, p_H2b_even, p_H2b_ground, nrow=1)
+
+
+grid.arrange(p_H2b_rich, p_H2b_even, p_H2b_ground, nrow=2)
 
 
 
@@ -1137,3 +996,5 @@ geom_ribbon(aes(x = x, ymin = predicted - std.error, ymax = predicted + std.erro
 
 
 grid.arrange(p_H2a_rich, p_H2a_even, p_H2a_ground, nrow = 1)
+
+
