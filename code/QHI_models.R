@@ -262,11 +262,6 @@ qqline(resid(m_H2c))
 
 # CV
 
-(hist <- ggplot(supervised_band_selection_2019, aes(x = CV)) +
-    geom_histogram() +
-    theme_classic())
-
-
 # models with supervised band selection for dimention reduction 
 
 m_H2d <- lmer(data = supervised_band_selection_2019, CV ~ type + (1|plot))
@@ -376,10 +371,6 @@ correlation_small <- cor(collison_spec_plot_small[,c(5, 8:9, 15:16)])
 
 
 # spectral mean 
-(hist <- ggplot(collison_spec_plot_small, aes(x = spec_mean)) +
-    geom_histogram() +
-    theme_classic())
-
 
 # linear model for H2 2018 2019
 
@@ -684,9 +675,6 @@ pr <- ggpredict(m_H2a, c( "richness", "type"))
 # use plot() method, easier than own ggplot-code from scratch
 plot(pr)
 
-
-# Visualises random effects 
-(re.effects <- plot_model(m_H2a, type = "re", show.values = TRUE))
 # visulise fixed effect
 (fe.effects <- plot_model(m_H2a, show.values = TRUE))
 
@@ -705,20 +693,7 @@ ggplot(e.df$`type:richness`, aes(x=richness, y=fit, color=type, ymin=lower, ymax
   scale_color_manual(values = c("#ffa544", "#2b299b")) +
   theme_cowplot()
 
-geom_ribbon(aes(x = x, ymin = predicted - std.error, ymax = predicted + std.error), 
-            fill = "lightgrey", alpha = 0.5) +  # error band
-  geom_line(aes(x = x, y = predicted + 25.5348)) +          # slope
-  
-  
-  geom_ribbon(data = e.df$`type:richness`, aes(x = year + 1998, ymin = lower, ymax = upper), 
-              fill = "#ffa544", alpha = 0.2) +
-  geom_line(data = biomass_HE_preds_df, aes(x = year + 1998, y = mean), colour = "#ffa544") +
-  geom_ribbon(data = biomass_KO_preds_df, aes(x = year + 1998, ymin = lower, ymax = upper), 
-              fill = "#2b299b", alpha = 0.2) +
-  geom_line(data = biomass_KO_preds_df, aes(x = year + 1998, y = mean), colour = "#2b299b") +
-  
-  
-  
+
   ggpredict(m_H2a, terms = c("type"), type = "fe") %>% 
   plot(rawdata = TRUE, show.title = F) +
   scale_color_manual(values = c("#ffa544", "#2b299b")) +
@@ -834,20 +809,6 @@ ggplot(e.df$`type:richness`, aes(x=richness, y=fit, color=type, ymin=lower, ymax
   scale_color_manual(values = c("#ffa544", "#2b299b")) +
   theme_cowplot()
 
-geom_ribbon(aes(x = x, ymin = predicted - std.error, ymax = predicted + std.error), 
-            fill = "lightgrey", alpha = 0.5) +  # error band
-  geom_line(aes(x = x, y = predicted + 25.5348)) +          # slope
-  
-  
-  geom_ribbon(data = e.df$`type:richness`, aes(x = year + 1998, ymin = lower, ymax = upper), 
-              fill = "#ffa544", alpha = 0.2) +
-  geom_line(data = biomass_HE_preds_df, aes(x = year + 1998, y = mean), colour = "#ffa544") +
-  geom_ribbon(data = biomass_KO_preds_df, aes(x = year + 1998, ymin = lower, ymax = upper), 
-              fill = "#2b299b", alpha = 0.2) +
-  geom_line(data = biomass_KO_preds_df, aes(x = year + 1998, y = mean), colour = "#2b299b") +
-  
-  
-  
   ggpredict(m_H2a, terms = c("type"), type = "fe") %>% 
   plot(rawdata = TRUE, show.title = F) +
   scale_color_manual(values = c("#ffa544", "#2b299b")) +
