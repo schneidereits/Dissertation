@@ -375,9 +375,6 @@ correlation_small <- cor(collison_spec_plot_small[,c(5, 8:9, 15:16)])
 # linear model for H2 2018 2019
 
 
-
-library(scales)
-
 collison_spec_plot_small_model <- collison_spec_plot_small_visable #%>% filter(year==2018)
 
 
