@@ -11,6 +11,7 @@ head(QHI_pointframe)
 levels(QHI_pointframe$SPP) # Checking all spelling is correct
 unique(QHI_pointframe$YEAR) # Check years
 
+
 QHI_cover <- read.csv("data/QHI_biodiversity/QHI_cover_1999_2019_sas.csv")
 head(QHI_cover)
 levels(QHI_cover$name) # Checking all spelling is correct
