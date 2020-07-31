@@ -292,8 +292,8 @@ fviz_pca_var(res.pca_H2, col.var = "contrib",
                           mean.point = TRUE, # braycenter mean point
                           # to color arrow by variable type
                           col.var = factor(c("spectral", "spectral", "diversity", "diversity",
-                                             "environmenal", "environmenal", "environmenal", 
-                                             "environmenal", "environmenal")),
+                                             "environmental", "environmental", "environmental", 
+                                             "environmental", "environmental")),
                           # gradient.cols = c("#00AFBB", "#00AFBB", "#FC4E07", "#FC4E07",
                           #                  "#E7B800",  "#E7B800",  "#E7B800",  "#E7B800",  "#E7B800"),
                           # col.var = "cos2",
